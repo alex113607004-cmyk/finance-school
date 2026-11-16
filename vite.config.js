@@ -1,0 +1,5 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { viteSingleFile } from 'vite-plugin-singlefile';
+export default defineConfig({base:'./',plugins:[react(),tailwindcss(),viteSingleFile()],build:{outDir:'dist/pages',emptyOutDir:true,assetsInlineLimit:10000000},test:{environment:'jsdom',globals:true,setupFiles:['./src/test-setup.js'],include:['src/**/*.test.{js,jsx}'],pool:'forks',maxWorkers:1}});
