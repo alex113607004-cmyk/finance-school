@@ -203,3 +203,5 @@ React/jsdom 驗證摘要四區、原始值與公式展開、來源連結、切�
 - 測試環境對大型既有看盤 DOM 的互動曾超過預設 5 秒，將 Vitest 單測時限設為 10 秒；未改動行情斷言或略過測試。
 
 - 最終本機 `npm test`：14 個檔案、100 個測試全部通過。`npm run build`：Pages 的 index.html、market-data.json、analysis-data.json 與可選 Worker 建置成功。
+
+- GitHub Actions 的證交所行情與營收更新成功；台積電 IR 主站與公司 CDN 均回覆 HTTP 403。本機仍可實際下載、核對全部季報。現有首次公告快照不改寫查核時間，頁面顯示更新失敗狀態；下一季未結束仍可驗算已核實四季，下一季已結束且不能核實時停止估值。此為已知外部限制，不能宣稱公司 IR 在 GitHub 自動擷取成功。

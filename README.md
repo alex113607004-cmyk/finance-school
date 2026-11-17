@@ -19,7 +19,7 @@ npm run dev -- --port 4173
 # http://127.0.0.1:4173/#analysis/2330
 ```
 
-盤後資料可直接使用已保存快照。另行更新：`npm run update:market`、`npm run update:analysis`（後者需 Python 3 與 poppler-utils 的 pdftotext）。自動部署已包含更新步驟。此版沒有即時行情憑證，不把盤後價當即時價。
+盤後資料可直接使用已保存快照。另行更新：`npm run update:market`、`npm run update:analysis`（後者需 Python 3 與 poppler-utils 的 pdftotext）。自動部署已包含更新步驟；GitHub 執行環境對公司 IR 回覆 403 時會顯示警示、保留查核快照，在下一季已結束而無法核實新季時停止估值（詳見資料文件）。此版沒有即時行情憑證，不把盤後價當即時價。
 
 ## 目前功能
 

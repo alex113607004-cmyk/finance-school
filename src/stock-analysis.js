@@ -55,13 +55,18 @@ export function historicalValuation({quote,history,filings,expectedPeriod,now=ne
   if(!asOf||!finite(quote.close)||quote.close<=0)return {...base,reasons:['尚無有效盤後收盤價。']};
   const ttm=trailingEPS(filings?.reports,asOf),samples=historicalSamples(history,filings,asOf),valid=samples.filter(s=>finite(s.pe)&&s.pe>0);
   const reasons=[];
+  // Quarterly first-release facts do not expire every few days. A later full quarter
+  // cannot be reported before it ends. Once one has ended, a failed/stale check can
+  // no longer establish that our latest quarter is still current: fail closed then.
+  const currentDay=taipeiDay(now),currentQuarter={year:Number(currentDay.slice(0,4)),quarter:Math.floor((Number(currentDay.slice(5,7))-1)/3)+1};
+  const newerQuarterEnded=ttm.latest&&quarterId(currentQuarter)>quarterId(ttm.latest)+1;
   if(!filings?.basisConfirmed||filings?.reviewRequired)reasons.push('財報版本或普通股每股口徑尚待確認。');
   if(!filings?.checkedAt||!finite(Date.parse(filings.checkedAt)))reasons.push('公司公告查核時間未確認。');
-  if(filings?.warnings?.some(s=>s.startsWith('公司公告更新失敗')))reasons.push('公司公告本次查核失敗，暫不能確認最新已公告財報。');
+  if(newerQuarterEnded&&filings?.warnings?.some(s=>s.startsWith('公司公告更新失敗')))reasons.push('下一季已結束且公司公告查核失敗，暫不能確認最新已公告財報。');
   if(!ttm.available)reasons.push(ttm.reason);else if(ttm.eps<=0)reasons.push('近四季 EPS 為零或負值，本益比法不適用。');
   if(expectedPeriod&&ttm.latest&&quarterId(expectedPeriod)>quarterId(ttm.latest))reasons.push('官方資料已有更新季報，尚未核實該季首次公告 EPS。');
   if(ttm.latest&&Number(new Date(asOf)-new Date(ttm.latest.periodEnd))/86400000>200)reasons.push('財報涵蓋期間過舊，請確認有無新公告。');
-  if(filings?.checkedAt&&Number(new Date(now)-new Date(filings.checkedAt))/86400000>8)reasons.push('公司公告逾 8 日未成功查核，不能確認是否仍為最新版本。');
+  if(newerQuarterEnded&&filings?.checkedAt&&Number(new Date(now)-new Date(filings.checkedAt))/86400000>8)reasons.push('下一季已結束且公司公告逾 8 日未成功查核，不能確認是否仍為最新版本。');
   if(history?.partial||history?.rows?.some(r=>!validCandle(r))||new Set(history?.rows?.map(r=>r.date)).size!==(history?.rows?.length||0))reasons.push('行情月份缺漏、重複日期或 K 線欄位無效，停止估值與均線判讀。');
   if(Number(new Date(taipeiDay(now))-new Date(asOf))/86400000>10)reasons.push('盤後行情距今逾 10 日，請更新後再分析現價。');
   if(valid.length<minSamples)reasons.push(`有效月末樣本 ${valid.length} 筆，至少需要 ${minSamples} 筆。`);

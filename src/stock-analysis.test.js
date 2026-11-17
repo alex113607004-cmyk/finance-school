@@ -58,9 +58,11 @@ describe('point-in-time Taiwanese stock analysis',()=>{
   expect(calc({filings:{...filings,reviewRequired:true}}).available).toBe(false);
   expect(calc({filings:{...filings,checkedAt:null}}).available).toBe(false);
   expect(calc({history:{...history,rows:[...history.rows,history.rows.at(-1)]}}).available).toBe(false);
-  expect(calc({filings:{...filings,warnings:['公司公告更新失敗：offline']}}).reasons.join()).toMatch(/查核失敗/);
+  // Preserve dated, already verified facts while the following quarter is still in progress.
+  expect(calc({filings:{...filings,warnings:['公司公告更新失敗：offline']}}).available).toBe(true);
+  expect(calc({filings:{...filings,warnings:['公司公告更新失敗：offline']},now:new Date('2027-01-02')}).reasons.join()).toMatch(/下一季已結束.*查核失敗/);
   expect(calc({expectedPeriod:{year:2099,quarter:1}}).reasons.join()).toMatch(/更新季報/);
-  expect(calc({now:new Date(new Date(filings.checkedAt).getTime()+9*86400000)}).reasons.join()).toMatch(/8 日/);
+  expect(calc({now:new Date('2027-01-02')}).reasons.join()).toMatch(/8 日/);
   expect(maPosition({...quote,date:'2020-01-01'},history).available).toBe(false);
   const broken=[...history.rows.slice(0,-1),{...quote,close:null}];expect(validCandle(broken.at(-1))).toBe(false);expect(dailyAverages(broken).at(-1).ma5).toBeNull();
  });
