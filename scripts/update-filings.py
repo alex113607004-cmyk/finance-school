@@ -7,9 +7,25 @@ path = pathlib.Path('data/2330-filings.json')
 data = json.loads(path.read_text())
 today = dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
 data['warnings'] = []
+data['verificationSources'] = []
 def get(url):
-    with urllib.request.urlopen(url, timeout=35) as response:
-        return response.read()
+    # Company-maintained public IR CDN is also linked by TSMC search/canonical pages.
+    # A GitHub runner may be denied by one hostname; never substitute a third-party mirror.
+    candidates=[url]
+    if url.startswith('https://investor.tsmc.com/'):
+        candidates.append(url.replace('https://investor.tsmc.com/','https://investor.cld.tsmc.com/',1))
+    error=None
+    for candidate in candidates:
+        try:
+            request=urllib.request.Request(candidate,headers={'User-Agent':'finance-school/2.0 (+https://github.com/alex113607004-cmyk/finance-school; educational source verification)','Accept':'text/html,application/pdf'})
+            with urllib.request.urlopen(request, timeout=35) as response:
+                body=response.read()
+                data['verificationSources'].append({'url':response.geturl(),'checkedAt':dt.datetime.now(dt.timezone.utc).isoformat()})
+                return body
+        except (urllib.error.URLError,TimeoutError) as e:
+            print(json.dumps({'sourceCheckFailed':candidate,'status':getattr(e,'code','network')}))
+            error=e
+    raise error
 def text_pdf(url):
     raw = get(url)
     with tempfile.TemporaryDirectory() as tmp:

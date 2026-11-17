@@ -15,7 +15,7 @@ describe('point-in-time Taiwanese stock analysis',()=>{
   expect(trailingEPS(filings.reports.filter(r=>!(r.year===2026&&r.quarter===2)),'2026-11-17').available).toBe(false);
  });
  it('independently recalculates monthly PEs and interpolated historical valuation from original TWSE responses',()=>{
-  const result=calc();expect(result.available).toBe(true);expect(result.validSamples.length).toBeGreaterThanOrEqual(34);
+  const result=calc();expect(result.available,result.reasons.join('；')).toBe(true);expect(result.validSamples.length).toBeGreaterThanOrEqual(34);
   const rawFiles=fs.readdirSync('data/stock-day/2330').filter(f=>f.endsWith('.json'));
   const sourceRows=rawFiles.map(f=>JSON.parse(fs.readFileSync('data/stock-day/2330/'+f)).body.data.at(-1));
   const values=result.validSamples.map(sample=>{
@@ -41,10 +41,10 @@ describe('point-in-time Taiwanese stock analysis',()=>{
    const groups=aggregateCandles(history.rows,kind,{asOf:quote.date,coverageStart:history.coverageStart});
    for(const g of groups){const rows=history.rows.filter(r=>r.date>=g.start&&r.date<=g.end);expect(g.open).toBe(rows[0].open);expect(g.close).toBe(rows.at(-1).close);expect(g.high).toBe(Math.max(...rows.map(r=>r.high)));expect(g.low).toBe(Math.min(...rows.map(r=>r.low)));expect(g.volume).toBe(rows.reduce((s,r)=>s+r.volume,0));}
    expect(groups.at(-1).unfinished).toBe(true);
-   expect(aggregateCandles(history.rows,kind,{asOf:'2027-01-01',coverageStart:history.coverageStart}).at(-1).unfinished).toBe(false);
+   expect(aggregateCandles(history.rows,kind,{asOf:'2099-01-01',coverageStart:history.coverageStart}).at(-1).unfinished).toBe(false);
   }
   expect(calendarPeriod('2026-01-01','week')).toEqual({start:'2025-12-29',end:'2026-01-04'});
-  expect(aggregateCandles(history.rows.slice(1,5),'week',{asOf:'2027-01-01',coverageStart:history.rows[1].date})[0].truncated).toBe(true);
+  expect(aggregateCandles(history.rows.slice(1,5),'week',{asOf:'2099-01-01',coverageStart:history.rows[1].date})[0].truncated).toBe(true);
  });
  it.each([0,-1])('does not apply PE when TTM EPS is %s',eps=>{
   const four=filings.reports.slice(-4),mutated={...filings,reports:[...filings.reports.slice(0,-4),...four.map(r=>({...r,eps:eps/4}))]};
@@ -66,6 +66,7 @@ describe('point-in-time Taiwanese stock analysis',()=>{
  });
  it('separates assumptions and rejects blank/invalid/reversed scenario inputs',()=>{
   expect(scenario(10,15,20)).toEqual({available:true,low:150,high:200});
+  expect(scenario(0,'','').reason).toMatch(/零或負/);
   for(const v of [['',15,20],[10,21,20],[10,0,20],[Infinity,10,20],[10,NaN,20]])expect(scenario(...v).available).toBe(false);
  });
 });

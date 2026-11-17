@@ -80,8 +80,9 @@ export function maPosition(quote,history){
 }
 export function scenario(eps,lowPE,highPE){
   const values=[eps,lowPE,highPE].map(v=>typeof v==='string'&&v.trim()===''?NaN:Number(v));
-  if(!values.every(finite))return {available:false,reason:'請完整輸入有限數值。'};
+  if(!finite(values[0]))return {available:false,reason:'請完整輸入有限數值。'};
   if(values[0]<=0)return {available:false,reason:'EPS 為零或負值，本益比法不適用，暫無適用估值。'};
+  if(!values.every(finite))return {available:false,reason:'請完整輸入有限數值。'};
   if(values[1]<=0||values[2]<=0||values[1]>values[2])return {available:false,reason:'倍數須為正值，下限不可大於上限。'};
   const low=values[0]*values[1],high=values[0]*values[2];
   return finite(low)&&finite(high)?{available:true,low,high}:{available:false,reason:'數字超出可計算範圍。'};
