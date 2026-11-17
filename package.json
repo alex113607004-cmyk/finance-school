@@ -10,6 +10,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "check": "npm test && npm run build",
+    "update:us": "node scripts/update-us.mjs",
     "update:market": "node scripts/update-market.mjs",
     "update:analysis": "python3 scripts/update-filings.py && node scripts/update-analysis.mjs",
     "update:universe": "node scripts/update-universe.mjs",
