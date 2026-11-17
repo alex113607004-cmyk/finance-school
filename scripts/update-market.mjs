@@ -1,6 +1,6 @@
 // Public official data only. Build a dated snapshot for GitHub Pages; no API key.
 import fs from 'node:fs';
-import {API,ENDPOINTS,stockData,historyRows,completedDateCandidates,applyDatedValuation,preferHistoryQuote,peerStatistics} from '../worker/runtime.mjs';
+import {API,ENDPOINTS,stockData,historyRows,completedDateCandidates,applyDatedValuation,preferHistoryQuote,peerStatistics,historyURLs,completedHistoryRows,suppressIncompleteAverages} from '../worker/runtime.mjs';
 const output='src/generated/market.json',checks={},now=new Date(),local=new Date(now.getTime()+8*3600000);
 const read=async url=>{for(let attempt=0;attempt<3;attempt++){try{const r=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(25000),headers:{Accept:'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();checks[url]=new Date().toISOString();return j}catch(e){if(attempt===2)throw new Error(url+': '+e.message)}}};
 const keys=Object.keys(ENDPOINTS),results=await Promise.allSettled(keys.map(k=>read(API+ENDPOINTS[k]))),datasets=Object.fromEntries(keys.map((k,i)=>[k,results[i].status==='fulfilled'&&Array.isArray(results[i].value)?results[i].value:[]]));
@@ -12,7 +12,17 @@ const dated=await Promise.allSettled(completedDateCandidates(now).map(async date
 for(const result of dated.filter(r=>r.status==='fulfilled').sort((a,b)=>String(a.value.report?.date).localeCompare(String(b.value.report?.date))))for(const code of Object.keys(snapshot.stocks))snapshot.stocks[code]=applyDatedValuation(snapshot.stocks[code],result.value.report,result.value.source,result.value.checkedAt);
 // Bounded history coverage; all listed quote/valuation/profit records are included.
 const codes=(process.env.MARKET_HISTORY_CODES||'2330,2317,2454,0050').split(',').filter(c=>/^[0-9A-Z]{4,6}$/.test(c));
-for(const code of codes){const urls=[0,1,2].map(back=>{const d=new Date(Date.UTC(local.getUTCFullYear(),local.getUTCMonth()-back,1));return `https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${d.getUTCFullYear()}${String(d.getUTCMonth()+1).padStart(2,'0')}01&stockNo=${code}`});const parts=await Promise.allSettled(urls.map(read));const partial=parts.some(r=>r.status==='rejected'||r.value?.stat!=='OK'),today=local.toISOString().slice(0,10),closed=local.getUTCHours()*60+local.getUTCMinutes()>=810;const rows=historyRows(parts.filter(r=>r.status==='fulfilled').map(r=>r.value)).filter(r=>r.date<today||(r.date===today&&closed));if(partial)for(const r of rows){r.ma5=null;r.ma10=null;}snapshot.histories[code]={code,rows,partial,sources:urls,fetchedAt:new Date().toISOString(),mode:'daily-snapshot'};if(partial)warnings.push(`${code} 部分歷史月份未取得，均線不計算`);}
+for(const code of codes){
+ const urls=historyURLs(code,now),parts=[];
+ // Bound concurrency so a build does not burst dozens of history requests at TWSE.
+ for(let i=0;i<urls.length;i+=3)parts.push(...await Promise.allSettled(urls.slice(i,i+3).map(read)));
+ const partial=parts.some(r=>r.status==='rejected'||r.value?.stat!=='OK');
+ let rows=completedHistoryRows(historyRows(parts.filter(r=>r.status==='fulfilled').map(r=>r.value)),now);
+ if(partial)rows=suppressIncompleteAverages(rows);
+ const sourceChecks=Object.fromEntries(urls.map(u=>[u,checks[u]||null]));
+ snapshot.histories[code]={code,rows,partial,sources:urls,sourceChecks,fetchedAt:Object.values(sourceChecks).filter(Boolean).sort().at(-1)||null,mode:'daily-snapshot',basis:'未還原日收盤價；週線與五日線同為 MA5，月／季／年線為 MA20／60／240。'};
+ if(partial)warnings.push(`${code} 部分歷史月份未取得，均線不計算`);
+}
 for(const code of Object.keys(snapshot.histories))snapshot.stocks[code]=preferHistoryQuote(snapshot.stocks[code],snapshot.histories[code]);
 const allStocks=Object.values(snapshot.stocks);for(const stock of allStocks)stock.fundamentals.peer=peerStatistics(stock,allStocks);
 fs.mkdirSync('src/generated',{recursive:true});fs.writeFileSync(output+'.tmp',JSON.stringify(snapshot));fs.renameSync(output+'.tmp',output);

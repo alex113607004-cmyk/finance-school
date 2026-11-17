@@ -46,5 +46,10 @@ describe('per-stock financial evidence in the market flow',()=>{
   await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));
   await user.click(report.getByRole('button',{name:'流動比率'}));
   expect(within(screen.getByRole('dialog')).getByText(/存貨或應收帳款不一定能立即變現/)).toBeInTheDocument();
+  await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));
+  const moving=within(screen.getByRole('region',{name:'六種均線觀察'}));
+  expect(moving.getAllByRole('article')).toHaveLength(6);
+  await user.click(moving.getByRole('button',{name:'年線'}));
+  expect(within(screen.getByRole('dialog')).getByText(/最近 240 個有效交易日/)).toBeInTheDocument();
  });
 });
