@@ -1,0 +1,46 @@
+[
+  {
+    "url": "https://finmind.github.io/",
+    "status": 200,
+    "title": "FinMind",
+    "checkedAt": "2026-11-17T12:31:53.044482+00:00"
+  },
+  {
+    "url": "https://finmind.github.io/tutor/TaiwanMarket/Financial/",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://finmindtrade.com/analysis/#/account/user",
+    "status": 200,
+    "title": "FinMind",
+    "checkedAt": "2026-11-17T12:31:53.779938+00:00"
+  },
+  {
+    "url": "https://www.sec.gov/os/accessing-edgar-data",
+    "status": 200,
+    "title": "SEC.gov | Accessing EDGAR Data",
+    "checkedAt": "2026-11-17T12:31:54.228434+00:00"
+  },
+  {
+    "url": "https://www.tradingview.com/lightweight-charts/",
+    "status": 200,
+    "title": "Lightweight Charts™ library — TradingView",
+    "checkedAt": "2026-11-17T12:31:54.635089+00:00"
+  },
+  {
+    "url": "https://finmind.github.io/tutor/TaiwanMarket/Fundamental/",
+    "status": 200,
+    "checkedAt": "2026-11-17T12:33:07.192729+00:00",
+    "note": "僅確認 API 欄位，公開再展示與快取方案尚未確認，未啟用。"
+  },
+  {
+    "url": "https://finmind.github.io/CommercialUse/",
+    "status": 200,
+    "checkedAt": "2026-11-17T12:34:08.920836+00:00"
+  },
+  {
+    "url": "https://finmind.github.io/Disclaimer/",
+    "status": 200,
+    "checkedAt": "2026-11-17T12:34:09.249199+00:00"
+  }
+]

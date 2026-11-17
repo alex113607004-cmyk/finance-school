@@ -18,7 +18,7 @@ export const useMarketData=()=>useContext(Context);
 export function VisitRefreshStatus(){
   const market=useMarketData();if(!market)return null;
   return <div className={'visit-update '+(market.phase==='partial'?'visit-update-warning':'')} aria-label="本次進站更新">
-    <span>{market.phase==='checking'?'正在取得最新已發布快照與官方盤後估值…':market.phase==='ready'?'本次進站查詢完成':'本次更新有資料待確認'}<small> {market.checkedAt&&taipeiTime(market.checkedAt)}</small></span>
+    <span>{market.phase==='checking'?'正在取得台股最新快照與官方盤後估值…':market.phase==='ready'?'本次台股查詢完成':'台股更新有資料待確認'}<small> {market.checkedAt&&taipeiTime(market.checkedAt)}</small></span>
     <a href="#market">看行情與資料日期 ↗</a>
     {market.messages.length>0&&<p>{market.messages.join('；')}</p>}
   </div>;

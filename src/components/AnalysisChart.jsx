@@ -2,12 +2,13 @@ import React,{useId,useMemo,useRef,useState} from 'react';
 import {aggregateCandles} from '../stock-analysis';
 import {chartIndexAtClientX} from '../chart-interaction';
 import {format} from '../domain';
+import LightweightCandles from './LightweightCandles';
 const colors={5:'#e6bd7f',20:'#aca6ff',60:'#79c9e4'};
 export default function AnalysisChart({history,asOf,term}){
  const [kind,setKind]=useState('day'),[visible,setVisible]=useState([5,20,60]),[limit,setLimit]=useState(60),[picked,setPicked]=useState(null);
  const pointer=useRef(null),help=useId(),volumeUnit=history?.volumeUnit||'股';
  const all=useMemo(()=>aggregateCandles(history?.rows||[],kind,{asOf,coverageStart:history?.coverageStart,partial:history?.partial}),[history,kind,asOf]);
- const rows=all.slice(-limit),active=rows.find(r=>r.date===picked)||rows.at(-1),idx=rows.indexOf(active);
+ const rows=useMemo(()=>all.slice(-limit),[all,limit]),active=rows.find(r=>r.date===picked)||rows.at(-1),idx=rows.indexOf(active);
  if(!rows.length)return <p role="status">尚無完整開高低收與成交量，無法繪製 K 線。</p>;
  const values=rows.flatMap(r=>[r.low,r.high,...(kind==='day'?visible.map(n=>r['ma'+n]):[])]).filter(Number.isFinite),min=Math.min(...values),max=Math.max(...values),pad=Math.max((max-min)*.08,max*.005),lo=min-pad,hi=max+pad;
  const x=i=>18+i*670/Math.max(rows.length-1,1),y=v=>20+(hi-v)/(hi-lo)*240,width=Math.max(1.5,Math.min(12,670/rows.length*.65)),vmax=Math.max(...rows.map(r=>r.volume),1);
@@ -19,6 +20,7 @@ export default function AnalysisChart({history,asOf,term}){
   {kind==='day'?<div className="ma-toggles" aria-label="個股均線開關">{[5,20,60].map(n=><label key={n}><input type="checkbox" checked={visible.includes(n)} onChange={()=>setVisible(v=>v.includes(n)?v.filter(x=>x!==n):[...v,n])}/><span style={{color:colors[n]}}>MA{n}（{n} 日）</span></label>)}{term('均線')}<a className="text-link" href="#unit/chart-averages">理解均線 ↗</a></div>:<p className="subtle">週／月 K 由每日資料彙整，不顯示日均線，避免混淆日數與根數。</p>}
   <div className="analysis-chart-readout" aria-live="polite"><b data-testid="candle-date">{active.start}{kind!=='day'&&' ～ '+active.date}</b><span>開 {format(active.open)}　高 {format(active.high)}　低 {format(active.low)}　收 <strong>{format(active.close)}</strong></span><span>量 {format(active.volume,0)} {volumeUnit} · {active.count} 個交易日</span>{active.unfinished&&<span className="analysis-tag">期中 K 棒 · 尚未結束</span>}{active.truncated&&<span>起始週／月未涵蓋完整資料</span>}{kind==='day'&&<span>{visible.map(n=><span key={n} style={{color:colors[n],marginRight:14}}>MA{n} {format(active['ma'+n])}</span>)}</span>}</div>
   <p id={help} className="subtle">按住並左右拖曳虛線，查看該根數值；也可聚焦圖表用 ← →、Home、End，或使用下方滑桿。</p>
+  {!/jsdom/i.test(navigator.userAgent)?<LightweightCandles rows={rows} kind={kind} visible={visible} active={active} onPick={setPicked} onKeyDown={key} label={`個股${{day:'日',week:'週',month:'月'}[kind]}K 與均線及成交量`} describedBy={help}/>:<>
   <svg className="native-chart interactive-chart analysis-candles" viewBox="0 0 790 300" role="img" tabIndex={0} aria-label={`個股${{day:'日',week:'週',month:'月'}[kind]}K 與均線`} aria-describedby={help} onKeyDown={key} onPointerDown={e=>{if(e.isPrimary===false||e.button!==0)return;pointer.current=e.pointerId;e.currentTarget.setPointerCapture?.(e.pointerId);select(e)}} onPointerMove={e=>{if(pointer.current===e.pointerId)select(e)}} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={end}>
    <title>{history.market==='TPEX'?'櫃買中心':'證交所'}未還原 K 線 · {history.currencyLabel||'新台幣元／股'}</title>{[0,1,2,3].map(i=>{const v=lo+(hi-lo)*i/3;return <g key={i}><line x1="10" x2="700" y1={y(v)} y2={y(v)} stroke="#293044"/><text x="711" y={y(v)+4}>{format(v,0)}</text></g>})}
    {rows.map((r,i)=>{const color=r.close>=r.open?'#ff8c99':'#7ad7a6';return <g key={r.date} data-candle={r.date} opacity={r.unfinished ? .65 : 1}><line x1={x(i)} x2={x(i)} y1={y(r.high)} y2={y(r.low)} stroke={color}/><rect x={x(i)-width/2} y={Math.min(y(r.open),y(r.close))} width={width} height={Math.max(1,Math.abs(y(r.open)-y(r.close)))} fill={color} stroke={r.unfinished?'#e6bd7f':color} strokeDasharray={r.unfinished?'2 2':undefined}/></g>})}
@@ -26,6 +28,8 @@ export default function AnalysisChart({history,asOf,term}){
    <line className="analysis-crosshair" data-date={active.date} x1={x(idx)} x2={x(idx)} y1="10" y2="265" stroke="#c1d7e4" strokeDasharray="3 5"/><circle cx={x(idx)} cy={y(active.close)} r="3.8" fill="#bce8d3"/><text x="10" y="290">{rows[0].date}</text><text x="700" y="290" textAnchor="end">{rows.at(-1).date}</text>
   </svg>
   <svg viewBox="0 0 790 100" className="analysis-volume" role="img" aria-label={`同週期成交量（${volumeUnit}）`}><title>成交量單位：{volumeUnit}</title><text x="10" y="12">成交量（{volumeUnit}）</text>{rows.map((r,i)=><rect key={r.date} x={x(i)-width/2} y={85-r.volume/vmax*65} width={width} height={r.volume/vmax*65} fill={r.close>=r.open?'#ff8c99':'#7ad7a6'} opacity=".55"/>)}<line x1={x(idx)} x2={x(idx)} y1="15" y2="88" stroke="#c1d7e4" strokeDasharray="3 5"/><text x="711" y="28">{format(vmax/1000000,1)} 百萬</text><text x="711" y="86">0</text></svg>
+  </>}
+  <p className="subtle chart-attribution">圖表使用 <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">TradingView Lightweight Charts™</a> · <a href="./LICENSE-lightweight-charts.txt" target="_blank" rel="noopener noreferrer">Apache 2.0</a> · <a href="./THIRD-PARTY-NOTICES.txt" target="_blank" rel="noopener noreferrer">NOTICE</a>。游標讀值與原始數字見下方。</p>
   <label className="analysis-slider">選取 K 棒<input type="range" aria-label="選取個股 K 棒" min="0" max={rows.length-1} value={idx} onChange={e=>setPicked(rows[Number(e.target.value)].date)}/></label>
   <p className="subtle">價格與日均線皆未還原除權息，包含除息跳空；成交量採{volumeUnit}。紅 K 為收盤 ≥ 開盤，綠 K 為收盤低於開盤。週採週一至週日、月採曆月；曆週／月尚未結束時以淡色框標記，不預測未來數值。日線僅含已公布盤後資料。</p>
   {history?.partial&&<p className="notice" role="status">部分月份更新失敗或缺漏；保留原始 K 棒，所有均線與估值判讀暫停，不以插值補齊。</p>}
