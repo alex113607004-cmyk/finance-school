@@ -1,3 +1,52 @@
-import React from'react';import{render,screen,fireEvent,waitFor,within}from'@testing-library/react';import userEvent from'@testing-library/user-event';import{describe,it,expect,vi}from'vitest';import App from'./App';import CalculatorPanel from'./components/Calculators';
-describe('learning app interactions',()=>{it('renders 19 units and finds a cross-stage keyword',async()=>{const user=userEvent.setup();render(<App/>);expect(screen.getAllByRole('article')).toHaveLength(19);await user.click(within(screen.getByRole('navigation',{name:'階段導航'})).getByRole('button',{name:/02.*基本面分析/}));expect(screen.getAllByRole('article')).toHaveLength(4);await user.type(screen.getByRole('searchbox',{name:'搜尋所有教學單元'}),'融資維持率');expect(screen.getAllByRole('article')).toHaveLength(1);expect(screen.getByRole('heading',{name:'融資融券與 130% 維持率'})).toBeInTheDocument()});it('persists bookmarks and shows them after reload',async()=>{const user=userEvent.setup();const {unmount}=render(<App/>);await user.click(screen.getByRole('button',{name:'收藏：EPS 與本益比：一份獲利，多少價格？'}));expect(JSON.parse(localStorage.getItem('finance-school.bookmarks.v2'))).toEqual(['s2-1']);unmount();window.history.replaceState(null,'','#bookmarks');render(<App/>);expect(screen.getAllByRole('article')).toHaveLength(1);await user.click(screen.getByRole('button',{name:'取消收藏：EPS 與本益比：一份獲利，多少價格？'}));expect(screen.getByText('還沒有收藏，先留下一個想複習的觀念。')).toBeInTheDocument()});it('gates solutions, opens definitions and restores completed state',async()=>{const user=userEvent.setup();window.history.replaceState(null,'','#unit/s1-1');const {unmount}=render(<App/>);await user.click(screen.getByRole('button',{name:'看完整解法'}));expect(screen.getByRole('status')).toHaveTextContent('先選一個');expect(screen.queryByText('103 > 100，所以紅 K；103 < 104，所以日報酬為負。')).not.toBeInTheDocument();await user.click(screen.getByLabelText(/紅 K，且比前收下跌/));await user.click(screen.getByRole('button',{name:'檢查我的答案'}));expect(screen.getByRole('status')).toHaveTextContent('答對');await user.click(screen.getByRole('button',{name:'看完整解法'}));expect(screen.getByText('103 > 100，所以紅 K；103 < 104，所以日報酬為負。')).toBeInTheDocument();await user.click(screen.getByRole('button',{name:'日K線'}));expect(screen.getByRole('dialog')).toBeInTheDocument();expect(within(screen.getByRole('dialog')).getByRole('heading',{name:'日K線'})).toBeInTheDocument();await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));await user.click(screen.getByRole('button',{name:'標記已學會'}));expect(JSON.parse(localStorage.getItem('finance-school.completed.v2'))).toEqual(['s1-1']);expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow','5');unmount();render(<App/>);expect(screen.getByRole('button',{name:'取消已學會標記'})).toBeInTheDocument()});it('survives unavailable localStorage',()=>{const spy=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('quota')});render(<App/>);expect(screen.getByRole('status')).toHaveTextContent('瀏覽器無法儲存');spy.mockRestore()})});
-describe('calculator UI',()=>{it('updates the financing result and rejects a blank field',async()=>{const user=userEvent.setup();render(<CalculatorPanel/>);expect(screen.getByText('133.33')).toBeInTheDocument();await user.clear(screen.getByLabelText('現價'));expect(screen.getByRole('status')).toHaveTextContent('完整填入');await user.type(screen.getByLabelText('現價'),'77');expect(screen.getByText('低於 130% 模型門檻')).toBeInTheDocument();expect(screen.getByText('128.33')).toBeInTheDocument()});it('shows a possible negative result for trailing stop planning',async()=>{const user=userEvent.setup();render(<CalculatorPanel type="stops"/>);await user.clear(screen.getByLabelText('波段最高價'));await user.type(screen.getByLabelText('波段最高價'),'105');expect(screen.getByText(/▼ 相對買進價 5.50%/)).toHaveClass('loss')});it('provides zero and loss-making EPS feedback',async()=>{const user=userEvent.setup();render(<CalculatorPanel type="pe"/>);const eps=screen.getByLabelText('近四季 EPS');await user.clear(eps);await user.type(eps,'0');expect(screen.getByRole('status')).toHaveTextContent('分母為零');await user.clear(eps);await user.type(eps,'-1');expect(screen.getByRole('status')).toHaveTextContent('虧損')})});
+import React from 'react';
+import {render,screen,within} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {describe,it,expect,vi} from 'vitest';
+import App from './App';
+import {units} from './data';
+
+describe('source-led learning app',()=>{
+ it('replaces the old curriculum with 15 lessons, five topics and no retired menus or shortcuts',()=>{
+  render(<App/>);expect(screen.getAllByRole('article')).toHaveLength(15);
+  expect(within(screen.getByRole('navigation',{name:'主題導航'})).getAllByRole('button')).toHaveLength(5);
+  expect(screen.queryByText('實戰試算室')).not.toBeInTheDocument();expect(screen.queryByText('真實歷史案例')).not.toBeInTheDocument();
+  expect(screen.queryByRole('link',{name:/試算|案例/})).not.toBeInTheDocument();
+  expect(screen.getByRole('link',{name:'從第一單元開始'})).toHaveAttribute('href','#unit/start-ownership');
+ });
+ it('filters topics and searches the new summaries and original publishers',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(within(screen.getByRole('navigation',{name:'主題導航'})).getByRole('button',{name:/財報與估值/}));expect(screen.getAllByRole('article')).toHaveLength(3);
+  await user.type(screen.getByRole('searchbox',{name:'搜尋所有教學單元'}),'集保');expect(screen.getAllByRole('article')).toHaveLength(1);
+  expect(screen.getByRole('heading',{name:'集保股權分散：級距與資料基準'})).toBeInTheDocument();
+  await user.clear(screen.getByRole('searchbox'));await user.type(screen.getByRole('searchbox'),'Fidelity');expect(screen.getAllByRole('article')).toHaveLength(3);
+ });
+ it('puts sourced takeaways before original resources and shows language and publisher',()=>{
+  window.history.replaceState(null,'','#unit/fund-statements');render(<App/>);
+  const top=screen.getByRole('region',{name:'本單元重點整理'}),reading=screen.getByRole('region',{name:'文章與教學影片'});
+  expect(within(top).getAllByRole('listitem')).toHaveLength(3);
+  expect(top.compareDocumentPosition(reading)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(within(top).getAllByRole('link').every(link=>link.href.startsWith('https://'))).toBe(true);
+  expect(within(reading).getByText('英文')).toBeInTheDocument();expect(within(reading).getByText('美國證券交易委員會 SEC')).toBeInTheDocument();
+  expect(within(reading).getAllByRole('link',{name:'閱讀原文'})).toHaveLength(2);
+ });
+ it('keeps progress and bookmarks on new IDs without marking old units as complete',async()=>{
+  const user=userEvent.setup();localStorage.setItem('finance-school.completed.v2','["s1-1"]');
+  window.history.replaceState(null,'','#unit/start-ownership');const{unmount}=render(<App/>);
+  expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow','0');
+  await user.click(screen.getByRole('button',{name:'收藏這個單元'}));await user.click(screen.getByRole('button',{name:'標記已學會'}));
+  expect(JSON.parse(localStorage.getItem('finance-school.completed.v3'))).toEqual(['start-ownership']);expect(localStorage.getItem('finance-school.completed.v2')).toBe('["s1-1"]');
+  unmount();window.history.replaceState(null,'','#bookmarks');render(<App/>);expect(screen.getAllByRole('article')).toHaveLength(1);
+  await user.click(screen.getByRole('button',{name:'取消收藏：持有股票，究竟持有什麼？'}));expect(screen.getByText('還沒有收藏，先留下一個想讀的單元。')).toBeInTheDocument();
+ });
+ it.each(['#tools','#cases','#case/1','#lesson/2'])('retires old route %s rather than displaying its former page',hash=>{
+  window.history.replaceState(null,'',hash);render(<App/>);expect(window.location.hash).toBe('#learn');expect(screen.getAllByRole('article')).toHaveLength(15);
+ });
+ it('shows official video pages through the materials index',async()=>{
+  const user=userEvent.setup();window.history.replaceState(null,'','#sources');render(<App/>);
+  await user.click(screen.getByRole('button',{name:'官方影片',exact:true}));expect(screen.getAllByRole('article')).toHaveLength(4);
+  for(const link of screen.getAllByRole('link',{name:'到原站觀看'})){expect(link.href).toMatch(/^https:\/\/www.twse.com.tw\/zh\/allinone\//);expect(link).toHaveAttribute('target','_blank');}
+ });
+ it('preserves readable content when browser storage is unavailable',()=>{
+  const spy=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('quota')});render(<App/>);expect(screen.getByRole('status')).toHaveTextContent('瀏覽器無法儲存');spy.mockRestore();
+ });
+});
