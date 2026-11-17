@@ -24,6 +24,10 @@ npm run dev -- --port 4173
 
 上櫃歷史資產在 dev/build 前由保存的官方日報重建，適用 GitHub Pages。原始更新依序為 `npm run update:market`、`npm run update:analysis`、`npm run update:universe`；財報新聞稿解析需 Python 3 與 poppler-utils。GitHub 排程仍為台北 17:00、21:00。
 
+## 美股個股分析
+
+[Apple（AAPL）](https://alex113607004-cmyk.github.io/finance-school/#analysis/us/AAPL) 與 [Microsoft（MSFT）](https://alex113607004-cmyk.github.io/finance-school/#analysis/us/MSFT) 提供 SEC 季報、營收年增、利潤率、現金流與可驗算的四季稀釋 EPS，並支援手動倍數試算。美股盤後行情及歷史估值需先設定具公開展示權的行情來源。更新、欄位口徑與設定見 [美股資料文件](docs/US-STOCKS.md)。
+
 ## 目前功能
 
 - **五個主題、15 個全新單元**：股票與交易入門、財報與估值、技術分析、籌碼與槓桿、配置與風險。

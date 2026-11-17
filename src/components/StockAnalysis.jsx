@@ -9,6 +9,7 @@ import {historicalValuation,maPosition,scenario,taipeiDay,quarterId} from '../st
 import {format} from '../domain';
 import {taipeiTime,freshness} from '../freshness';
 import AnalysisChart from './AnalysisChart';
+import { AnalysisMarkets } from './UsStockAnalysis';
 import QuoteSnapshot from './QuoteSnapshot';
 import '../stock-analysis.css';
 
@@ -90,7 +91,7 @@ export default function StockAnalysis({term,param}){
  const warnings=[...publication.warnings,...(selected?.warnings||[]),...(entry?.warnings||[]),...(filings.warnings||[]),currentLoad?.error,history.reason].filter(Boolean);
  const priceUnit=/^\d{5}[CK]$/.test(code)?'原交易幣別／受益權單位（幣別待核實）':'新台幣元／'+(fund?'受益權單位':'股');
  return <div className="stock-analysis-page">
-  <div className="page-title"><span className="eyebrow">TAIWAN STOCK EXPLORER / 全市場個股查詢</span><h1>找到你的股票，看懂每個數字。</h1><p>上市、上櫃與興櫃，按代號或名稱搜尋；每項資料保留日期、口徑及來源。</p></div>
+  <div className="page-title"><span className="eyebrow">TAIWAN STOCK EXPLORER / 全市場個股查詢</span><h1>找到你的股票，看懂每個數字。</h1><p>上市、上櫃與興櫃，按代號或名稱搜尋；每項資料保留日期、口徑及來源。</p><AnalysisMarkets/></div>
   <div className="analysis-universe-counts" aria-label="股票清單範圍">{Object.entries(counts).map(([m,n])=><span key={m}>{MARKET_NAMES[m]} <b>{n.toLocaleString()}</b> 檔</span>)}<small>含官方清單中的 ETF、ETN 與特別股；不含權證、個別債券及已下市標的。</small></div>
   <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="analysis-search">搜尋個股代號或名稱</label><input id="analysis-search" role="combobox" aria-autocomplete="list" aria-expanded={focused&&!!query&&!!suggestions.length} aria-controls="stock-search-results" aria-activedescendant={focused&&suggestions[activeOption]?'stock-option-'+suggestions[activeOption].code:undefined} autoComplete="off" onBlur={e=>{if(!e.currentTarget.parentElement.parentElement.contains(e.relatedTarget))setFocused(false);}} value={query} onFocus={()=>setFocused(true)} onChange={e=>{setQuery(e.target.value);setActiveOption(0);setFocused(true);}} onKeyDown={e=>{if(e.key==='Escape')setFocused(false);if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();setFocused(true);setActiveOption(i=>Math.max(0,Math.min(suggestions.length-1,i+(e.key==='ArrowDown'?1:-1))));}}} placeholder="輸入代號或名稱，例如 2330、鴻海、環球晶"/><button className="primary">分析個股</button></form>
    {focused&&query&&suggestions.length>0&&<ul className="analysis-suggestions" role="listbox" id="stock-search-results" aria-label="股票搜尋結果">{suggestions.map((s,i)=><li role="option" id={'stock-option-'+s.code} aria-selected={i===activeOption} key={s.code} onMouseDown={e=>e.preventDefault()}><button type="button" onClick={()=>choose(s)}><b>{s.code}</b><span>{s.name}<small>{s.company?.fullName}</small></span><em>{MARKET_NAMES[s.market]} · {KIND_NAMES[s.securityKind]||'股票'}</em></button></li>)}</ul>}
