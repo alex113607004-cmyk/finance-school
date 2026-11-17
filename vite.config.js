@@ -17,4 +17,4 @@ function marketSnapshot(){return {
   const dir='src/generated/histories/TPEX';if(fs.existsSync(dir))for(const file of fs.readdirSync(dir).filter(f=>/^[0-9A-Z]{4,6}\.json$/.test(f)))this.emitFile({type:'asset',fileName:'stock-history/TPEX/'+file,source:fs.readFileSync(dir+'/'+file,'utf8')});
  },
 };}
-export default defineConfig({base:'./',plugins:[marketSnapshot(),react(),tailwindcss(),viteSingleFile()],build:{outDir:'dist/pages',emptyOutDir:true,assetsInlineLimit:10000000},test:{testTimeout:10000,environment:'jsdom',globals:true,setupFiles:['./src/test-setup.js'],include:['src/**/*.test.{js,jsx}'],pool:'forks',maxWorkers:1}});
+export default defineConfig({base:'./',server:{proxy:{'/api/twstock/quote':'http://127.0.0.1:4174'}},plugins:[marketSnapshot(),react(),tailwindcss(),viteSingleFile()],build:{outDir:'dist/pages',emptyOutDir:true,assetsInlineLimit:10000000},test:{testTimeout:10000,environment:'jsdom',globals:true,setupFiles:['./src/test-setup.js'],include:['src/**/*.test.{js,jsx}'],pool:'forks',maxWorkers:1}});
