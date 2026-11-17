@@ -9,6 +9,7 @@ import {historicalValuation,maPosition,scenario,taipeiDay,quarterId} from '../st
 import {format} from '../domain';
 import {taipeiTime,freshness} from '../freshness';
 import AnalysisChart from './AnalysisChart';
+import QuoteSnapshot from './QuoteSnapshot';
 import '../stock-analysis.css';
 
 const Link=({href,children})=>!href?<span className="subtle">{children}（尚未取得來源）</span>:<a className="text-link" href={href} target="_blank" rel="noopener noreferrer">{children} <ArrowUpRight size={13}/></a>;
@@ -104,6 +105,7 @@ export default function StockAnalysis({term,param}){
    <p className="subtle">{selected.market==='TWSE'?'查看時查詢證交所近期日線；財報與全市場清單由排程更新。':selected.market==='TPEX'?'上櫃原始來源限制瀏覽器跨網域讀取，改讀每日更新的官方盤後快照；每次進入會重查最新已發布版本。':'興櫃採議價成交；來源提供最新成交與前日均價，不視為上市櫃收盤價與前收漲跌幅。'} 不把查詢時間當交易時間。</p>
    {warnings.length>0&&<p className="notice" role="status">{[...new Set(warnings)].join('；')}{filings.warnings?.some(w=>w.startsWith('公司公告更新失敗'))&&value.available?'；沿用已核實首次公告快照及原查核時間，下一季結束仍未核實時停止估值。':''}</p>}
   </section>
+  {import.meta.env.DEV&&import.meta.env.VITE_TWSTOCK_LOCAL==='1'&&['TWSE','TPEX'].includes(selected.market)&&<QuoteSnapshot key={code} code={code} priceUnit={priceUnit} estimate={value}/>}
   {!entry&&!fund&&<OfficialValuation stock={effectiveStock} term={term}/>}
   <section className="analysis-insights" aria-label="估值與均線分別判讀"><article className="panel"><span className="eyebrow">01 / VERIFIED HISTORICAL VALUATION</span><h2>{busy?'正在核對資料':fund?'基金不適用公司本益比法':value.title}</h2>{!busy&&value.available?<><p>收盤 {format(quote.close)} 元 ÷ 近四季 EPS {format(value.ttm.eps)} 元 ＝ {format(value.pe)} 倍。歷史中段為 {format(value.p25)} ～ {format(value.p75)} 倍。</p><RangePlot value={value} price={quote.close}/><p>{value.position==='below'?`目前 ${format(quote.close)} 元低於下緣 ${format(value.low)} 元，倍數低於自身歷史樣本中段；仍需核對獲利能否維持、一次性損益與營運風險。`:value.position==='above'?`目前 ${format(quote.close)} 元高於上緣 ${format(value.high)} 元，需要比歷史樣本更高的定價；歷史區間不能驗證未來成長，也不能預測下跌。`:`目前 ${format(quote.close)} 元介於 ${format(value.low)} 與 ${format(value.high)} 元，屬自身歷史倍數中段，仍不能保證內在價值或買進報酬。`}</p></>:!busy&&<>{fund?<p>以基金淨值與折溢價等指標研究，請勿把公司 EPS 估值套用到基金。</p>:<><p>可查詢此股的行情與已申報財務資料；尚未取得下列估值必要資料：</p><ul>{value.reasons.map(s=><li key={s}>{s}</li>)}</ul><p className="subtle">不以本益比倒推 EPS 冒充已公告財報，也不借用台積電的倍數或財報。下方另提供官方估值與同業分布觀察。</p></>}</>}</article>
    <article className="panel"><span className="eyebrow">02 / PRICE VS. MA20</span><h2>{busy?'正在核對均線':ma.available?`現價${ma.position==='above'?'高於':ma.position==='below'?'低於':'等於'} 20 日均線`:'均線資料不足'}</h2>{ma.available?<><p>MA20 {format(ma.average)}，成交價格 {format(quote.close)}，乖離 {format(ma.distance)}%。</p><p>均線描述價格位置，不能代替公司估值。高於均線不保證繼續漲，低於均線不保證便宜。</p><details><summary>驗算 20 日均線</summary><p className="analysis-formula">{ma.rows[0].date} ～ {ma.rows.at(-1).date}<br/>{ma.rows.map(r=>format(r.close)).join(' ＋ ')}<br/>合計 {format(ma.sum)} ÷ 20 ＝ {format(ma.average,4)}</p></details></>:<p>{history.reason||ma.text}</p>}<div className="analysis-course-links"><a href="#unit/chart-averages">回到均線課程 ↗</a></div></article>

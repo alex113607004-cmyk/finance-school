@@ -13,7 +13,8 @@ https://alex113607004-cmyk.github.io/finance-school/
 
 - [全市場資料、涵蓋範圍、限制與驗收](docs/ALL-STOCKS.md)
 - [已核實的台積電歷史模型與原始來源](docs/STOCK-ANALYSIS.md)
-- [即時行情介接規格（尚未接通）](docs/REALTIME.md)
+- 個股圖表可切換「開啟縮放圖表」，使用 TradingView Lightweight Charts 檢視日／週／月 K、成交量與日均線。
+- [本機 twstock 報價快照及正式即時行情介接規格](docs/REALTIME.md)
 
 ```bash
 npm ci
