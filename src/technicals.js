@@ -3,9 +3,8 @@ import {taipeiDate} from './freshness.js';
 
 export const TECHNICAL_MODEL='均線觀察模型 1.0';
 export const MA_LINES=[
- {label:'五日線',period:5,color:'#e4ba74'},
+ {label:'週線',period:5,color:'#e4ba74'},
  {label:'十日線',period:10,color:'#a5a5fc'},
- {label:'週線',period:5,alias:true,color:'#e4ba74'},
  {label:'月線',period:20,color:'#7ed6cb'},
  {label:'季線',period:60,color:'#e698cb'},
  {label:'年線',period:240,color:'#9dbfe7'},
@@ -36,7 +35,7 @@ export function analyzeTechnicals(history,data,now=new Date()){
  const alignment=MA_PERIODS.every((n,i)=>i===0||byPeriod(MA_PERIODS[i-1]).value>=byPeriod(n).value);
  const bias20=byPeriod(20).bias,extended=Number.isFinite(bias20)&&bias20>10;
  if(extended)concerns.push('收盤高於月線超過 10%，觸及本模型自訂的追價觀察門檻；不代表必然回檔。');
- if(above<5)concerns.push(`價格僅站上 ${above}／5 條獨立均線；週線與五日線為同一條，不重複計入。`);
+ if(above<5)concerns.push(`價格僅站上 ${above}／5 條均線（週、十日、月、季、年）。`);
  if(rising<5)concerns.push(`僅 ${rising}／5 條均線較前一交易日上揚；斜率不是未來漲跌預測。`);
  if(!alignment)concerns.push('尚未形成 MA5 ≥ MA10 ≥ MA20 ≥ MA60 ≥ MA240 的完整排列。');
  const status=gaps.length?'insufficient':extended?'extended':above===5&&rising===5&&alignment?'support':last.close<byPeriod(60).value&&last.close<byPeriod(240).value?'caution':'mixed';

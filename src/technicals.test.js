@@ -12,15 +12,15 @@ function history(count=260,price=i=>100+i){
 }
 const quote=h=>({code:'2330',quote:{date:h.rows.at(-1).date,close:h.rows.at(-1).close}});
 describe('complete moving-average evidence',()=>{
- it('independently recomputes five unique averages, slopes and bias without double-counting the weekly alias',()=>{
+ it('independently recomputes five distinct averages, slopes and bias using the weekly label',()=>{
   const h=history(),r=analyzeTechnicals(h,quote(h),now),last=359;
-  expect(r.status).toBe('support');expect(r.metrics).toHaveLength(6);expect(r.above).toBe(5);
+  expect(r.status).toBe('support');expect(r.metrics).toHaveLength(5);expect(r.above).toBe(5);
   for(const metric of r.metrics){
    const expected=h.rows.slice(-metric.period).reduce((sum,row)=>sum+row.close,0)/metric.period;
    expect(metric.value).toBeCloseTo(expected,10);expect(metric.slope).toBeCloseTo(1,10);
    expect(metric.bias).toBeCloseTo((last/expected-1)*100,10);
   }
-  expect(r.metrics.find(x=>x.label==='週線').value).toBe(r.metrics.find(x=>x.label==='五日線').value);
+  expect(r.metrics.find(x=>x.label==='週線').period).toBe(5);expect(r.metrics.find(x=>x.label==='五日線')).toBeUndefined();
  });
  it('requires 240 closes for an annual average and 241 for its slope',()=>{
   const short=history(239),just=history(240),complete=history(241);
