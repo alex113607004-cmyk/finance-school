@@ -1,0 +1,58 @@
+{
+  "browser": "Chromium / headless Linux",
+  "viewports": [
+    "1440x1080 desktop",
+    "820x1180 iPad touch emulation",
+    "390x844 phone"
+  ],
+  "errors": [],
+  "checks": [
+    {
+      "step": "subpath US data",
+      "value": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "url": "http://127.0.0.1:4176/finance-school/us-data.json"
+      }
+    },
+    {
+      "step": "drag crosshair",
+      "before": "2026-08-26",
+      "after": "2026-10-12",
+      "changed": true
+    },
+    {
+      "step": "weekly unfinished",
+      "value": "2026-11-16 ～ 2026-11-17"
+    },
+    {
+      "step": "monthly",
+      "value": "2026-11-01 ～ 2026-11-17"
+    },
+    {
+      "step": "iPad overflow",
+      "value": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "step": "iPad touch crosshair",
+      "before": "2026-11-17",
+      "after": "2026-10-30",
+      "changed": true
+    },
+    {
+      "step": "iPad US switch",
+      "url": "http://127.0.0.1:4176/finance-school/#analysis/US/AAPL",
+      "overflow": false
+    },
+    {
+      "step": "phone overflow",
+      "value": {
+        "width": 390,
+        "scroll": 390
+      }
+    }
+  ]
+}

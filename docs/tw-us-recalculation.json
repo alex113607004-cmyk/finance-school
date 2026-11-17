@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-17T12:37:27.745631+00:00",
+  "method": "Independent Python arithmetic from committed TWSE STOCK_DAY response bodies and first-release EPS records, not application functions.",
+  "TW:2330": {
+    "date": "2026-11-17",
+    "close": 2170.0,
+    "ttmEPS": 98.26,
+    "ma20Sum": 46490.0,
+    "ma20": 2324.5,
+    "samples": 34,
+    "period": [
+      "2024-01-31",
+      "2026-10-30"
+    ],
+    "firstSample": {
+      "date": "2024-01-31",
+      "price": 628.0,
+      "eps": 32.34,
+      "pe": 19.4186765615337
+    },
+    "quantiles": {
+      "0.25": 23.033447547183147,
+      "0.5": 24.988324742018914,
+      "0.75": 26.87292582919982
+    },
+    "range": [
+      2263.266555986216,
+      2640.5336919771744
+    ]
+  },
+  "US:AAPL": {
+    "period": "2026-06-28/2026-09-26",
+    "quarterRevenueUSD": 114477000000,
+    "quarterOCFUSD": 28101000000,
+    "quarterCapexUSD": 2242000000,
+    "quarterFCFUSD": 25859000000,
+    "TTMDirectDilutedEPS": 8.97,
+    "valuation": "Unavailable: no public-display-qualified quotes; no fabricated price used."
+  },
+  "US:MSFT": {
+    "fiscalPeriod": "FY2027 Q1: 2026-07-01/2026-09-30",
+    "OCFUSD": 58000000000,
+    "capexUSD": 39367000000,
+    "FCFUSD": 18633000000,
+    "TTMDirectDilutedEPS": 19.16
+  }
+}

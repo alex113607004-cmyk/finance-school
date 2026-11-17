@@ -1,0 +1,12 @@
+{
+  "facts": {
+    "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+    "checkedAt": "2026-11-17T12:15:43.721Z",
+    "sha256": "8c1903c041f5c27e86ed15f37debb1f41882b7904bba129ef9edc76478b1e8ea"
+  },
+  "submissions": {
+    "url": "https://data.sec.gov/submissions/CIK0000789019.json",
+    "checkedAt": "2026-11-17T12:15:46.675Z",
+    "sha256": "0c7415804bdda6f5daea74122223596eecc02ee5fe23de8e83cf4e2630ff03e0"
+  }
+}

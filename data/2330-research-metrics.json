@@ -1,0 +1,872 @@
+{
+  "code": "2330",
+  "region": "TW",
+  "checkedAt": "2026-11-17T12:21:44.289991+00:00",
+  "latest": {
+    "fiscalYear": 2026,
+    "fiscalQuarter": 3,
+    "start": "2026-07-01",
+    "end": "2026-09-30"
+  },
+  "metrics": {
+    "revenue": {
+      "value": 1494243000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+      "tag": "revenue",
+      "unit": "TWD",
+      "currency": "TWD",
+      "form": "TSMC 首次財報摘要",
+      "accession": "TSMC-2026Q3",
+      "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+      "available": true,
+      "method": "direct",
+      "sources": [
+        {
+          "value": 1494243000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "revenue",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+        }
+      ]
+    },
+    "grossProfit": {
+      "value": 992379000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+      "tag": "grossProfit",
+      "unit": "TWD",
+      "currency": "TWD",
+      "form": "TSMC 首次財報摘要",
+      "accession": "TSMC-2026Q3",
+      "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+      "available": true,
+      "method": "direct",
+      "sources": [
+        {
+          "value": 992379000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "grossProfit",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+        }
+      ]
+    },
+    "operatingIncome": {
+      "value": 876445000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+      "tag": "operatingIncome",
+      "unit": "TWD",
+      "currency": "TWD",
+      "form": "TSMC 首次財報摘要",
+      "accession": "TSMC-2026Q3",
+      "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+      "available": true,
+      "method": "direct",
+      "sources": [
+        {
+          "value": 876445000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "operatingIncome",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+        }
+      ]
+    },
+    "netIncome": {
+      "value": 763064000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+      "tag": "netIncome",
+      "unit": "TWD",
+      "currency": "TWD",
+      "form": "TSMC 首次財報摘要",
+      "accession": "TSMC-2026Q3",
+      "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+      "available": true,
+      "method": "direct",
+      "sources": [
+        {
+          "value": 763064000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "netIncome",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+        }
+      ]
+    },
+    "operatingCashFlow": {
+      "value": 919776000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+      "tag": "operatingCashFlow",
+      "unit": "TWD",
+      "currency": "TWD",
+      "form": "TSMC 首次財報摘要",
+      "accession": "TSMC-2026Q3",
+      "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+      "available": true,
+      "method": "direct",
+      "sources": [
+        {
+          "value": 919776000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "tag": "operatingCashFlow",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+        }
+      ]
+    },
+    "capex": {
+      "value": 443206000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+      "tag": "capex",
+      "unit": "TWD",
+      "currency": "TWD",
+      "form": "TSMC 首次財報摘要",
+      "accession": "TSMC-2026Q3",
+      "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+      "available": true,
+      "method": "direct",
+      "sources": [
+        {
+          "value": 443206000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "tag": "capex",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+        }
+      ]
+    },
+    "grossMargin": {
+      "available": true,
+      "value": 66.41349499378614,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "unit": "percent",
+      "currency": null,
+      "method": "computed",
+      "sources": [
+        {
+          "value": 992379000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "grossProfit",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+          "available": true,
+          "method": "direct",
+          "sources": [
+            {
+              "value": 992379000000,
+              "start": "2026-07-01",
+              "end": "2026-09-30",
+              "filed": "2026-10-15",
+              "availableFrom": "2026-10-16",
+              "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+              "tag": "grossProfit",
+              "unit": "TWD",
+              "currency": "TWD",
+              "form": "TSMC 首次財報摘要",
+              "accession": "TSMC-2026Q3",
+              "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+            }
+          ]
+        },
+        {
+          "value": 1494243000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "revenue",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+          "available": true,
+          "method": "direct",
+          "sources": [
+            {
+              "value": 1494243000000,
+              "start": "2026-07-01",
+              "end": "2026-09-30",
+              "filed": "2026-10-15",
+              "availableFrom": "2026-10-16",
+              "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+              "tag": "revenue",
+              "unit": "TWD",
+              "currency": "TWD",
+              "form": "TSMC 首次財報摘要",
+              "accession": "TSMC-2026Q3",
+              "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+            }
+          ]
+        }
+      ],
+      "formula": "毛利 ÷ 營收 × 100%"
+    },
+    "operatingMargin": {
+      "available": true,
+      "value": 58.654783726609395,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "unit": "percent",
+      "currency": null,
+      "method": "computed",
+      "sources": [
+        {
+          "value": 876445000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "operatingIncome",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+          "available": true,
+          "method": "direct",
+          "sources": [
+            {
+              "value": 876445000000,
+              "start": "2026-07-01",
+              "end": "2026-09-30",
+              "filed": "2026-10-15",
+              "availableFrom": "2026-10-16",
+              "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+              "tag": "operatingIncome",
+              "unit": "TWD",
+              "currency": "TWD",
+              "form": "TSMC 首次財報摘要",
+              "accession": "TSMC-2026Q3",
+              "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+            }
+          ]
+        },
+        {
+          "value": 1494243000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+          "tag": "revenue",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+          "available": true,
+          "method": "direct",
+          "sources": [
+            {
+              "value": 1494243000000,
+              "start": "2026-07-01",
+              "end": "2026-09-30",
+              "filed": "2026-10-15",
+              "availableFrom": "2026-10-16",
+              "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+              "tag": "revenue",
+              "unit": "TWD",
+              "currency": "TWD",
+              "form": "TSMC 首次財報摘要",
+              "accession": "TSMC-2026Q3",
+              "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+            }
+          ]
+        }
+      ],
+      "formula": "營業利益 ÷ 營收 × 100%"
+    },
+    "freeCashFlow": {
+      "available": true,
+      "value": 476570000000,
+      "start": "2026-07-01",
+      "end": "2026-09-30",
+      "filed": "2026-10-15",
+      "availableFrom": "2026-10-16",
+      "unit": "TWD",
+      "currency": "TWD",
+      "method": "computed",
+      "sources": [
+        {
+          "value": 919776000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "tag": "operatingCashFlow",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+          "available": true,
+          "method": "direct",
+          "sources": [
+            {
+              "value": 919776000000,
+              "start": "2026-07-01",
+              "end": "2026-09-30",
+              "filed": "2026-10-15",
+              "availableFrom": "2026-10-16",
+              "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+              "tag": "operatingCashFlow",
+              "unit": "TWD",
+              "currency": "TWD",
+              "form": "TSMC 首次財報摘要",
+              "accession": "TSMC-2026Q3",
+              "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+            }
+          ]
+        },
+        {
+          "value": 443206000000,
+          "start": "2026-07-01",
+          "end": "2026-09-30",
+          "filed": "2026-10-15",
+          "availableFrom": "2026-10-16",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "tag": "capex",
+          "unit": "TWD",
+          "currency": "TWD",
+          "form": "TSMC 首次財報摘要",
+          "accession": "TSMC-2026Q3",
+          "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+          "available": true,
+          "method": "direct",
+          "sources": [
+            {
+              "value": 443206000000,
+              "start": "2026-07-01",
+              "end": "2026-09-30",
+              "filed": "2026-10-15",
+              "availableFrom": "2026-10-16",
+              "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+              "tag": "capex",
+              "unit": "TWD",
+              "currency": "TWD",
+              "form": "TSMC 首次財報摘要",
+              "accession": "TSMC-2026Q3",
+              "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+            }
+          ]
+        }
+      ],
+      "formula": "營業現金流 − 現金購置設備總額"
+    }
+  },
+  "prior": {
+    "start": "2025-07-01",
+    "end": "2025-09-30",
+    "metrics": {
+      "revenue": {
+        "value": 989918000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+        "tag": "revenue",
+        "unit": "TWD",
+        "currency": "TWD",
+        "form": "TSMC 首次財報摘要",
+        "accession": "TSMC-2026Q3",
+        "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+        "available": true,
+        "method": "direct",
+        "sources": [
+          {
+            "value": 989918000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "revenue",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+          }
+        ]
+      },
+      "grossProfit": {
+        "value": 588543000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+        "tag": "grossProfit",
+        "unit": "TWD",
+        "currency": "TWD",
+        "form": "TSMC 首次財報摘要",
+        "accession": "TSMC-2026Q3",
+        "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+        "available": true,
+        "method": "direct",
+        "sources": [
+          {
+            "value": 588543000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "grossProfit",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+          }
+        ]
+      },
+      "operatingIncome": {
+        "value": 500685000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+        "tag": "operatingIncome",
+        "unit": "TWD",
+        "currency": "TWD",
+        "form": "TSMC 首次財報摘要",
+        "accession": "TSMC-2026Q3",
+        "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+        "available": true,
+        "method": "direct",
+        "sources": [
+          {
+            "value": 500685000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "operatingIncome",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+          }
+        ]
+      },
+      "netIncome": {
+        "value": 452302000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+        "tag": "netIncome",
+        "unit": "TWD",
+        "currency": "TWD",
+        "form": "TSMC 首次財報摘要",
+        "accession": "TSMC-2026Q3",
+        "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+        "available": true,
+        "method": "direct",
+        "sources": [
+          {
+            "value": 452302000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "netIncome",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+          }
+        ]
+      },
+      "operatingCashFlow": {
+        "value": 426829000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+        "tag": "operatingCashFlow",
+        "unit": "TWD",
+        "currency": "TWD",
+        "form": "TSMC 首次財報摘要",
+        "accession": "TSMC-2026Q3",
+        "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+        "available": true,
+        "method": "direct",
+        "sources": [
+          {
+            "value": 426829000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+            "tag": "operatingCashFlow",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+          }
+        ]
+      },
+      "capex": {
+        "value": 287452000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+        "tag": "capex",
+        "unit": "TWD",
+        "currency": "TWD",
+        "form": "TSMC 首次財報摘要",
+        "accession": "TSMC-2026Q3",
+        "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+        "available": true,
+        "method": "direct",
+        "sources": [
+          {
+            "value": 287452000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+            "tag": "capex",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+          }
+        ]
+      },
+      "grossMargin": {
+        "available": true,
+        "value": 59.45371232768775,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "unit": "percent",
+        "currency": null,
+        "method": "computed",
+        "sources": [
+          {
+            "value": 588543000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "grossProfit",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+            "available": true,
+            "method": "direct",
+            "sources": [
+              {
+                "value": 588543000000,
+                "start": "2025-07-01",
+                "end": "2025-09-30",
+                "filed": "2026-10-15",
+                "availableFrom": "2026-10-16",
+                "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+                "tag": "grossProfit",
+                "unit": "TWD",
+                "currency": "TWD",
+                "form": "TSMC 首次財報摘要",
+                "accession": "TSMC-2026Q3",
+                "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+              }
+            ]
+          },
+          {
+            "value": 989918000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "revenue",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+            "available": true,
+            "method": "direct",
+            "sources": [
+              {
+                "value": 989918000000,
+                "start": "2025-07-01",
+                "end": "2025-09-30",
+                "filed": "2026-10-15",
+                "availableFrom": "2026-10-16",
+                "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+                "tag": "revenue",
+                "unit": "TWD",
+                "currency": "TWD",
+                "form": "TSMC 首次財報摘要",
+                "accession": "TSMC-2026Q3",
+                "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+              }
+            ]
+          }
+        ],
+        "formula": "毛利 ÷ 營收 × 100%"
+      },
+      "operatingMargin": {
+        "available": true,
+        "value": 50.57843174889233,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "unit": "percent",
+        "currency": null,
+        "method": "computed",
+        "sources": [
+          {
+            "value": 500685000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "operatingIncome",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+            "available": true,
+            "method": "direct",
+            "sources": [
+              {
+                "value": 500685000000,
+                "start": "2025-07-01",
+                "end": "2025-09-30",
+                "filed": "2026-10-15",
+                "availableFrom": "2026-10-16",
+                "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+                "tag": "operatingIncome",
+                "unit": "TWD",
+                "currency": "TWD",
+                "form": "TSMC 首次財報摘要",
+                "accession": "TSMC-2026Q3",
+                "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+              }
+            ]
+          },
+          {
+            "value": 989918000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+            "tag": "revenue",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+            "available": true,
+            "method": "direct",
+            "sources": [
+              {
+                "value": 989918000000,
+                "start": "2025-07-01",
+                "end": "2025-09-30",
+                "filed": "2026-10-15",
+                "availableFrom": "2026-10-16",
+                "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=2",
+                "tag": "revenue",
+                "unit": "TWD",
+                "currency": "TWD",
+                "form": "TSMC 首次財報摘要",
+                "accession": "TSMC-2026Q3",
+                "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+              }
+            ]
+          }
+        ],
+        "formula": "營業利益 ÷ 營收 × 100%"
+      },
+      "freeCashFlow": {
+        "available": true,
+        "value": 139377000000,
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "filed": "2026-10-15",
+        "availableFrom": "2026-10-16",
+        "unit": "TWD",
+        "currency": "TWD",
+        "method": "computed",
+        "sources": [
+          {
+            "value": 426829000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+            "tag": "operatingCashFlow",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+            "available": true,
+            "method": "direct",
+            "sources": [
+              {
+                "value": 426829000000,
+                "start": "2025-07-01",
+                "end": "2025-09-30",
+                "filed": "2026-10-15",
+                "availableFrom": "2026-10-16",
+                "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+                "tag": "operatingCashFlow",
+                "unit": "TWD",
+                "currency": "TWD",
+                "form": "TSMC 首次財報摘要",
+                "accession": "TSMC-2026Q3",
+                "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+              }
+            ]
+          },
+          {
+            "value": 287452000000,
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "filed": "2026-10-15",
+            "availableFrom": "2026-10-16",
+            "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+            "tag": "capex",
+            "unit": "TWD",
+            "currency": "TWD",
+            "form": "TSMC 首次財報摘要",
+            "accession": "TSMC-2026Q3",
+            "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額",
+            "available": true,
+            "method": "direct",
+            "sources": [
+              {
+                "value": 287452000000,
+                "start": "2025-07-01",
+                "end": "2025-09-30",
+                "filed": "2026-10-15",
+                "availableFrom": "2026-10-16",
+                "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+                "tag": "capex",
+                "unit": "TWD",
+                "currency": "TWD",
+                "form": "TSMC 首次財報摘要",
+                "accession": "TSMC-2026Q3",
+                "basis": "合併；淨利採歸屬母公司，資本支出採現金購置設備總額"
+              }
+            ]
+          }
+        ],
+        "formula": "營業現金流 − 現金購置設備總額"
+      }
+    }
+  },
+  "basis": "2026Q3 公司首次公告之直接單季數字，與既有年初累計欄位分開。"
+}

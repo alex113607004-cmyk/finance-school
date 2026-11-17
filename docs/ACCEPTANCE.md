@@ -217,3 +217,10 @@ React/jsdom 驗證摘要四區、原始值與公式展開、來源連結、切�
 - 仍未提供：未核實公司的四季 EPS／歷史估值與營業現金流、興櫃一致口徑 K 線、授權即時行情、實體 iPad／Safari 測試。完整範圍與原因見 `ALL-STOCKS.md`；資料缺口不以台積電或模擬數值代替。
 
 - 補驗舊看盤入口輸入 6488 可導到全市場個股頁；手機 touchStart/touchMove/touchEnd 拖曳成功；1293 無成交零值不顯示 0 元；1213 累計虧損提示、EPS 名詞彈窗皆通過。
+
+
+## 台美股統一個股研究（2026-11-17）
+
+新增市場切換與含市場網址、SEC 季度財報／直接四季稀釋 EPS、可展開來源與現金流、Lightweight Charts 與授權檔。舊台股網址和學習紀錄保留。140 項測試通過，`npm run build:pages` 與可選 Worker 建置成功；桌面、iPad 尺寸／觸控、手機與 `/finance-school/` 子路徑已在 Chromium 驗收。
+
+完整數字、來源、使用條件與具體缺口見 [TW-US-ANALYSIS](TW-US-ANALYSIS.md)、[獨立重算](tw-us-recalculation.json)、[瀏覽器驗收](tw-us-browser-acceptance.json)。美股行情沒有合格公開展示來源，未發布價格、K 線或實際估值；依使用者選擇不提供識別聯絡資訊，SEC 自動更新預設暫停，保留真正查核時間。沒有把靜態財報說成即時資料，也沒有把模擬行情當成驗收結果。

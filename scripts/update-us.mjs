@@ -1,137 +1,71 @@
-import { readFile, rename, writeFile } from 'node:fs/promises';
-import { daysBetween, newYorkDay, US_STOCKS } from '../src/us-stock-analysis.js';
-import { validCandle } from '../src/stock-analysis.js';
-import { normalizeSecCompany } from './us-sec-data.mjs';
-
-const releases = {
-  AAPL: [
-    ['2023-07-02', '2023-09-30', '2023-11-02', 1.46],
-    ['2024-06-30', '2024-09-28', '2024-10-31', .97],
-    ['2025-06-29', '2025-09-27', '2025-10-30', 1.85],
-    ['2026-06-28', '2026-09-26', '2026-11-02', 2.10],
-  ],
-  MSFT: [
-    ['2023-04-01', '2023-06-30', '2023-07-25', 2.69],
-    ['2024-04-01', '2024-06-30', '2024-07-30', 2.95],
-    ['2025-04-01', '2025-06-30', '2025-07-30', 3.65],
-    ['2026-04-01', '2026-06-30', '2026-07-29', 4.81],
-  ],
-};
-
-const now = new Date();
-const checkedAt = now.toISOString();
-const cutoff = newYorkDay(now);
-const snapshotPath = new URL('../src/generated/us-stocks.json', import.meta.url);
-const config = process.env;
-const publishBars = config.US_PUBLISH_MARKET_DATA === '1';
-const feed = config.US_ALPACA_FEED || 'sip';
-
-async function json(url, headers) {
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      const response = await fetch(url, { headers, signal: AbortSignal.timeout(20_000) });
-      if (response.ok) return await response.json();
-      const retryAfter = response.headers.get('retry-after');
-      const delay = retryAfter === null ? 2 : /^\d+$/.test(retryAfter) ? Number(retryAfter) : (Date.parse(retryAfter) - Date.now()) / 1000;
-      if (attempt === 2 || response.status < 500 && response.status !== 429 || delay > 10) {
-        throw new Error(`${new URL(url).hostname} HTTP ${response.status}`);
-      }
-      await new Promise(resolve => setTimeout(resolve, Math.max(delay, 1) * 1000));
-    } catch (error) {
-      if (attempt === 2 || error.message.includes(' HTTP ')) throw error;
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import {extractFacts,fiscalPeriods,financialSnapshot,plainFinancialSummary} from '../src/sec-financials.js';
+import companies from '../data/us-companies.json' with {type:'json'};
+import {marketDate} from '../src/security.js';
+import {publicQuoteBundle} from './us-quote-provider.mjs';
+import {alpacaPublication} from './us-alpaca-provider.mjs';
+const now=new Date(),asOf=marketDate(now,'US'),offline=process.argv.includes('--offline'),registry=JSON.parse(fs.readFileSync('data/sec/quarter-eps-exhibits.json','utf8'));
+let ua=process.env.SEC_UPDATES_ENABLED==='true'?(process.env.SEC_USER_AGENT||''):'',lastStarted=0;
+// Identity is supplied explicitly by the maintainer. Never infer a contact from
+// GitHub profiles or send a personal address without the user's choice.
+const pause=ms=>new Promise(r=>setTimeout(r,ms));
+async function secRead(url){
+ if(!ua||!/@/.test(ua))throw Error('未設定 SEC_USER_AGENT 的可識別聯絡資料。');
+ for(let attempt=0;attempt<4;attempt++){
+  await pause(Math.max(0,1100-(Date.now()-lastStarted)));lastStarted=Date.now();
+  const r=await fetch(url,{headers:{'User-Agent':ua,Accept:'application/json,text/html','Accept-Encoding':'identity'},signal:AbortSignal.timeout(40000)});
+  if(r.ok)return {text:await r.text(),checkedAt:new Date().toISOString()};
+  if(r.status===403)throw Error('SEC 回覆 403；停止重試並保留已核實快照。');
+  if(![429,500,502,503,504].includes(r.status))throw Error('SEC HTTP '+r.status);
+  if(attempt===3)throw Error('SEC HTTP '+r.status+'，退避後仍失敗。');
+  const retry=Number(r.headers.get('retry-after'));await pause(Math.min(60000,retry>0?retry*1000:2000*2**attempt));
+ }
+}
+const path='src/generated/us.json';
+const stocks={};
+for(const company of companies){
+ const warnings=[],name=company.ticker,cik=company.cik,factsURL=`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik}.json`,submissionsURL=`https://data.sec.gov/submissions/CIK${cik}.json`,metaFile=`data/sec/${name}-source-checks.json`;
+ let checks;try{checks=JSON.parse(fs.readFileSync(metaFile,'utf8'));}catch{checks={facts:{url:factsURL,checkedAt:null},submissions:{url:submissionsURL,checkedAt:null}};}
+ if(!offline&&!ua)warnings.push('SEC 自動更新尚未啟用；保留最後已核實快照與原查核時間。');
+ if(!offline&&ua){
+  try{
+   const facts=await secRead(factsURL),submissions=await secRead(submissionsURL),f=JSON.parse(facts.text),s=JSON.parse(submissions.text);
+   if(Number(f.cik)!==Number(cik)||Number(s.cik)!==Number(cik)||!s.tickers?.includes(name))throw Error('SEC CIK／ticker 識別不符。');
+   fs.writeFileSync(`data/sec/${name}-facts.json`,facts.text);fs.writeFileSync(`data/sec/${name}-submissions.json`,submissions.text);
+   checks={facts:{url:factsURL,checkedAt:facts.checkedAt,sha256:crypto.createHash('sha256').update(facts.text).digest('hex')},submissions:{url:submissionsURL,checkedAt:submissions.checkedAt,sha256:crypto.createHash('sha256').update(submissions.text).digest('hex')}};fs.writeFileSync(metaFile,JSON.stringify(checks,null,2)+'\n');
+  }catch(e){warnings.push(e.message);}
+ }
+ let cf,sub;try{cf=JSON.parse(fs.readFileSync(`data/sec/${name}-facts.json`,'utf8'));sub=JSON.parse(fs.readFileSync(`data/sec/${name}-submissions.json`,'utf8'));}catch(e){stocks['US:'+name]={...company,id:'US:'+name,region:'US',code:name,market:company.exchange,securityKind:'stock',dataStatus:'unavailable',warnings:['尚無可核實 SEC 快照。']};continue;}
+ const extraEPS=[];
+ for(const e of registry.filter(e=>e.ticker===name)){
+  if(!offline&&ua&&!extraEPS.some(x=>x.source===e.source)){
+   try{const source=await secRead(e.source),sha=crypto.createHash('sha256').update(source.text).digest('hex');if(sha!==e.sha256){warnings.push('第四季 EPS 原始 exhibit 版本已變更，暫不使用待人工核對。');continue;}}
+   catch(err){warnings.push('第四季 exhibit 本次未能重查，保留原查核版本：'+err.message);}
   }
+  // A verified original document stays a dated version; never renew its publication date.
+  extraEPS.push(e);
+ }
+ const facts=extractFacts(cf,sub),periods=fiscalPeriods(facts,sub,extraEPS),financials={facts,periods,extraEPS},snapshot=financialSnapshot(financials,asOf);
+ stocks['US:'+name]={id:'US:'+name,region:'US',code:name,ticker:name,cik,name:company.name,nameZh:company.nameZh,market:company.exchange,securityKind:'stock',currency:'USD',fiscalYearEnd:sub.fiscalYearEnd,latestFiscalEnd:periods.filter(p=>p.fiscalQuarter===4).at(-1)?.end,financials,snapshot,summary:plainFinancialSummary(snapshot),sourceChecks:checks,sources:{facts:factsURL,submissions:submissionsURL},dataStatus:warnings.length?'last-verified':'verified',warnings,quote:{status:'unavailable',currency:'USD',price:null,source:null,reason:'公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。'},history:{code:name,market:company.exchange,region:'US',rows:[],sources:[],partial:false,completeMonths:[],corporateActionsVerified:false,reason:'沒有已授權的美股歷史行情，K 線、均線與價格估值暫不可用。'}};
+ console.log(JSON.stringify({ticker:name,period:snapshot.latest?.end,ttmEPS:snapshot.ttm?.eps,status:stocks['US:'+name].dataStatus,warnings}));
 }
-
-function q4Releases(symbol) {
-  return releases[symbol].map(([start, end, filed, value]) => ({
-    start, end, filed, value,
-    source: symbol === 'AAPL'
-      ? `https://www.apple.com/newsroom/${filed.slice(0, 4)}/${filed.slice(5, 7)}/apple-reports-fourth-quarter-results/`
-      : `https://www.microsoft.com/en-us/investor/earnings/fy-${end.slice(0, 4)}-q4/press-release-webcast`,
-  }));
+// ETF fields are explicit gaps; ETF issuer corporate earnings are never substituted.
+stocks['US:SPY']={id:'US:SPY',region:'US',code:'SPY',ticker:'SPY',market:'NYSE Arca',name:'SPDR S&P 500 ETF Trust',nameZh:'標普 500 ETF',securityKind:'etf',currency:'USD',dataStatus:'partial',sources:{issuer:'https://www.ssga.com/us/en/individual/etfs/spdr-sp-500-etf-trust-spy'},quote:{status:'unavailable',price:null,currency:'USD',reason:'未設定可公開展示的 ETF 行情來源。'},nav:{available:false,reason:'尚無同日、同幣別且可展示的基金淨值，折溢價不計算。'},history:{code:'SPY',market:'NYSE Arca',region:'US',rows:[],sources:[],completeMonths:[],partial:false},warnings:[]};
+// Replaceable backend contract: a provider creates this file after verifying its
+// display/cache agreement. Neither the raw payload nor credentials are published.
+if(!offline&&process.env.US_PUBLISH_MARKET_DATA==='1')for(const company of companies){
+ try{const input=await alpacaPublication(company);if(input)Object.assign(stocks['US:'+company.ticker],publicQuoteBundle(input,{publicDisplayConfirmed:true}));}
+ catch{stocks['US:'+company.ticker].warnings.push('Alpaca 行情取得或展示／快取條款檢查失敗，未發布行情。');}
 }
-
-async function alpacaBars(symbol, adjustment) {
-  const url = new URL('https://data.alpaca.markets/v2/stocks/bars');
-  const start = new Date(cutoff + 'T00:00:00Z');
-  start.setUTCFullYear(start.getUTCFullYear() - 3);
-  start.setUTCDate(1);
-  url.search = new URLSearchParams({
-    symbols: symbol, timeframe: '1Day', start: start.toISOString(),
-    end: cutoff + 'T00:00:00Z', limit: 10000, feed, adjustment,
-  });
-  const data = await json(url, {
-    'APCA-API-KEY-ID': config.ALPACA_API_KEY_ID,
-    'APCA-API-SECRET-KEY': config.ALPACA_API_SECRET_KEY,
-  });
-  const bars = data.bars?.[symbol];
-  if (!Array.isArray(bars) || data.next_page_token) throw new Error('Incomplete Alpaca bars');
-  const rows = bars.map(bar => ({
-    date: newYorkDay(new Date(bar.t)),
-    open: bar.o, high: bar.h, low: bar.l, close: bar.c, volume: bar.v,
-  }));
-  if (!rows.length || rows.some((row, index) =>
-    !validCandle(row) || row.date >= cutoff || index > 0 && row.date <= rows[index - 1].date)) {
-    throw new Error('Invalid Alpaca bars');
+if(process.env.US_PUBLIC_QUOTE_FILE){
+ try{const inputs=JSON.parse(fs.readFileSync(process.env.US_PUBLIC_QUOTE_FILE,'utf8'));
+  for(const input of inputs.stocks||[]){const stock=stocks['US:'+input.symbol];if(!stock||input.region!=='US'||input.cik&&Number(input.cik)!==Number(stock.cik))continue;
+   Object.assign(stock,publicQuoteBundle(input,{publicDisplayConfirmed:process.env.US_PUBLIC_DISPLAY_CONFIRMED==='true'}));
   }
-  return rows;
+ }catch{for(const stock of Object.values(stocks))stock.warnings.push('行情介接檔讀取失敗；停止發布價格，保留 SEC 基本面。');}
 }
-
-async function stockHistory(symbol) {
-  const rows = await alpacaBars(symbol, 'raw');
-  let splitBasisConfirmed = false;
-  if (feed === 'sip') {
-    try {
-      const adjusted = await alpacaBars(symbol, 'split');
-      splitBasisConfirmed = rows.length === adjusted.length && rows.every((bar, i) =>
-        bar.date === adjusted[i].date && ['open', 'high', 'low', 'close', 'volume'].every(field =>
-          bar[field] === adjusted[i][field]));
-    } catch (error) {
-      console.warn(`${symbol} split check: ${error.message}`);
-    }
-  }
-  return {
-    rows, feed, fetchedAt: checkedAt, splitBasisConfirmed,
-    partial: rows.some((row, i) => i > 0 && daysBetween(rows[i - 1].date, row.date) > 10),
-    source: 'https://docs.alpaca.markets/us/reference/stockbars',
-  };
-}
-
-const old = await readFile(snapshotPath, 'utf8').then(JSON.parse).catch(() => ({ stocks: {} }));
-const stocks = {};
-for (const stock of Object.values(US_STOCKS)) {
-  const { symbol, cik } = stock;
-  try {
-    const raw = config.SEC_FIXTURE_DIRECTORY
-      ? JSON.parse(await readFile(`${config.SEC_FIXTURE_DIRECTORY}/${symbol}.json`, 'utf8'))
-      : await json(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik}.json`, {
-        'User-Agent': config.SEC_USER_AGENT || 'FinanceSchool research https://github.com/alex113607004-cmyk/finance-school',
-      });
-    stocks[symbol] = { ...normalizeSecCompany(raw, stock, cutoff, q4Releases(symbol)), checkedAt };
-  } catch (error) {
-    console.warn(`${symbol} SEC: ${error.message}`);
-    const fallback = old.stocks[symbol];
-    if (!fallback) continue;
-    stocks[symbol] = { ...fallback, warning: '本次 SEC 更新失敗，顯示前次成功擷取的申報資料。' };
-  }
-  delete stocks[symbol].history;
-  if (publishBars && config.ALPACA_API_KEY_ID && config.ALPACA_API_SECRET_KEY && ['iex', 'sip'].includes(feed)) {
-    try {
-      stocks[symbol].history = await stockHistory(symbol);
-    } catch (error) {
-      console.warn(`${symbol} Alpaca: ${error.message}`);
-      stocks[symbol].marketWarning = '本次美股盤後行情更新失敗。';
-    }
-  }
-}
-if (Object.keys(stocks).length !== Object.keys(US_STOCKS).length) {
-  throw new Error('One or more initial SEC snapshots could not be generated');
-}
-const temp = new URL(snapshotPath.href + '.tmp');
-await writeFile(temp, JSON.stringify({ stocks }) + '\n');
-await rename(temp, snapshotPath);
-for (const stock of Object.values(stocks)) {
-  console.log(`${stock.symbol}: ${stock.periods.length} periods, ${stock.quarterlyEps.length} EPS observations, ${stock.history?.rows.length || 0} daily bars`);
-}
+const result={schemaVersion:1,generatedAt:new Date().toISOString(),asOf,source:'SEC EDGAR Company Facts + Submissions',stocks,policy:{quotes:'unavailable-until-display-rights-verified',secAutomaticUpdate:!!ua&&/@/.test(ua),secRequestsPerSecond:1,financialVersions:'latest-public-as-of-observation',eps:'direct-quarterly-GAAP-diluted; Q4 verified from issuer 8-K exhibit'}};
+fs.writeFileSync(path,JSON.stringify(result)+'\n');
+// Small fallback avoids shipping raw SEC facts inside the initial HTML bundle.
+fs.writeFileSync('src/generated/us-summary.json',JSON.stringify({...result,stocks:Object.fromEntries(Object.entries(stocks).map(([id,s])=>[id,{...s,financials:undefined}]))})+'\n');

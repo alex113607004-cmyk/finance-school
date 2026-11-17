@@ -4,7 +4,6 @@ import {stages,units,resources,glossary,REVIEWED_AT} from './data.js';
 import {filterUnits,parseStoredList} from './domain.js';
 import Market from './components/Market';
 import StockAnalysis from './components/StockAnalysis';
-import UsStockAnalysis from './components/UsStockAnalysis';
 import {VisitRefreshStatus} from './MarketDataContext';
 import {LearningUnit,UnitCard,SourceLibrary} from './components/Learning';
 
@@ -43,7 +42,7 @@ export default function App(){
  const nav=[['learn',BookOpen,'學習主題'],['sources',Library,'精選教材'],['analysis',CandlestickChart,'個股分析'],['market',ChartNoAxesCombined,'台美股看盤'],['glossary',Globe2,'名詞知識庫'],['bookmarks',FolderHeart,'我的收藏']];
  function goStage(id){setStage(id);setQuery('');setStatus('all');setMobile(false);if(view!=='learn')window.location.hash='learn';}
  function termButton(t){return <button className="term-button" onClick={()=>setTerm(t)}>{t}<Info size={12}/></button>}
- useEffect(()=>{setMobile(false);document.title=(view==='analysis'?(param==='us'?'美股':'台股')+'個股分析｜':view==='unit'&&currentUnit?currentUnit.title+'｜':'')+'新手財經小學堂：台美股實戰知識庫'},[view,param,currentUnit]);
+ useEffect(()=>{setMobile(false);document.title=(view==='analysis'?'台美股個股分析｜':view==='unit'&&currentUnit?currentUnit.title+'｜':'')+'新手財經小學堂：台美股實戰知識庫'},[view,param,currentUnit]);
  return <>
   <a className="skip-link" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>跳到主要內容</a>
   <aside className={'sidebar '+(mobile?'mobile-open':'')}>
@@ -57,7 +56,7 @@ export default function App(){
   <div className="app-shell"><header className="topbar"><div className="topbar-title"><button className="mobile-menu icon-button" onClick={()=>setMobile(true)} aria-label="開啟導覽"><Menu size={22}/></button><span>知識是你最好的投資</span><ChevronRight size={13}/><b>{view==='unit'?'學習單元':nav.find(n=>n[0]===view)?.[2]||'學習主題'}</b></div><label className="global-search"><Search size={17}/><input type="search" aria-label="搜尋所有教學單元" placeholder="搜尋主題、重點、發布機構…" value={query} onChange={e=>{setQuery(e.target.value);setStage('all');if(!['learn','bookmarks','glossary','sources'].includes(view))window.location.hash='learn'}}/><kbd>⌕</kbd></label><span className="top-avatar" aria-label="本機學習空間">學</span></header>
   <main id="main-content" className="main-content" tabIndex={-1}><VisitRefreshStatus/>
    {(progressWarning||bookmarkWarning)&&<p role="status" className="notice">瀏覽器無法儲存資料；本次操作仍有效，但關閉頁面後可能不保留。</p>}
-   {view==='analysis'?(param==='us'?<UsStockAnalysis term={termButton} symbol={symbol}/>:<StockAnalysis term={termButton} param={param}/>):view==='market'?<Market term={termButton}/>:view==='unit'&&currentUnit?<LearningUnit key={param} u={currentUnit} {...{completed,bookmarks,toggleDone,toggleBookmark}} term={{has:t=>!!glossary[t],render:termButton}}/>:view==='unit'?<div className="empty-state"><h1>這個單元已更新</h1><p>請從新版主題教材繼續學習。</p><a className="primary" href="#learn">回到學習主題</a></div>:view==='sources'?<SourceLibrary {...{query,kind,setKind}}/>:view==='glossary'?<>
+   {view==='analysis'?<StockAnalysis term={termButton} param={param} symbol={symbol}/>:view==='market'?<Market term={termButton}/>:view==='unit'&&currentUnit?<LearningUnit key={param} u={currentUnit} {...{completed,bookmarks,toggleDone,toggleBookmark}} term={{has:t=>!!glossary[t],render:termButton}}/>:view==='unit'?<div className="empty-state"><h1>這個單元已更新</h1><p>請從新版主題教材繼續學習。</p><a className="primary" href="#learn">回到學習主題</a></div>:view==='sources'?<SourceLibrary {...{query,kind,setKind}}/>:view==='glossary'?<>
     <div className="page-title"><span className="eyebrow">YOUR INVESTING DICTIONARY</span><h1>把陌生名詞，變成理解。</h1><p>用上方搜尋篩選定義與例子，再到相關單元閱讀來源。</p></div><div className="dictionary-grid">{Object.entries(glossary).filter(([k,v])=>(k+v.join('')).toLocaleLowerCase().includes(query.toLocaleLowerCase())).map(([k,v])=><article className="panel dictionary-entry" key={k}><h2>{termButton(k)}</h2><p>{v[0]}</p><div className="example-small">例如：{v[1]}</div>{units.find(u=>u.tags.includes(k))&&<a className="text-link" href={'#unit/'+units.find(u=>u.tags.includes(k)).id}>閱讀相關單元 <ArrowUpRight size={14}/></a>}</article>)}</div>
    </>:<>
     {!isBookmarks&&!query&&stage==='all'?<LearningHero next={next} completed={completed}/>:<div className="page-title"><span className="eyebrow">{isBookmarks?'YOUR READING COLLECTION':'EXPLORE BY TOPIC'}</span><h1>{isBookmarks?'留下想深入讀的內容。':query?'找到你現在想理解的事。':stages.find(s=>s.id===stage)?.name||'學習主題'}</h1><p>{isBookmarks?'收藏整個單元，連同重點與原始教材一起保存。':'從中文重點開始，接著閱讀原文或觀看官方教學。'}</p></div>}

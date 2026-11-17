@@ -3,6 +3,15 @@
 繁體中文的來源導讀與台美股資料學習網站。正式網站：
 https://alex113607004-cmyk.github.io/finance-school/
 
+## 台美股個股研究
+
+新增市場切換、含市場的網址、AAPL／MSFT 的 SEC 財報、季度與近四季稀釋 EPS、營收與獲利率、現金流及可展開的來源／算式。台股沿用官方流程，個股圖改用 Lightweight Charts，保留拖曳查值與日／週／月切換。
+
+- [台積電](https://alex113607004-cmyk.github.io/finance-school/#analysis/TW/2330) · [Apple](https://alex113607004-cmyk.github.io/finance-school/#analysis/US/AAPL) · [Microsoft](https://alex113607004-cmyk.github.io/finance-school/#analysis/US/MSFT)
+- **美股行情尚無可公開展示的來源，價格、K 線與估值明確保留缺口。** SEC 基本面可查；依使用者選擇，未設定識別用聯絡資訊，因此 SEC 自動更新預設暫停，保留原始查核日。
+- [來源、授權狀態、更新頻率、介接設定與驗算](docs/TW-US-ANALYSIS.md)
+- 本機 `npm run dev`；正式子路徑預覽 `npm run build:pages && npm run preview:pages`，開啟 `http://127.0.0.1:4176/finance-school/#analysis/US/AAPL`。
+
 ## 全市場台股個股分析
 
 [開啟個股分析](https://alex113607004-cmyk.github.io/finance-school/#analysis/6488)：已取消單一股票限制，依官方清單搜尋上市、上櫃、興櫃及基金類標的。2026-11-17 快照 2,789 檔，包含 1,392 上市、1,023 上櫃、374 興櫃。
@@ -13,7 +22,7 @@ https://alex113607004-cmyk.github.io/finance-school/
 
 - [全市場資料、涵蓋範圍、限制與驗收](docs/ALL-STOCKS.md)
 - [已核實的台積電歷史模型與原始來源](docs/STOCK-ANALYSIS.md)
-- 個股圖表可切換「開啟縮放圖表」，使用 TradingView Lightweight Charts 檢視日／週／月 K、成交量與日均線。
+- 個股圖表使用 TradingView Lightweight Charts，可滾輪／捏合縮放、拖曳讀值及切換日／週／月 K。
 - [本機 twstock 報價快照及正式即時行情介接規格](docs/REALTIME.md)
 
 ```bash
@@ -60,7 +69,7 @@ npm test
 npm run build:pages
 ```
 
-建置產出 `dist/pages/index.html`（內含程式、樣式與回退快照）、`market-data.json` 、`analysis-data.json`、`universe-data.json` 及 `stock-history/TPEX/*.json`（進站／按需更新用）。部署時上傳整個 `dist/pages/`；相對路徑與 hash 路由支援 GitHub Pages 的 repository 子路徑。
+建置產出 `dist/pages/index.html`（內含程式、樣式與回退快照）、`market-data.json` 、`analysis-data.json`、`universe-data.json` 、`us-data.json`、圖表授權文字及 `stock-history/TPEX/*.json`（進站／按需更新用）。部署時上傳整個 `dist/pages/`；相對路徑與 hash 路由支援 GitHub Pages 的 repository 子路徑。
 
 `npm run build` 另產出可選 Worker；GitHub Pages 不會執行 Worker。現有預覽若另有部署，需自行更新，這次交付以 GitHub Pages 為準。
 
