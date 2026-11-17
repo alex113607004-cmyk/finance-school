@@ -33,14 +33,21 @@ describe('stock analysis learning workflow',()=>{
   await user.clear(input);await user.type(input,'-3');expect(within(area).getByRole('status')).toHaveTextContent('EPS 為零或負值');
   await user.click(within(area).getByRole('button',{name:'還原原始資料的起始值'}));expect(within(area).getByRole('status')).toHaveTextContent('假設區間');
  });
- it('shows unsupported and unknown stock states without borrowing 2330 figures',async()=>{
+ it('queries another listed stock and handles unknown codes without borrowing 2330 data',async()=>{
   const user=userEvent.setup();setup();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());const input=screen.getByRole('combobox',{name:'搜尋個股代號或名稱'});
-  await user.type(input,'2317');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'此股票尚未有完整分析資料'})).toBeInTheDocument();expect(screen.queryByRole('region',{name:'個股基本面'})).not.toBeInTheDocument();
-  await user.clear(input);await user.type(input,'9999');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'查無支援的代號或名稱'})).toBeInTheDocument();
+  await user.type(input,'2317');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'鴻海 盤後'})).toBeInTheDocument();expect(screen.getByRole('region',{name:'個股基本面'})).toBeInTheDocument();
+  expect(screen.getByRole('region',{name:'個股盤後行情'})).not.toHaveTextContent('TWSE · 2330');
+  await user.clear(input);await user.type(input,'9999');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'查無代號或名稱'})).toBeInTheDocument();
   await user.click(screen.getByRole('button',{name:'查看台積電完整流程'}));await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent(format(analysis.stocks[2330].quote.close));
+ });
+ it('finds OTC names and separates emerging snapshots and ETFs from corporate EPS',async()=>{
+  const user=userEvent.setup();setup();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());const input=screen.getByRole('combobox',{name:'搜尋個股代號或名稱'});
+  await user.type(input,'環球');const list=screen.getByRole('listbox',{name:'股票搜尋結果'});await user.click(within(list).getByRole('button',{name:/6488/}));expect(screen.getByRole('heading',{name:'環球晶 盤後'})).toBeInTheDocument();
+  await user.type(input,'1260');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'富味鄉 成交快照'})).toBeInTheDocument();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getAllByText(/不拼出假 K/).length).toBeGreaterThan(0);
+  await user.type(input,'0050');await user.click(screen.getByRole('button',{name:'分析個股'}));await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByRole('heading',{name:'基金不適用公司本益比法'})).toBeInTheDocument();expect(screen.queryByRole('region',{name:'使用者假設情境試算'})).not.toBeInTheDocument();
  });
  it('reports refresh failure and keeps the last dated snapshot',async()=>{
   vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));render(<StockAnalysis term={term}/>);
-  await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByText(/分析快照更新失敗/)).toBeInTheDocument();expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent('保留已保存版本');
+  await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByText(/全市場快照本次更新失敗/)).toBeInTheDocument();expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent('保留已保存資料');
  });
 });

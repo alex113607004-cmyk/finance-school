@@ -8,3 +8,5 @@ coverage/
 .DS_Store
 
 __pycache__/
+
+src/generated/histories/

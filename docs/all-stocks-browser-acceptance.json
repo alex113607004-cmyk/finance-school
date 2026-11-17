@@ -1,0 +1,101 @@
+[
+  {
+    "device": "desktop",
+    "checks": [
+      {
+        "code": "2317",
+        "heading": "鴻海 盤後",
+        "insights": [
+          "暫無適用估值",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      },
+      {
+        "code": "6488",
+        "heading": "環球晶 盤後",
+        "insights": [
+          "暫無適用估值",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      },
+      {
+        "code": "0050",
+        "heading": "元大台灣50 盤後",
+        "insights": [
+          "基金不適用公司本益比法",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      },
+      {
+        "code": "1260",
+        "heading": "富味鄉 成交快照",
+        "insights": [
+          "暫無適用估值",
+          "均線資料不足"
+        ],
+        "overflow": 0
+      },
+      {
+        "code": "2330",
+        "heading": "台積電 盤後",
+        "insights": [
+          "低於歷史估值區間",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      }
+    ],
+    "errors": []
+  },
+  {
+    "device": "phone",
+    "checks": [
+      {
+        "code": "6488",
+        "heading": "環球晶 盤後",
+        "insights": [
+          "暫無適用估值",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      },
+      {
+        "code": "00679B",
+        "heading": "元大美債20年 盤後",
+        "insights": [
+          "基金不適用公司本益比法",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      }
+    ],
+    "errors": []
+  },
+  {
+    "device": "ipad",
+    "checks": [
+      {
+        "code": "2330",
+        "heading": "台積電 盤後",
+        "insights": [
+          "低於歷史估值區間",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      },
+      {
+        "code": "6274",
+        "heading": "台燿 盤後",
+        "insights": [
+          "暫無適用估值",
+          "現價低於 20 日均線"
+        ],
+        "overflow": 0
+      }
+    ],
+    "errors": []
+  }
+]

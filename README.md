@@ -3,23 +3,25 @@
 繁體中文的來源導讀與台美股資料學習網站。正式網站：
 https://alex113607004-cmyk.github.io/finance-school/
 
-## 台股個股分析（新增）
+## 全市場台股個股分析
 
-[直接開啟台積電分析](https://alex113607004-cmyk.github.io/finance-school/#analysis/2330)：第一版完整支援 2330 台積電，原始盤後行情、日／週／月 K、成交量、MA5/20/60、近四季稀釋 EPS、月營收年增與營業現金流。
+[開啟個股分析](https://alex113607004-cmyk.github.io/finance-school/#analysis/6488)：已取消單一股票限制，依官方清單搜尋上市、上櫃、興櫃及基金類標的。2026-11-17 快照 2,789 檔，包含 1,392 上市、1,023 上櫃、374 興櫃。
 
-依各月末當時已公告的財報重算自身歷史本益比，列出 P25～P75、四季來源與完整算式；現價相對歷史區間、相對 MA20 分開呈現。可拖曳圖表、展開計算、調整假設 EPS／倍數，名詞與教材互相連結。資料不足或 EPS 非正不套本益比法。
+上市／上櫃提供日、週、月 K、成交量、MA5/20/60 與拖曳虛線；依公司申報資料整理累計 EPS、月營收年增、財報比率及官方 PE/PB/殖利率。搜尋支援部分名稱、英文簡稱、市場篩選與最近查看，不借用上一檔股票數據。
 
-- [資料、公式、原始數字及參考專案授權](docs/STOCK-ANALYSIS.md)
-- [即時行情所需憑證、後端與介接規格（尚未接通）](docs/REALTIME.md)
-- [Chromium 桌面／手機／iPad 尺寸驗收](docs/analysis-browser-acceptance.json)
+連續四季 EPS、公告日與歷史樣本未核實的股票不套歷史估值；累計 EPS 不冒充 TTM。現金流未接入時列出缺口，興櫃不以議價均價製造 K 線，ETF 不套公司本益比法。
+
+- [全市場資料、涵蓋範圍、限制與驗收](docs/ALL-STOCKS.md)
+- [已核實的台積電歷史模型與原始來源](docs/STOCK-ANALYSIS.md)
+- [即時行情介接規格（尚未接通）](docs/REALTIME.md)
 
 ```bash
 npm ci
 npm run dev -- --port 4173
-# http://127.0.0.1:4173/#analysis/2330
+# http://127.0.0.1:4173/#analysis/6488
 ```
 
-盤後資料可直接使用已保存快照。另行更新：`npm run update:market`、`npm run update:analysis`（後者需 Python 3 與 poppler-utils 的 pdftotext）。自動部署已包含更新步驟；GitHub 執行環境對公司 IR 回覆 403 時會顯示警示、保留查核快照，在下一季已結束而無法核實新季時停止估值（詳見資料文件）。此版沒有即時行情憑證，不把盤後價當即時價。
+上櫃歷史資產在 dev/build 前由保存的官方日報重建，適用 GitHub Pages。原始更新依序為 `npm run update:market`、`npm run update:analysis`、`npm run update:universe`；財報新聞稿解析需 Python 3 與 poppler-utils。GitHub 排程仍為台北 17:00、21:00。
 
 ## 目前功能
 
@@ -53,7 +55,7 @@ npm test
 npm run build:pages
 ```
 
-建置產出 `dist/pages/index.html`（內含程式、樣式與回退快照）、`market-data.json` 及 `analysis-data.json`（進站更新用）。部署時上傳整個 `dist/pages/`；相對路徑與 hash 路由支援 GitHub Pages 的 repository 子路徑。
+建置產出 `dist/pages/index.html`（內含程式、樣式與回退快照）、`market-data.json` 、`analysis-data.json`、`universe-data.json` 及 `stock-history/TPEX/*.json`（進站／按需更新用）。部署時上傳整個 `dist/pages/`；相對路徑與 hash 路由支援 GitHub Pages 的 repository 子路徑。
 
 `npm run build` 另產出可選 Worker；GitHub Pages 不會執行 Worker。現有預覽若另有部署，需自行更新，這次交付以 GitHub Pages 為準。
 

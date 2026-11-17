@@ -32,6 +32,16 @@ jobs:
       - name: Refresh point-in-time stock analysis
         if: github.event_name != 'pull_request'
         run: npm run update:analysis
+      - name: Restore official OTC daily archive
+        uses: actions/cache@v4
+        with:
+          path: data/universe/tpex-days
+          key: otc-daily-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            otc-daily-${{ runner.os }}-
+      - name: Refresh all-market stock catalog and OTC history
+        if: github.event_name != 'pull_request'
+        run: npm run update:universe
       - run: npm test
       - name: Build standalone page
         run: npm run build:pages
