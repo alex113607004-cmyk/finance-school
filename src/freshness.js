@@ -12,5 +12,22 @@ export function taipeiTime(iso){if(!iso)return'尚未成功查詢';const d=new D
 export function newestData(incoming,known){
  if(!incoming)return known;if(!known)return incoming;const result={...incoming,sources:{...incoming.sources},sourceChecks:{...incoming.sourceChecks},warnings:[...(incoming.warnings||[])]};
  for(const key of ['quote','valuation','profit']){const date=x=>key==='profit'?`${x?.year||0}-${x?.quarter||0}`:x?.date||'';if(known[key]&&date(known[key])>date(incoming[key])){result[key]=known[key];const source=key==='quote'?'quotes':key;result.sources[source]=known.sources?.[source];result.sourceChecks[source]=known.sourceChecks?.[source]||known.fetchedAt;result.warnings.push(`${key==='quote'?'行情':key==='valuation'?'估值':'財報'}來源本次回傳較舊或缺少資料，保留已查核的較新期間。`);}}
+ if(known.fundamentals){
+  const prior=known.fundamentals,next=incoming.fundamentals;
+  result.fundamentals={...prior,...next};
+  if(!next||next.kind==='unavailable'&&prior.kind!=='unavailable'){
+   result.fundamentals={...prior};result.company=incoming.company||known.company;
+   for(const key of ['companies','revenue','earnings','balance']){result.sources[key]=known.sources?.[key];result.sourceChecks[key]=known.sourceChecks?.[key]||null;}
+   result.warnings.push('基本面來源本次缺少資料，保留前次成功查核的快照。');
+  }else for(const key of ['revenue','earnings','balance']){
+   const date=x=>key==='revenue'?x?.month||'':x?.period?.end||'';
+   if(prior[key]&&(!next[key]||date(prior[key])>date(next[key])||date(prior[key])===date(next[key])&&(prior[key].tableDate||'')>(next[key].tableDate||''))){
+    result.fundamentals[key]=prior[key];result.sources[key]=known.sources?.[key];result.sourceChecks[key]=known.sourceChecks?.[key]||null;
+    result.warnings.push(`${key==='revenue'?'月營收':key==='earnings'?'累計損益':'資產負債'}來源本次回傳較舊或缺少資料，保留已查核的較新期間。`);
+   }
+  }
+  const matches=peer=>peer&&peer.date===result.valuation?.date&&peer.financialPeriod===result.valuation?.financialPeriod;
+  result.fundamentals.peer=matches(next?.peer)?next.peer:matches(prior.peer)?prior.peer:null;
+ }
  return result;
 }

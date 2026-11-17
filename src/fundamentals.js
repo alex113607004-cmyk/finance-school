@@ -1,0 +1,38 @@
+import {taipeiDate} from './freshness.js';
+const finite=Number.isFinite;
+export const MODEL_VERSION='基本面觀察模型 1.0';
+export function analyzeFundamentals(data,now=new Date()){
+ const f=data?.fundamentals,companyName=data?.name||'此標的';
+ const base={version:MODEL_VERSION,name:companyName,strengths:[],concerns:[],gaps:['營業現金流、自由現金流與多年獲利趨勢尚未接入，無法確認獲利的現金品質。'],checks:[],criticalGaps:[],status:'insufficient',title:'資料不足，暫不能判斷買進條件',summary:'先補齊資料，避免只憑單一本益比或股價決定。'};
+ if(!f)return {...base,gaps:['尚未取得此標的基本面資料。',...base.gaps]};
+ if(f.kind!=='company')return {...base,status:'special',title:f.kind==='etf'?'ETF 需採基金評估方法':f.kind==='financial'?'金融股需採金融業評估方法':'尚未接入此標的的基本面資料',summary:f.kind==='etf'?'請檢視指數、成分集中、費用、追蹤差異與配息口徑；不套用單一公司的毛利率或負債門檻。':f.kind==='financial'?'應另看資本適足率、資產品質及業別獲利結構，本頁不套用一般公司的流動比率與毛利率門檻。':'目前不能產生基本面買進判讀。'};
+ const e=f.earnings,r=f.revenue,b=f.balance,p=data.profit,v=data.valuation,peer=f.peer;
+ const add=(key,label,status,reason)=>{base.checks.push({key,label,status,reason});if(status==='support')base.strengths.push(reason);else if(status==='caution')base.concerns.push(reason);else base.criticalGaps.push(reason)};
+ const profitKnown=[e?.epsYtd,p?.gross,p?.operating,p?.net].every(finite);
+ add('profitability','獲利能力',!profitKnown?'missing':e.epsYtd>0&&p.operating>0&&p.net>0?'support':'caution',!profitKnown?'累計 EPS、營業利益率或淨利率資料缺漏。':e.epsYtd>0&&p.operating>0&&p.net>0?'已公布累計 EPS、營業利益率與淨利率均為正，具備本模型的獲利條件。':'累計 EPS 或利益率未維持正值，本模型的獲利條件未通過。');
+ const growthKnown=[r?.yoy,r?.ytdGrowth].every(finite);
+ add('growth','營收成長',!growthKnown?'missing':r.yoy>0&&r.ytdGrowth>0?'support':'caution',!growthKnown?'月營收年增與累計年增資料缺漏。':r.yoy>0&&r.ytdGrowth>0?`${r.month} 單月與年初累計營收均較去年同期成長，但尚不能推論淨利同步成長。`:'單月或累計營收未較去年同期成長，需確認淡旺季、基期與需求變化。');
+ const balanceKnown=[b?.debtRatio,b?.currentRatio,b?.equity].every(finite);
+ add('balance','財務結構',!balanceKnown?'missing':b.debtRatio<=60&&b.currentRatio>=100&&b.equity>0?'support':'caution',!balanceKnown?'一般業資產負債、流動比率或權益資料缺漏。':b.debtRatio<=60&&b.currentRatio>=100&&b.equity>0?'負債占資產不高於 60%、流動比率至少 100% 且權益為正，通過本頁的初步財務篩選。':'負債占比、流動比率或權益未通過本頁篩選；需先研究債務到期、流動性與資產品質。');
+ const valuationKnown=finite(v?.pe)&&v.pe>0&&peer?.count>=5&&finite(peer.median)&&peer.median>0&&peer.date===v.date&&!!v.financialPeriod&&peer.financialPeriod===v.financialPeriod&&peer.industryCode===f.industryCode;
+ add('valuation','相對估值',!valuationKnown?'missing':v.pe<=peer.median?'support':'caution',!valuationKnown?'缺少正本益比或至少 5 家同產業、同估值日、同參考財報期的可比較樣本。':v.pe<=peer.median?`本益比不高於 ${peer.count} 家同產業正本益比樣本的中位數；這是相對位置，不是低估證明。`:'本益比高於同業正本益比樣本中位數；買進前須確認成長能否支持溢價，不能只因獲利為正就忽略價格。');
+ const today=taipeiDate(now),age=date=>/^\d{4}-\d{2}-\d{2}$/.test(date||'')&&finite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date?(Date.parse(today)-Date.parse(date))/86400000:Infinity;
+ if(!finite(data.quote?.close)||data.quote.close<=0)base.criticalGaps.push('缺少有效的正收盤價，無法評估這個買進價格。');
+ if(!data.quote?.date||age(data.quote.date)>7||age(data.quote.date)<0)base.criticalGaps.push('價格日期缺漏、異常或距今超過 7 個日曆日，無法用來評估當下估值。');
+ if(data.quote?.date!==v?.date)base.criticalGaps.push('收盤價與估值日期不一致，需等同日資料對齊。');
+ const periodKey=x=>x?`${x.year}-${x.quarter}`:null;
+ if(!e?.period||!b?.period||periodKey(e.period)!==periodKey(b.period)||periodKey(e.period)!==periodKey(p))base.criticalGaps.push('損益、資產負債與三率的會計季度不一致或未提供。');
+ if(age(e?.period?.end)>200||age(e?.period?.end)<0)base.criticalGaps.push('財報期末日期缺漏、過舊或晚於今天，應核對最近已公告財報。');
+ const ym=r?.month?.match(/^(\d{4})-(\d{2})$/),months=ym?(Number(today.slice(0,4))-Number(ym[1]))*12+Number(today.slice(5,7))-Number(ym[2]):Infinity;
+ if(months>2||months<0||!ym||Number(ym[2])<1||Number(ym[2])>12)base.criticalGaps.push('營收月份尚未提供、距今超過 2 個月或月份異常。');
+ const sourceLabels={quotes:'行情',valuation:'估值',profit:'三率',companies:'產業代碼',earnings:'累計損益',revenue:'月營收',balance:'資產負債'};
+ const unchecked=Object.keys(sourceLabels).filter(key=>{const time=Date.parse(data.sourceChecks?.[key]);return !finite(time)||now.getTime()-time>72*3600000||time>now.getTime()+300000});
+ if(unchecked.length)base.criticalGaps.push(`${unchecked.map(k=>sourceLabels[k]).join('、')}來源超過 72 小時未成功查核、時間異常或未提供查核時間，請先更新資料。`);
+ if(data.warnings?.some(x=>/來源本次|失敗|較舊|缺少|無法取得/.test(x)))base.criticalGaps.push('本次來源有缺漏或沿用資料，先核對原始公告再作買進判斷。');
+ base.gaps=[...new Set([...base.criticalGaps,...base.gaps])];
+ const hardRisk=profitKnown&&e.epsYtd<=0||balanceKnown&&b.equity<=0;
+ if(base.criticalGaps.length)return {...base,summary:'部分數字可以閱讀，但關鍵資料尚未齊備或日期未對齊，不能據此形成當下買進結論。'};
+ if(hardRisk)return {...base,status:'caution',title:'先觀望：獲利或權益出現警訊',summary:'不符合此一般業基本面模型的買進條件。應先釐清虧損持續性、資產品質及改善證據。'};
+ if(base.checks.every(c=>c.status==='support'))return {...base,status:'candidate',title:'有條件列入買進研究候選',summary:'以中長期一般業基本面策略觀察，獲利、營收成長、初步財務與相對估值均有支持。買進前仍需補核現金流、獲利可持續性及個人部位風險。'};
+ return {...base,status:'watch',title:'先觀察，買進條件尚未全部符合',summary:base.checks.find(c=>c.key==='valuation')?.status==='caution'?'現有價格包含同業比較下的估值溢價，或還有其他基本面風險；先確認溢價理由，再決定是否接受這個價格。':'先處理成長或財務結構的疑點，再確認是否適合列入買進候選。'};
+}

@@ -1,0 +1,118 @@
+{
+  "code": "2330",
+  "name": "台積電",
+  "fetchedAt": "2026-11-17T02:43:36.179Z",
+  "quote": {
+    "date": "2026-11-16",
+    "close": 2215,
+    "open": 2340,
+    "high": 2350,
+    "low": 2215,
+    "volume": 52604545,
+    "change": -135,
+    "changePercent": -5.74468085106383
+  },
+  "valuation": {
+    "date": "2026-11-16",
+    "pe": 22.54,
+    "pb": 8.21,
+    "yield": 0.99,
+    "financialPeriod": "115/3"
+  },
+  "profit": {
+    "year": 2026,
+    "quarter": 3,
+    "period": "2026/01/01–2026/09/30（累計）",
+    "tableDate": "2026-11-17",
+    "gross": 66.79,
+    "operating": 59.05,
+    "net": 52.4
+  },
+  "company": {
+    "fullName": "台灣積體電路製造股份有限公司",
+    "english": "TSMC",
+    "industryCode": "24",
+    "listed": "1994-09-05",
+    "website": "https://www.tsmc.com"
+  },
+  "sources": {
+    "quotes": "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20261101&stockNo=2330",
+    "valuation": "https://www.twse.com.tw/exchangeReport/BWIBBU_d?response=json&date=20261116&selectType=ALL",
+    "profit": "https://openapi.twse.com.tw/v1/opendata/t187ap17_L",
+    "companies": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+    "revenue": "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+    "earnings": "https://openapi.twse.com.tw/v1/opendata/t187ap14_L",
+    "balance": "https://openapi.twse.com.tw/v1/opendata/t187ap07_L_ci"
+  },
+  "warnings": [],
+  "fundamentals": {
+    "kind": "company",
+    "industryCode": "24",
+    "industryName": "半導體業",
+    "revenue": {
+      "month": "2026-10",
+      "tableDate": "2026-11-16",
+      "amount": 586890319,
+      "priorMonth": 511857399,
+      "priorYear": 367473051,
+      "yoy": 59.709757600700904,
+      "mom": 14.658949962741477,
+      "ytdGrowth": 43.29045540365918,
+      "unit": "新台幣千元"
+    },
+    "earnings": {
+      "period": {
+        "year": 2026,
+        "quarter": 3,
+        "label": "2026 Q3（年初累計）",
+        "end": "2026-09-30"
+      },
+      "tableDate": "2026-11-17",
+      "epsYtd": 78.75,
+      "revenue": 3898726974,
+      "operatingProfit": 2302013957,
+      "netProfit": 2042923054,
+      "unit": "新台幣千元（EPS 為元／股）"
+    },
+    "balance": {
+      "period": {
+        "year": 2026,
+        "quarter": 3,
+        "label": "2026 Q3（年初累計）",
+        "end": "2026-09-30"
+      },
+      "tableDate": "2026-11-17",
+      "assets": 10052887514,
+      "liabilities": 3009660084,
+      "currentAssets": 5084925495,
+      "currentLiabilities": 1967745043,
+      "equity": 7043227430,
+      "debtRatio": 29.93826480012477,
+      "currentRatio": 258.4138383724542,
+      "unit": "新台幣千元"
+    },
+    "cashflow": null,
+    "peer": {
+      "industryCode": "24",
+      "date": "2026-11-16",
+      "financialPeriod": "115/3",
+      "count": 80,
+      "median": 21.31,
+      "p25": 13.0625,
+      "p75": 35.6225,
+      "percentile": 51.24999999999999,
+      "excludesSelf": true,
+      "positiveOnly": true
+    }
+  },
+  "sourceChecks": {
+    "quotes": "2026-11-17T02:43:36.179Z",
+    "valuation": "2026-11-17T02:43:34.624Z",
+    "profit": "2026-11-17T02:43:33.315Z",
+    "companies": "2026-11-17T02:43:33.270Z",
+    "revenue": "2026-11-17T02:43:33.248Z",
+    "earnings": "2026-11-17T02:43:32.791Z",
+    "balance": "2026-11-17T02:43:33.340Z"
+  },
+  "mode": "daily-snapshot"
+}

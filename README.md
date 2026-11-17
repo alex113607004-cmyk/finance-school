@@ -92,10 +92,12 @@ scripts/build-worker.mjs   產出 Worker（Pages 不需要）
 
 本版已內建最新查核的全上市證券盤後快照，GitHub Pages 不設定 API 也能顯示股價、本益比與適用財報欄位。
 
-- `npm run update:market`：從官方來源擷取全上市行情／估值／營益分析／公司資料，寫入 `src/generated/market.json`，不需要金鑰。
+正式網站：https://alex113607004-cmyk.github.io/finance-school/#market
+
+- `npm run update:market`：從官方來源擷取全上市行情／估值／營益分析／公司資料／月營收／累計 EPS／一般業資產負債表，寫入 `src/generated/market.json`，不需要金鑰。
 - 若 OpenAPI 彙總更新較慢，另核對按日期查詢的正式估值報表；採較新來源的收盤價、本益比、股價淨值比等，不把舊數字改標今日。
 - 日均線快照預設涵蓋 2330、2317、2454、0050。其他股票的股價與適用財務比率仍有快照，任意個股日均線可透過 API 取得。可用 `MARKET_HISTORY_CODES` 環境變數調整日線清單，逗號分隔。
-- workflow 已加入每日 UTC 09:00、13:00（台北 17:00、21:00）擷取、測試後建置及部署；GitHub 排程可能延後，repository 須先建立、啟用 Pages 並允許 Actions。本次尚未替你啟用不存在的 repository。
+- workflow 已加入每日 UTC 09:00、13:00（台北 17:00、21:00）擷取、測試後建置及部署；GitHub 排程可能延後，repository 須先建立、啟用 Pages 並允許 Actions。目前已在本 repository 啟用 GitHub Actions 與 Pages，排程仍可能因 GitHub 延後或停用而未執行。
 - Pages 將最新資料嵌入單檔 HTML。訪客可按「更新資料」重載最新已部署快照；網頁不會自行從 GitHub 觸發 Actions。公開 repository 長時間沒有活動可能被 GitHub 暫停排程，請留意 Actions 狀態。
 - Sites 預覽則在進入看盤、每分鐘、切回頁面與手動更新時重查同源 API。來源快取最多 5 分鐘，強制重驗最短 15 秒，跨台北日期不沿用前一日快取。
 - 更新狀態分開顯示「交易日期／估值日期／財報期間／來源實際擷取時間」。`servedAt` 只是 API 回應時間，不冒充資料擷取時間。
@@ -121,3 +123,27 @@ npm run build:pages
 
 官方說明：https://support.google.com/docs/answer/3093281?hl=zh-Hant
 Google Finance 聲明：https://www.google.com/intl/en/googlefinance/disclaimer/
+
+## 個股基本面整理與條件判讀
+
+在「看盤與查閱」選擇股票後，下方會整理獲利、營收成長、財務結構及相對估值。股價卡上的「查看基本面判讀」可直接捲至摘要，名詞可點開定義。`src/fundamentals.js` 為可測試的固定規則，`FundamentalSummary.jsx` 負責呈現。
+
+- 獲利：累計基本 EPS、營業利益率與淨利率均為正；三率／EPS／資產負債須同一季度。累計 EPS 不乘上年化倍數，也不代替近四季 EPS 重算本益比。
+- 成長：單月及年初累計營收較去年同期均成長；MoM 僅作背景。顯示原始千元數字與重算公式，不宣稱營收成長等於淨利成長。
+- 財務：一般業負債比率 ≤60%、流動比率 ≥100% 且權益為正。這些是本頁自訂篩選門檻，沒有通用安全線之意。
+- 估值：至少 5 家其他上市公司，產業代碼、估值日期及官方參考財報期相同、本益比為正；比較中位數及第 25／75 百分位（線性內插）。低於中位數不是低估證明；未做成長調整，排除虧損樣本可能有選擇偏誤。
+- 資料門檻：價與估值同日，價格距今 ≤7 個日曆日、財報期末 ≤200 日、營收月份距今 ≤2 月，每個必要來源須在 72 小時內成功查核。缺漏、未來異常、期間不齊與沿用資料會暫停買進候選結論。
+- 四項有支持時顯示「有條件列入買進研究候選」；有未通過條件時顯示「先觀察」，關鍵資料缺漏顯示「資料不足」。金融股、ETF 及未接入美股另用研究說明，不套一般業門檻。
+
+候選不是個人買進指令，也不是回測策略。營業／自由現金流、多年 EPS 與利潤趨勢、前瞻估值、個人期限與部位仍未接入，頁面明列這些缺口。只以正式盤後價評估，沒有目標價、未來勝率或保證報酬。
+
+新增來源（均為證交所公開資訊）：
+
+| 資料 | 來源 |
+| --- | --- |
+| 月營收 | https://openapi.twse.com.tw/v1/opendata/t187ap05_L |
+| 各產業 EPS／累計損益 | https://openapi.twse.com.tw/v1/opendata/t187ap14_L |
+| 一般業資產負債 | https://openapi.twse.com.tw/v1/opendata/t187ap07_L_ci |
+| 公式與期間口徑 | https://mopsfin.twse.com.tw/terms |
+
+每個欄位保留會計期間、出表日及來源擷取時間。這些 API 沒有提供個別公司公告日，本頁標示「未提供」，不把出表日冒充公告日。詳細規則可在報告下方展開。
