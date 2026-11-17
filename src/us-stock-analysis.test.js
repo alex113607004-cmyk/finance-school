@@ -43,16 +43,19 @@ describe('US filings and market-time valuation', () => {
       rows.push({ date: day.toISOString().slice(0, 10), open: 100, high: 105, low: 95, close: 100, volume: 50 });
     }
     const history = { rows, feed: 'sip', splitBasisConfirmed: true, partial: false };
-    const observation = valueUsStock({ ...AAPL, history }, testDay);
+    const researched = { ...AAPL, history, warning: null };
+    const observation = valueUsStock(researched, testDay);
     expect(observation.available).toBe(true);
     expect(observation.samples.length).toBeGreaterThanOrEqual(24);
     expect(observation.low).toBeCloseTo(observation.p25 * 8.97);
     expect(observation.high).toBeCloseTo(observation.p75 * 8.97);
-    expect(valueUsStock({ ...AAPL, history: { ...history, feed: 'iex' } }, testDay).available).toBe(false);
-    expect(valueUsStock({ ...AAPL, history: { ...history, splitBasisConfirmed: false } }, testDay).samples).toEqual([]);
-    expect(valueUsStock({ ...AAPL, history }, '2026-12-04').available).toBe(false);
-    expect(valueUsStock({ ...AAPL, history, quarterlyEps: AAPL.quarterlyEps.map(x => ({ ...x, value: -1 })) }, testDay).available).toBe(false);
+    expect(valueUsStock({ ...researched, history: { ...history, feed: 'iex' } }, testDay).available).toBe(false);
+    expect(valueUsStock({ ...researched, history: { ...history, splitBasisConfirmed: false } }, testDay).samples).toEqual([]);
+    expect(valueUsStock(researched, '2026-12-04').available).toBe(false);
+    expect(valueUsStock({ ...researched, quarterlyEps: AAPL.quarterlyEps.map(x => ({ ...x, value: -1 })) }, testDay).available).toBe(false);
     expect(valueUsStock(AAPL, testDay).reasons).toContain('尚無可公開展示的美股行情。');
+    expect(valueUsStock({ ...researched, warning: 'SEC update failed' }, testDay).reasons)
+      .toContain('本次財報更新失敗，尚未確認是否有更新申報。');
   });
 
   it('does not treat a year-to-date EPS or a replayed prior-year comparative as the current quarter', () => {
