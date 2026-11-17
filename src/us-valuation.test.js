@@ -3,6 +3,7 @@ import {analyzeUSValuation} from './us-valuation';
 import {securityId,parseAnalysisAddress,analysisHref,quoteStatus,alignEPSForSplits} from './security';
 import {publicQuoteBundle} from '../scripts/us-quote-provider.mjs';
 import {nextDay} from './sec-financials';
+import {alpacaPublication} from '../scripts/us-alpaca-provider.mjs';
 function fixture(){
  const periods=[],eps=[],rows=[],completeMonths=[];
  for(let y=2021;y<=2026;y++)for(let q=1;q<=4;q++){
@@ -27,5 +28,16 @@ describe('public quote adapter rights gate',()=>{
  it('never publishes yfinance or unverified licenses and strips provider secrets',()=>{
   const input={provider:'licensed-test',region:'US',symbol:'TEST',exchange:'NASDAQ',apiKey:'never-publish',quote:fixture().quote,history:fixture().history,license:{publicDisplayAllowed:true,documentation:'https://example.com/contract',checkedAt:'2026-11-17'}};
   expect(publicQuoteBundle(input).quote.price).toBeNull();expect(publicQuoteBundle({...input,provider:'yfinance'},{publicDisplayConfirmed:true}).quote.price).toBeNull();const bundle=publicQuoteBundle(input,{publicDisplayConfirmed:true});expect(bundle.quote.price).toBe(40);expect(JSON.stringify(bundle)).not.toContain('never-publish');expect(publicQuoteBundle(null).quote.status).toBe('unavailable');
+ });
+});
+describe('existing optional Alpaca integration',()=>{
+ const company={ticker:'AAPL',cik:'0000320193',exchange:'NASDAQ'};
+ it('does not request quotes without the explicit publish and license settings',async()=>{
+  let requested=false;const fetcher=async()=>{requested=true;};expect(await alpacaPublication(company,{config:{},fetcher})).toBeNull();await expect(alpacaPublication(company,{config:{US_PUBLISH_MARKET_DATA:'1'},fetcher})).rejects.toThrow(/條款/);expect(requested).toBe(false);
+ });
+ it('keeps raw daily timestamps distinct from trade time and excludes single-exchange valuation',async()=>{
+  const config={US_PUBLISH_MARKET_DATA:'1',ALPACA_API_KEY_ID:'private-id',ALPACA_API_SECRET_KEY:'private-secret',US_ALPACA_FEED:'iex',US_MARKET_DATA_LICENSE_URL:'https://example.com/license',US_MARKET_DATA_LICENSE_CHECKED_AT:'2026-11-17',US_MARKET_DATA_CACHE_POLICY:'test contract'};
+  const fetcher=async()=>Response.json({bars:{AAPL:[{t:'2026-11-16T05:00:00Z',o:100,h:105,l:99,c:102,v:1000}]}});
+  const input=await alpacaPublication(company,{config,fetcher,now}),bundle=publicQuoteBundle(input,{publicDisplayConfirmed:true});expect(bundle.quote.timestampKind).toBe('daily-bar-start');expect(bundle.history.valuationCoverage).toBe('single-exchange');expect(JSON.stringify(bundle)).not.toContain('private-secret');expect(analyzeUSValuation({...fixture(),history:{...fixture().history,valuationCoverage:'single-exchange'}},{now}).reasons.join()).toMatch(/IEX/);
  });
 });

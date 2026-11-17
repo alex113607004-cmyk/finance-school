@@ -1,6 +1,6 @@
 import React from 'react';
 import TaiwanStockAnalysis from './TaiwanStockAnalysis';
-import USStockAnalysis from './USStockAnalysis';
+import USStockAnalysis from './USResearchPage';
 import {parseAnalysisAddress,analysisHref} from '../security';
 import '../stock-analysis.css';
 export default function StockAnalysis({param,symbol,term=t=>t}){

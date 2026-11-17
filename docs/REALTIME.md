@@ -48,3 +48,9 @@ SSE 中斷顯示最後成功值及「連線中斷」，不可保留「即時」�
 - 金鑰掃描、限流、HTTPS／CORS 與部署平台長連線實測。
 
 這些項目未宣稱通過；盤後版不依賴上述服務即可啟動及使用。
+
+## 本機試用 twstock 報價快照
+
+在 Python 虛擬環境中安裝 `python -m pip install twstock requests`，另開終端機執行 `python scripts/twstock-quote.py`。服務只在本機 4174 埠監聽。把 `VITE_TWSTOCK_LOCAL=1` 加到專案根目錄的 `.env.local`，再啟動 `npm run dev`。選擇上市或上櫃個股後，按「取得報價快照」。
+
+這是按需查詢證交所基本市況報導網站的快照，頁面顯示來源提供的行情時間，沒有 WebSocket、延遲承諾或自動輪詢。GitHub Pages 的正式版仍使用盤後行情，盤後 K 棒與估值資料照各自的來源更新。

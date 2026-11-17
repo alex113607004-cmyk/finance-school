@@ -9,6 +9,7 @@ export function analyzeUSValuation(stock,{now=new Date(),minSamples=24}={}){
  if(!status.usable)reasons.push(status.reason||'尚無可用行情。');
  if(!financials)reasons.push('尚無可追溯歷史文件版本的 EPS。');
  if(quote?.currency&&quote.currency!=='USD')reasons.push('行情與 SEC EPS 幣別不同。');
+ if(history.valuationCoverage==='single-exchange')reasons.push('IEX 為單一交易所行情，不與整合市場月末樣本混算估值。');
  if(!history.corporateActionsVerified)reasons.push('價格與 EPS 的分割／股數基準尚未核實。');
  if(history.adjustment&&history.adjustment!=='unadjusted')reasons.push('估值須使用實際未還原價格；含股利調整價格不與 EPS 混算。');
  if(history.partial||history.rows?.some(r=>!validCandle(r))||new Set((history.rows||[]).map(r=>r.date)).size!==(history.rows||[]).length)reasons.push('歷史行情缺漏、重複日期或 OHLCV 無效。');

@@ -6,7 +6,7 @@ import LightweightCandles from './LightweightCandles';
 const colors={5:'#e6bd7f',20:'#aca6ff',60:'#79c9e4'};
 export default function AnalysisChart({history,asOf,term}){
  const [kind,setKind]=useState('day'),[visible,setVisible]=useState([5,20,60]),[limit,setLimit]=useState(60),[picked,setPicked]=useState(null);
- const pointer=useRef(null),help=useId(),volumeUnit=history?.volumeUnit||'股';
+ const pointer=useRef(null),help=useId(),volumeUnit=history?.volumeUnit||'股',adjustmentLabel=history?.adjustment==='split-adjusted'?'已還原分割，未還原股利':history?.adjustment==='dividend-and-split-adjusted'?'已還原股利與分割':'未還原除權息與分割';
  const all=useMemo(()=>aggregateCandles(history?.rows||[],kind,{asOf,coverageStart:history?.coverageStart,partial:history?.partial}),[history,kind,asOf]);
  const rows=useMemo(()=>all.slice(-limit),[all,limit]),active=rows.find(r=>r.date===picked)||rows.at(-1),idx=rows.indexOf(active);
  if(!rows.length)return <p role="status">尚無完整開高低收與成交量，無法繪製 K 線。</p>;
@@ -31,7 +31,7 @@ export default function AnalysisChart({history,asOf,term}){
   </>}
   <p className="subtle chart-attribution">圖表使用 <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">TradingView Lightweight Charts™</a> · <a href="./LICENSE-lightweight-charts.txt" target="_blank" rel="noopener noreferrer">Apache 2.0</a> · <a href="./THIRD-PARTY-NOTICES.txt" target="_blank" rel="noopener noreferrer">NOTICE</a>。游標讀值與原始數字見下方。</p>
   <label className="analysis-slider">選取 K 棒<input type="range" aria-label="選取個股 K 棒" min="0" max={rows.length-1} value={idx} onChange={e=>setPicked(rows[Number(e.target.value)].date)}/></label>
-  <p className="subtle">價格與日均線皆未還原除權息，包含除息跳空；成交量採{volumeUnit}。紅 K 為收盤 ≥ 開盤，綠 K 為收盤低於開盤。週採週一至週日、月採曆月；曆週／月尚未結束時以淡色框標記，不預測未來數值。日線僅含已公布盤後資料。</p>
+  <p className="subtle">價格與日均線同為{adjustmentLabel}；未還原口徑包含除息／分割跳空。成交量採{volumeUnit}。紅 K 為收盤 ≥ 開盤，綠 K 為收盤低於開盤。週採週一至週日、月採曆月；曆週／月尚未結束時以淡色框標記，不預測未來數值。日線僅含已公布盤後資料。</p>
   {history?.partial&&<p className="notice" role="status">部分月份更新失敗或缺漏；保留原始 K 棒，所有均線與估值判讀暫停，不以插值補齊。</p>}
   <details><summary>查看 K 棒與均線原始數字（目前 {rows.length} 根）</summary><div className="table-scroll"><table><thead><tr>{['起日','末交易日','開','高','低','收',`成交量（${volumeUnit}）`,...(kind==='day'?['MA5','MA20','MA60']:['交易日數','狀態'])].map(s=><th key={s}>{s}</th>)}</tr></thead><tbody>{[...rows].reverse().map(r=><tr key={r.date}><td>{r.start}</td><td>{r.date}</td>{['open','high','low','close'].map(k=><td key={k}>{format(r[k])}</td>)}<td>{format(r.volume,0)}</td>{kind==='day'?[5,20,60].map(n=><td key={n}>{format(r['ma'+n])}</td>):<><td>{r.count}</td><td>{r.unfinished?'期中':'已結束'}{r.truncated?'／起始截斷':''}</td></>}</tr>)}</tbody></table></div></details>
  </div>;

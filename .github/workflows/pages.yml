@@ -47,7 +47,15 @@ jobs:
         run: npm run update:us
         env:
           NODE_USE_ENV_PROXY: 1
+          SEC_UPDATES_ENABLED: ${{ vars.SEC_UPDATES_ENABLED }}
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT || vars.SEC_USER_AGENT }}
+          US_PUBLISH_MARKET_DATA: ${{ vars.US_PUBLISH_MARKET_DATA }}
+          US_ALPACA_FEED: ${{ vars.US_ALPACA_FEED }}
+          ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
+          ALPACA_API_SECRET_KEY: ${{ secrets.ALPACA_API_SECRET_KEY }}
+          US_MARKET_DATA_LICENSE_URL: ${{ vars.US_MARKET_DATA_LICENSE_URL }}
+          US_MARKET_DATA_LICENSE_CHECKED_AT: ${{ vars.US_MARKET_DATA_LICENSE_CHECKED_AT }}
+          US_MARKET_DATA_CACHE_POLICY: ${{ vars.US_MARKET_DATA_CACHE_POLICY }}
       - run: npm test
       - name: Build standalone page
         run: npm run build:pages

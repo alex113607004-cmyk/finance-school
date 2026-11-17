@@ -221,6 +221,6 @@ React/jsdom 驗證摘要四區、原始值與公式展開、來源連結、切�
 
 ## 台美股統一個股研究（2026-11-17）
 
-新增市場切換與含市場網址、SEC 季度財報／直接四季稀釋 EPS、可展開來源與現金流、Lightweight Charts 與授權檔。舊台股網址和學習紀錄保留。130 項測試通過，`npm run build:pages` 與可選 Worker 建置成功；桌面、iPad 尺寸／觸控、手機與 `/finance-school/` 子路徑已在 Chromium 驗收。
+新增市場切換與含市場網址、SEC 季度財報／直接四季稀釋 EPS、可展開來源與現金流、Lightweight Charts 與授權檔。舊台股網址和學習紀錄保留。140 項測試通過，`npm run build:pages` 與可選 Worker 建置成功；桌面、iPad 尺寸／觸控、手機與 `/finance-school/` 子路徑已在 Chromium 驗收。
 
 完整數字、來源、使用條件與具體缺口見 [TW-US-ANALYSIS](TW-US-ANALYSIS.md)、[獨立重算](tw-us-recalculation.json)、[瀏覽器驗收](tw-us-browser-acceptance.json)。美股行情沒有合格公開展示來源，未發布價格、K 線或實際估值；依使用者選擇不提供識別聯絡資訊，SEC 自動更新預設暫停，保留真正查核時間。沒有把靜態財報說成即時資料，也沒有把模擬行情當成驗收結果。

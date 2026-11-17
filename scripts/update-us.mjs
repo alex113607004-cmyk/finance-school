@@ -4,8 +4,9 @@ import {extractFacts,fiscalPeriods,financialSnapshot,plainFinancialSummary} from
 import companies from '../data/us-companies.json' with {type:'json'};
 import {marketDate} from '../src/security.js';
 import {publicQuoteBundle} from './us-quote-provider.mjs';
+import {alpacaPublication} from './us-alpaca-provider.mjs';
 const now=new Date(),asOf=marketDate(now,'US'),offline=process.argv.includes('--offline'),registry=JSON.parse(fs.readFileSync('data/sec/quarter-eps-exhibits.json','utf8'));
-let ua=process.env.SEC_USER_AGENT||'',lastStarted=0;
+let ua=process.env.SEC_UPDATES_ENABLED==='true'?(process.env.SEC_USER_AGENT||''):'',lastStarted=0;
 // Identity is supplied explicitly by the maintainer. Never infer a contact from
 // GitHub profiles or send a personal address without the user's choice.
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -53,6 +54,10 @@ for(const company of companies){
 stocks['US:SPY']={id:'US:SPY',region:'US',code:'SPY',ticker:'SPY',market:'NYSE Arca',name:'SPDR S&P 500 ETF Trust',nameZh:'標普 500 ETF',securityKind:'etf',currency:'USD',dataStatus:'partial',sources:{issuer:'https://www.ssga.com/us/en/individual/etfs/spdr-sp-500-etf-trust-spy'},quote:{status:'unavailable',price:null,currency:'USD',reason:'未設定可公開展示的 ETF 行情來源。'},nav:{available:false,reason:'尚無同日、同幣別且可展示的基金淨值，折溢價不計算。'},history:{code:'SPY',market:'NYSE Arca',region:'US',rows:[],sources:[],completeMonths:[],partial:false},warnings:[]};
 // Replaceable backend contract: a provider creates this file after verifying its
 // display/cache agreement. Neither the raw payload nor credentials are published.
+if(!offline&&process.env.US_PUBLISH_MARKET_DATA==='1')for(const company of companies){
+ try{const input=await alpacaPublication(company);if(input)Object.assign(stocks['US:'+company.ticker],publicQuoteBundle(input,{publicDisplayConfirmed:true}));}
+ catch{stocks['US:'+company.ticker].warnings.push('Alpaca 行情取得或展示／快取條款檢查失敗，未發布行情。');}
+}
 if(process.env.US_PUBLIC_QUOTE_FILE){
  try{const inputs=JSON.parse(fs.readFileSync(process.env.US_PUBLIC_QUOTE_FILE,'utf8'));
   for(const input of inputs.stocks||[]){const stock=stocks['US:'+input.symbol];if(!stock||input.region!=='US'||input.cik&&Number(input.cik)!==Number(stock.cik))continue;

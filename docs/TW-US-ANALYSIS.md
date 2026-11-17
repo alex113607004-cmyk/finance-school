@@ -31,7 +31,7 @@ npm run preview:pages
 | 美股行情 | 可替換的後端資料介面 | **未取得展示權或憑證，未發布任何美股價格、成交量、K 線或實際估值。** 盤前／正常盤／盤後明列未提供。 |
 | FinMind 候選 | [基本面 API](https://finmind.github.io/tutor/TaiwanMarket/Fundamental/)、[商業使用](https://finmind.github.io/CommercialUse/)、[資料授權](https://finmind.github.io/Disclaimer/) | 已確認財報、現金流、月營收資料集；全市場批次功能限 backer／sponsor 等方案。官方商業 Q&A 指向 Sponsor Pro，並限制原始資料再散布／鏡像；對外公開仍須確認原來源授權。**沒有確認本專案方案與再展示權，因此未啟用。** |
 | Lightweight Charts 5.3.0 | TradingView | Apache 2.0。網站保留標誌、連結、NOTICE 與授權全文；不是從 TradingView 取行情。 |
-| twstock／yfinance | 可選本機工具 | 不加入公共部署依賴。既有 TWSE 原始本機快照完整保留；本次未找到原有 twstock 專用資料檔。新增本機匯出工具，不冒稱已使用／驗收此套件。yfinance 沒有被當作公開展示授權來源。 |
+| twstock／yfinance | 可選本機工具 | 不加入公共部署依賴。既有 TWSE 原始快照與 main 新增的 twstock loopback 報價服務完整保留。新增可選本機匯出工具；沒有把本機行情發到公開站。yfinance 沒有被當作公開展示授權來源。 |
 
 Apple：CIK `0000320193`；Microsoft：CIK `0000789019`。原始 JSON 保存在 `data/sec/`，前端只載入整理後的 `us-data.json`，沒有 User-Agent 或憑證。
 
@@ -46,8 +46,8 @@ Apple：CIK `0000320193`；Microsoft：CIK `0000789019`。原始 JSON 保存在 
 
 - 台股：沿用每日台北 **17:00、21:00** Actions 更新、測試、建置及部署；排程可能延遲。進站讀取最新已發布資產，上市近期日線可由瀏覽器重查；上櫃讀取同源官方快照。
 - **SEC：依使用者選擇，未提供聯絡信箱，預設不啟用自動抓取。** 保留 2026-11-17 已核實資料和真正來源查核時間。按重新查詢只讀發布快照，不能宣稱已查到當天新公告。
-- 維護者日後可在 Actions Secret 或 repository variable 設定 `SEC_USER_AGENT`，內容需包含專案識別及同意用於此用途的聯絡 email。程式不會從 GitHub profile 推測或代填信箱；身份資料不寫入前端、JSON 或紀錄。
-- 已設定識別後，`npm run update:us` 才會對 SEC 發請求。依 [SEC fair access](https://www.sec.gov/os/accessing-edgar-data) 以每次至少 1.1 秒、序列請求（低於 10 requests/sec）；429／5xx 依 Retry-After／指數退避，403 停止重試，保留舊快照與原日期。來源失敗不把 checkedAt 改成成功。
+- 維護者日後可在 Actions Secret 或 repository variable 設定 `SEC_USER_AGENT` 並明確設定 `SEC_UPDATES_ENABLED=true`，內容需包含專案識別及同意用於此用途的聯絡 email。程式不會從 GitHub profile 推測或代填信箱；身份資料不寫入前端、JSON 或紀錄。
+- 已設定識別並啟用後，`npm run update:us` 才會對 SEC 發請求。依 [SEC fair access](https://www.sec.gov/os/accessing-edgar-data) 以每次至少 1.1 秒、序列請求（低於 10 requests/sec）；429／5xx 依 Retry-After／指數退避，403 停止重試，保留舊快照與原日期。來源失敗不把 checkedAt 改成成功。
 - `npm run update:us:offline` 只從保存的原始資料重建，絕不更新來源查核時間。GitHub 的 PR 建置不向 SEC 抓資料。
 - 台積電 IR 在 GitHub runner 的既有 403 限制仍存在；保留既有版本警示與停止估值規則。補充季度營運面板是獨立核實快照，未假裝跟隨每次行情更新。
 
@@ -88,6 +88,18 @@ Apple：CIK `0000320193`；Microsoft：CIK `0000789019`。原始 JSON 保存在 
 - MSFT：FY2027 Q1 營收 **92,279** 百萬 USD、OCF **58,000**、CapEx **39,367**、FCF **18,633**；四季 EPS **19.16**，年度與季度映射正確。
 - 6488：上櫃快照 2026-11-17 收 **546 TWD**、成交量 **10,450,392 股**，載入同源歷史資產，沒有使用上市 endpoint。
 - 0050／SPY：顯示基金資料與 NAV 缺口，不套公司 PE。
-- 自動測試涵蓋同代號不同市場、跨年累計、公告晚於觀察日、更正、分割、負 EPS、行情過期／延遲、來源失敗、搜尋／ETF／假設試算。
+- 140 項自動測試通過，涵蓋同代號不同市場、跨年累計、公告晚於觀察日、更正、分割、負 EPS、行情過期／延遲、來源失敗、搜尋／ETF／假設試算。
 - Chromium 實測 1440px 桌面、820px iPad、390px 手機及真正 `/finance-school/` 掛載。台股滑鼠／iPad 觸控拖曳會改變讀值，日／週／月切換與期中標記正常；無頁面 JS 錯誤、無整頁水平溢出。這是 Chromium 的 iPad 尺寸／觸控模擬，未使用實體 iPad Safari。
 - 授權行情、真正即時／延遲與盤前盤後串流、可選本機套件，以及來源後續新財報版本仍需外部設定／實測，不列為通過。
+
+
+### 與主分支整合
+
+整合 main 的 twstock 報價快照：本機先安裝 `requests twstock`，執行 `python3 scripts/twstock-quote.py`（127.0.0.1:4174），並以 `VITE_TWSTOCK_LOCAL=1 npm run dev` 顯示單次快照。只有開發環境顯示，GitHub Pages 不代理此服務；本次保留既有元件與測試，未以外部套件重抓報價。舊 `#analysis/us/AAPL` 可進入統一頁，避免維護兩個美股分析入口。
+
+
+### 沿用選用 Alpaca 日線介面
+
+保留主分支使用的 `ALPACA_API_KEY_ID`、`ALPACA_API_SECRET_KEY`、`US_PUBLISH_MARKET_DATA=1`、`US_ALPACA_FEED=sip|iex`。公開前還須在 repository variables 記錄 `US_MARKET_DATA_LICENSE_URL`、`US_MARKET_DATA_LICENSE_CHECKED_AT`（YYYY-MM-DD）、`US_MARKET_DATA_CACHE_POLICY`；這是維護者對實際合約的確認，不能僅填 API 文件網址冒充授權。缺任一設定時不發行情請求。
+
+介面只取已完成日線，保留 raw／split 比較與 SIP／IEX 涵蓋標記。IEX 僅供該交易所圖表，不套整合市場估值；發現分割或行情缺漏時停止估值。daily bar 的時間是來源期間起始標記，頁面不把它稱作最後成交時間。單元測試以模擬 HTTP 檢查邊界，沒有真實憑證或合約，因此沒有宣稱完成 Alpaca 實測。
