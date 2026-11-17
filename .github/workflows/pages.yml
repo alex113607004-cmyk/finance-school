@@ -26,6 +26,12 @@ jobs:
       - name: Fetch latest official daily data
         if: github.event_name != 'pull_request'
         run: npm run update:market
+      - name: Prepare financial PDF reader
+        if: github.event_name != 'pull_request'
+        run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
+      - name: Refresh point-in-time stock analysis
+        if: github.event_name != 'pull_request'
+        run: npm run update:analysis
       - run: npm test
       - name: Build standalone page
         run: npm run build:pages

@@ -1,0 +1,143 @@
+[
+  {
+    "device": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "headings": [
+      "低於歷史估值區間",
+      "現價低於 20 日均線"
+    ],
+    "drag": {
+      "before": "2026-11-17",
+      "after": "2026-10-14",
+      "home": "2026-08-19"
+    },
+    "overflow": {
+      "viewport": 1440,
+      "body": 1440,
+      "offenders": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    "links": [
+      "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/526b65af7305df2dde6b9ece6812b1fdf1e49f9b/3Q26%20EarningsRelease.pdf",
+      "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+      "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+      "http://127.0.0.1:4173/#unit/fund-pe",
+      "http://127.0.0.1:4173/#unit/fund-statements"
+    ],
+    "errors": [],
+    "passed": [
+      "daily/week/month",
+      "partial candles",
+      "volume",
+      "MA toggle",
+      "drag and keyboard",
+      "EPS0/negative",
+      "source links",
+      "glossary",
+      "unknown symbol"
+    ]
+  },
+  {
+    "device": "phone",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "headings": [
+      "低於歷史估值區間",
+      "現價低於 20 日均線"
+    ],
+    "drag": {
+      "before": "2026-11-17",
+      "after": "2026-10-14",
+      "home": "2026-08-19"
+    },
+    "overflow": {
+      "viewport": 390,
+      "body": 390,
+      "offenders": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    "links": [
+      "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/526b65af7305df2dde6b9ece6812b1fdf1e49f9b/3Q26%20EarningsRelease.pdf",
+      "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+      "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+      "http://127.0.0.1:4173/#unit/fund-pe",
+      "http://127.0.0.1:4173/#unit/fund-statements"
+    ],
+    "errors": [],
+    "passed": [
+      "daily/week/month",
+      "partial candles",
+      "volume",
+      "MA toggle",
+      "drag and keyboard",
+      "EPS0/negative",
+      "source links",
+      "glossary",
+      "unknown symbol"
+    ]
+  },
+  {
+    "device": "ipad",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "headings": [
+      "低於歷史估值區間",
+      "現價低於 20 日均線"
+    ],
+    "drag": {
+      "before": "2026-11-17",
+      "after": "2026-10-14",
+      "home": "2026-08-19"
+    },
+    "overflow": {
+      "viewport": 820,
+      "body": 820,
+      "offenders": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    "links": [
+      "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/526b65af7305df2dde6b9ece6812b1fdf1e49f9b/3Q26%20EarningsRelease.pdf",
+      "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+      "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+      "http://127.0.0.1:4173/#unit/fund-pe",
+      "http://127.0.0.1:4173/#unit/fund-statements"
+    ],
+    "errors": [],
+    "passed": [
+      "daily/week/month",
+      "partial candles",
+      "volume",
+      "MA toggle",
+      "drag and keyboard",
+      "EPS0/negative",
+      "source links",
+      "glossary",
+      "unknown symbol"
+    ]
+  }
+]

@@ -1,0 +1,102 @@
+{
+  "checkedAt": "2026-11-17T06:43:04.097258+00:00",
+  "method": "Downloaded company first-release PDFs; pdftotext -layout; EPS matched both headline and first paragraph; publication date from dateline. Cash flow selected NTD YTD column on page 4, not USD or single-quarter column.",
+  "sources": [
+    {
+      "key": "2023-q1",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2023-04/765324723cf228ac306b87854f31fef5ebc9cd68/1Q23EarningsRelease.pdf",
+      "sha256": "c4784b608b9cba99a4d88bdb9d7bfb27b4f4c07e805c4cc5063dab10ca89924e"
+    },
+    {
+      "key": "2023-q2",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2023-07/ad504a4ad5534f8078babbe190b3d071aa02cc92/2Q23EarningsRelease.pdf",
+      "sha256": "c48475da23613e0d1013ecc84362df4912893f6def032300bfc3479a9799944b"
+    },
+    {
+      "key": "2023-q3",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2023-10/fec9688d56fc0c61b747de9a224a8a15c47bdf20/3Q23EarningsRelease.pdf",
+      "sha256": "f83884e81d4944e3e239d8d9776818251fc96c309a8b097f588284c551c5725d"
+    },
+    {
+      "key": "2023-q4",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2024-01/b65d7a92d8dc9da3f66817946d941401fa4b2cda/4Q23EarningsRelease.pdf",
+      "sha256": "1108970d365089f19a2d5bff228569b61c643ae0159b44bae5a10305d19bf5c8"
+    },
+    {
+      "key": "2024-q1",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2024-04/e19914dd320b6386af51d5ed27fa5c51af9c441e/1Q24EarningsRelease.pdf",
+      "sha256": "734d1dc0fc14593b65aaaaee310b7b2636bd45a2acfd0d685d661386bb8d3a4a"
+    },
+    {
+      "key": "2024-q2",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2024-07/a152eded224aa1b83fdf342ed71d4c42af013915/2Q24EarningsRelease.pdf",
+      "sha256": "84df9a6bb10278e70e4289f703dcdfcc8609b24ccebcfb42f0831da87f7d7134"
+    },
+    {
+      "key": "2024-q3",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2024-10/d00bfb55ffe01e36f56863f975e88d827f9943e8/3Q24EarningsRelease.pdf",
+      "sha256": "0056cf0bb2d4e28f837c0216542512ac598e4592cd282fcb6a5b73e2a25bae42"
+    },
+    {
+      "key": "2024-q4",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2025-01/cc4e1dec3474f69109d5455fbf8939c3e3cd5a71/4Q24EarningsRelease.pdf",
+      "sha256": "3a2e2a2b10eaf67fb16f0f57edca44dc57ac472c2f24664abec5fe7c4d6ceb9a"
+    },
+    {
+      "key": "2025-q1",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2025-04/6580235c47b7b8f1056b071faa44d958c2c3ba04/1Q25EarningsRelease.pdf",
+      "sha256": "355254c5ab7af0d5a3d19f1371d94195a7401a555ec19fc977b9b7c875a3d651"
+    },
+    {
+      "key": "2025-q2",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2025-07/d9d294ed46ca22c560a17eb060373bc35f2d464a/2Q25EarningsRelease.pdf",
+      "sha256": "14b24d4f735363fff90ef8d50611864d0dc000edfd74489994569b7428e78d40"
+    },
+    {
+      "key": "2025-q3",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2025-10/ff1cf977182dad2178b6d158e61d375ac98ff517/3Q25EarningsRelease.pdf",
+      "sha256": "70bd2764e78e7b88a314272e1d4644fc5f4b67dfd6977a6a1465c8e42f5ccf88"
+    },
+    {
+      "key": "2025-q4",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-01/3e49621566a3ca53bdf8aee2586929b666c17fd6/4Q25EarningsRelease.pdf",
+      "sha256": "d14b67a858ffa01e6d16d64f81230d4fedfc7815b3a572b5e5feb0b2f2a2fbd9"
+    },
+    {
+      "key": "2026-q1",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-04/e85216eea8dccd8ca75d7e040e8d57be3ccd618b/1Q26%20EarningsRelease.pdf",
+      "sha256": "25675c5ad8fae2f042a5c1449fe8fb0d1419f323d23c15d1e204c053d9a7cc47"
+    },
+    {
+      "key": "2026-q2",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-07/a80d7933be643644081584087731f73b22ea5a2c/2Q26%20EarningsRelease.pdf",
+      "sha256": "67c8e14a5786449dc6cbc4e8e0472b8b56c33895e4c8abcdfe4f48ac5f60207e"
+    },
+    {
+      "key": "2026-q3",
+      "type": "財務報表",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf",
+      "sha256": "05cf01194e35c87d45b4c254a6b04ea0a4cf48af192451caebd3b3046c8d9928"
+    },
+    {
+      "key": "2026-q3",
+      "type": "財報新聞稿",
+      "url": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/526b65af7305df2dde6b9ece6812b1fdf1e49f9b/3Q26%20EarningsRelease.pdf",
+      "sha256": "c56119b240c1f7ba728c58228b14cb51d3a756d808af41e7d4b53b46ba29734a"
+    }
+  ]
+}

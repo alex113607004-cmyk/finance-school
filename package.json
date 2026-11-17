@@ -1,1 +1,36 @@
-{"name":"finance-school-tw-us","version":"2.0.0","private":true,"type":"module","scripts":{"dev":"vite --host 127.0.0.1","build":"vite build && node scripts/build-worker.mjs","build:pages":"vite build","preview":"vite preview --host 127.0.0.1","test":"vitest run","check":"npm test && npm run build","update:market":"node scripts/update-market.mjs"},"dependencies":{"react":"^19.2.0","react-dom":"^19.2.0","lucide-react":"^0.468.0"},"devDependencies":{"vite":"^7.2.0","@vitejs/plugin-react":"^5.1.0","tailwindcss":"^4.1.0","@tailwindcss/vite":"^4.1.0","vite-plugin-singlefile":"^2.3.0","vitest":"^3.2.0","jsdom":"^26.1.0","@testing-library/react":"^16.3.0","@testing-library/user-event":"^14.6.1","@testing-library/jest-dom":"^6.9.0"},"engines":{"node":">=22.12.0"}}
+{
+  "name": "finance-school-tw-us",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && node scripts/build-worker.mjs",
+    "build:pages": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "check": "npm test && npm run build",
+    "update:market": "node scripts/update-market.mjs",
+    "update:analysis": "python3 scripts/update-filings.py && node scripts/update-analysis.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "lucide-react": "^0.468.0"
+  },
+  "devDependencies": {
+    "vite": "^7.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/vite": "^4.1.0",
+    "vite-plugin-singlefile": "^2.3.0",
+    "vitest": "^3.2.0",
+    "jsdom": "^26.1.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/jest-dom": "^6.9.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
