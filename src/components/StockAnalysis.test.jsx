@@ -8,13 +8,14 @@ import {format} from '../domain';
 const term=t=><button>{t}</button>;
 afterEach(()=>vi.unstubAllGlobals());
 const setup=()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json(analysis)));return render(<StockAnalysis term={term}/>)};
-describe('stock analysis learning workflow',()=>{
- it('loads a real stock, labels sources and accounting basis, and links back to EPS/MA lessons',async()=>{
+describe('stock analysis workflow',()=>{
+ it('loads a real stock, labels sources and accounting basis, and keeps metric definitions without retired course links',async()=>{
   setup();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());
   expect(screen.getByRole('heading',{name:'台積電 盤後'})).toBeInTheDocument();
   expect(screen.getByRole('region',{name:'個股基本面'})).toHaveTextContent('年初至季末累計');
-  expect(screen.getAllByRole('link',{name:/EPS.*本益比/})[0]).toHaveAttribute('href','#unit/fund-pe');
-  expect(screen.getByRole('link',{name:'回到均線課程 ↗'})).toHaveAttribute('href','#unit/chart-averages');
+  expect(screen.getAllByRole('button',{name:'EPS'}).length).toBeGreaterThan(0);
+  expect(screen.getAllByRole('button',{name:'均線'}).length).toBeGreaterThan(0);
+  expect(document.querySelector('a[href^="#unit/"]')).toBeNull();
   expect(screen.getByRole('link',{name:/現金流表/})).toHaveAttribute('href',analysis.stocks[2330].filings.cashflow.source);
  });
  it('switches daily/weekly/monthly K, keeps volume, and toggles daily MAs',async()=>{
@@ -24,7 +25,7 @@ describe('stock analysis learning workflow',()=>{
   await user.click(screen.getByRole('button',{name:'週 K',exact:true}));expect(screen.getByRole('img',{name:'個股週K 與均線'})).toBeInTheDocument();expect(screen.getByText('期中 K 棒 · 尚未結束')).toBeInTheDocument();
   await user.click(screen.getByRole('button',{name:'月 K',exact:true}));expect(screen.getByRole('img',{name:'個股月K 與均線'})).toBeInTheDocument();expect(screen.getByRole('img',{name:'同週期成交量（股）'})).toBeInTheDocument();
  });
- it('lets learners reveal the calculation and edit assumptions including EPS zero/negative',async()=>{
+ it('lets users reveal the calculation and edit assumptions including EPS zero/negative',async()=>{
   const user=userEvent.setup();setup();await screen.findByRole('button',{name:'重新查詢'});
   await user.click(screen.getByText('展開計算：EPS、歷史倍數與價格區間'));
   expect(screen.getByRole('heading',{name:'1. 原始 EPS：只加單季，不加累計'})).toBeVisible();
