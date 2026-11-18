@@ -1,0 +1,14 @@
+import React from 'react';
+import {render,screen,within} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {beforeEach,afterEach,it,expect,vi} from 'vitest';
+beforeEach(()=>{vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-18T10:00:00Z'));});
+afterEach(()=>vi.useRealTimers());
+import PriceAssessment from './PriceResearchSummary';
+import us from '../generated/us.json';
+import universe from '../generated/universe.json';
+import analysis from '../generated/analysis.json';
+import {historicalValuation} from '../stock-analysis';
+const t=t=><button>{t}</button>;
+it('shows fundamental and technical facts with readable model gaps and assumptions',async()=>{const s=us.stocks['US:AAPL'];render(<PriceAssessment stock={s} history={s.history} snapshot={s.snapshot} valuation={{available:false,reasons:['尚無行情']}} region="US" term={t}/>);const area=screen.getByRole('region',{name:'價格合理性評估'});expect(within(area).getByRole('heading',{name:'目前無法核實現價合理區間'})).toBeInTheDocument();expect(within(area).getByRole('article',{name:'基本面評估摘要'})).toHaveTextContent('8.97');expect(within(area).getByRole('article',{name:'技術面評估摘要'})).toHaveTextContent(s.quote.reason);expect(within(area).getAllByRole('link',{name:/來源/}).length).toBeGreaterThan(2);await userEvent.click(within(area).getByText('這份價格評估如何產生？'));expect(within(area).getByText(/不會提供|不提供虛構分數/)).toBeInTheDocument();});
+it('labels saved-data analysis while checking, and updates when switching to a different stock',()=>{const a=analysis.stocks['2330'],value=historicalValuation({...a,now:new Date(analysis.generatedAt)}),stock={...universe.stocks['2330'],quote:a.quote};const {rerender}=render(<PriceAssessment stock={stock} history={a.history} valuation={value} busy term={t}/>);expect(screen.getByRole('region',{name:'價格合理性評估'})).toHaveAttribute('aria-busy','true');expect(screen.getByRole('status')).toHaveTextContent('已保存快照');const s=us.stocks['MSFT']||us.stocks['US:MSFT'];rerender(<PriceAssessment stock={s} history={s.history} snapshot={s.snapshot} valuation={{available:false,reasons:['無合格行情']}} region="US" term={t}/>);const area=screen.getByRole('region',{name:'價格合理性評估'});expect(area).toHaveTextContent('US:MSFT');expect(area).not.toHaveTextContent('TW:2330');expect(area).toHaveTextContent('19.16');});
