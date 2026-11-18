@@ -42,6 +42,22 @@ jobs:
       - name: Refresh all-market stock catalog and OTC history
         if: github.event_name != 'pull_request'
         run: npm run update:universe
+      - name: Restore verified MOPS cash-flow observations
+        if: github.event_name != 'pull_request'
+        uses: actions/cache@v4
+        with:
+          path: data/mops-cashflows.json
+          key: mops-cashflow-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            mops-cashflow-v1-${{ runner.os }}-
+      - name: Supplement official financials with bounded batch requests
+        if: github.event_name != 'pull_request'
+        run: npm run update:financials
+        env:
+          NODE_USE_ENV_PROXY: 1
+      - name: Materialize verified cash flows for offline PR builds
+        if: github.event_name == 'pull_request'
+        run: npm run update:financials:offline
       - name: Refresh SEC filings and verified US fundamentals
         if: github.event_name != 'pull_request'
         run: npm run update:us

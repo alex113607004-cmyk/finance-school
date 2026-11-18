@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-11-18T16:08:33.035Z",
+  "configuration": {
+    "TW_quotes": "TWSE / TPEx official APIs; existing visitor refresh and 17:00/21:00 Asia/Taipei publishing",
+    "TW_financial_summary": "existing TWSE / TPEx MOPS open datasets",
+    "TW_cashflow": "MOPS financial comparison, verified consolidated YTD statements; serial batched requests, 7-day minimum revisit interval, 403/429 global 24-hour cooldown",
+    "twstock": "existing optional local-only quote/history verification; no public API or new runtime dependency",
+    "FinMind": "not enabled; no plan/token/display agreement configured",
+    "US_SEC": "automatic updates remain disabled unless explicit SEC_UPDATES_ENABLED plus SEC_USER_AGENT; no contact inferred",
+    "US_quotes": "no authorized public provider; gap retained"
+  },
+  "coverageAtVerification": {
+    "eligibleOrdinaryNonFinancialTWSE_TPEX": 1946,
+    "verifiedCashflow": 51,
+    "completeOCF_Capex_FCF": 51
+  },
+  "rights": {
+    "TWSE_OpenAPI": {
+      "spec": "https://openapi.twse.com.tw/v1/swagger.json",
+      "terms": "https://www.twse.com.tw/zh/page/terms/use.html",
+      "licenseReference": "https://data.gov.tw/license",
+      "finding": "Official specification links to use terms and open-data license; no real-time entitlement asserted."
+    },
+    "TPEx_OpenAPI": {
+      "spec": "https://www.tpex.org.tw/openapi/swagger.json",
+      "terms": "https://www.tpex.org.tw/web/inc/gtsm_disclaimer.php?l=zh-tw"
+    },
+    "MOPS_comparison": {
+      "source": "https://mopsfin.twse.com.tw/",
+      "terms": "https://mopsfin.twse.com.tw/terms",
+      "termsCheck": "HTTP 403 in this environment; no blanket commercial or redistribution license asserted. Store selected factual figures and source hashes, not a raw mirror of the website. Original company filings remain the reference."
+    },
+    "twstock": {
+      "softwareLicense": "MIT",
+      "url": "https://github.com/mlouielu/twstock",
+      "finding": "Software license does not grant market-data display rights."
+    }
+  },
+  "manualRecalculations": [
+    {
+      "security": "TWSE:2330",
+      "start": "2026-01-01",
+      "end": "2026-09-30",
+      "unit": "新台幣千元",
+      "scope": "consolidated",
+      "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+      "checkedAt": "2026-11-18T16:08:17.291Z",
+      "rawResponseSHA256": "f9a2e1be3e16260624d1bcb8e2475fef2c114aeace255a9664679d8866acca25",
+      "operatingCashFlow": 2402116725,
+      "rawEquipmentCashflow": -1289970777,
+      "cashEquipmentExpenditure": 1289970777,
+      "freeCashFlow": 1112145948,
+      "formula": "FCF = operatingCashFlow - positive cash equipment expenditure",
+      "announcementDate": null
+    },
+    {
+      "security": "TWSE:2317",
+      "start": "2026-01-01",
+      "end": "2026-09-30",
+      "unit": "新台幣千元",
+      "scope": "consolidated",
+      "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+      "checkedAt": "2026-11-18T16:08:17.291Z",
+      "rawResponseSHA256": "f9a2e1be3e16260624d1bcb8e2475fef2c114aeace255a9664679d8866acca25",
+      "operatingCashFlow": -125723025,
+      "rawEquipmentCashflow": -161725656,
+      "cashEquipmentExpenditure": 161725656,
+      "freeCashFlow": -287448681,
+      "formula": "FCF = operatingCashFlow - positive cash equipment expenditure",
+      "announcementDate": null
+    },
+    {
+      "security": "TPEX:6488",
+      "start": "2026-01-01",
+      "end": "2026-09-30",
+      "unit": "新台幣千元",
+      "scope": "consolidated",
+      "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+      "checkedAt": "2026-11-18T16:04:57.211Z",
+      "rawResponseSHA256": "b8ead04ba78f4e53af962c1445bafdac3f436d80884d62e929658120053ab4b7",
+      "operatingCashFlow": 6379662,
+      "rawEquipmentCashflow": -8875540,
+      "cashEquipmentExpenditure": 8875540,
+      "freeCashFlow": -2495878,
+      "formula": "FCF = operatingCashFlow - positive cash equipment expenditure",
+      "announcementDate": null
+    }
+  ],
+  "limits": [
+    "First announcement date absent in MOPS comparison; no PIT valuation inputs created.",
+    "Quarterly diluted EPS and 24 PIT month-end samples still missing for most equities.",
+    "Financials, emerging stocks and funds excluded from this general-company cash-flow backfill.",
+    "Official source returned HTTP 403 after 50 successful companies; collector stopped. Existing separately verified 6488 observation retained.",
+    "No live third-party credential or SEC automatic retrieval tested."
+  ]
+}

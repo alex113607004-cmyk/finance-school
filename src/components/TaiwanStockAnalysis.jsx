@@ -10,6 +10,8 @@ import {format} from '../domain';
 import {taipeiTime,freshness} from '../freshness';
 import AnalysisChart from './AnalysisChart';
 import PriceResearchSummary from './PriceResearchSummary';
+import FinancialDataStatus from './FinancialDataStatus';
+import {cashflowView} from '../tw-cashflow';
 import QuoteSnapshot from './QuoteSnapshot';
 import ResearchFundamentals,{researchSnapshotTW,ETFReference} from './ResearchFundamentals';
 import extra2330 from '../../data/2330-research-metrics.json';
@@ -40,7 +42,7 @@ function RangePlot({value,price}){
  return <div className="analysis-range" aria-label={`歷史估值區間 ${format(value.low)} 至 ${format(value.high)} 元，收盤 ${format(price)} 元`}><div className="analysis-range-track"><span className="analysis-range-band" style={{left:pct(value.low)+'%',width:(pct(value.high)-pct(value.low))+'%'}}/><i style={{left:pct(price)+'%'}}/></div><div className="analysis-range-labels"><span>P25 下緣<br/><b>{format(value.low)} 元</b></span><span>白線：收盤<br/><b>{format(price)} 元</b></span><span>P75 上緣<br/><b>{format(value.high)} 元</b></span></div></div>;
 }
 function Fundamentals({stock,filings,ttm,term}){
- const f=stock.fundamentals||{},revenue=f.revenue,cash=filings?.cashflow||f.cashflow,e=f.earnings;
+ const f=stock.fundamentals||{},revenue=f.revenue,verifiedCash=cashflowView(stock),cash=filings?.cashflow||(verifiedCash.available?verifiedCash:null),e=f.earnings;
  const fund=['etf','etn','reit'].includes(stock.securityKind),financial=f.kind==='financial';
  return <section className="panel analysis-section" aria-label="個股基本面">
   <span className="eyebrow">BUSINESS DATA / 各項期間分開列示</span><h2>{fund?'基金資料與估值適用範圍':'公司賺了多少，收到多少現金？'}</h2>
@@ -52,13 +54,13 @@ function Fundamentals({stock,filings,ttm,term}){
    </article>
    <article><span>{term('單月營收')} 年增率 {term('YoY')}</span><strong>{format(revenue?.yoy)} <small>%</small></strong><p>{revenue?.month||'尚未取得'} · {revenue?.unit||'新台幣千元'}<br/>本月 {format(revenue?.amount,0)}<br/>去年同月 {format(revenue?.priorYear,0)}</p><Link href={stock.sources?.revenue}>官方公司申報資料</Link><p className="subtle">(本月 − 去年同月) ÷ 去年同月 × 100%；出表日 {revenue?.tableDate||'—'}（非首次公告日）。擷取 {taipeiTime(stock.sourceChecks?.revenue)}。</p></article>
    <article><span>{term('營業現金流')}（活動淨額）</span><strong>{format(cash?.amount,0)} <small>{cash?.unit||'新台幣千元'}</small></strong>
-    {cash?<><p>{cash.periodStart} ～ {cash.periodEnd}<br/>公告 {cash.announcedOn||'日期未核實'} · {cash.unaudited?'首次公告未經查核摘要':'公司財報'}</p><Link href={cash.source}>公司現金流表{cash.page?`第 ${cash.page} 頁`:''}</Link><p className="subtle">{cash.basis}。不與其他累計季度相加，也不等於自由現金流。</p></>:<><p>尚無可核實數值與公告日，保留缺口，不從淨利推估現金流。</p><Link href="https://mops.twse.com.tw/mops/#/web/t164sb05">公開資訊觀測站現金流量表</Link><p className="subtle">可用代號 {stock.code} 查原始財報；一般公開彙總 API 未提供此欄。</p></>}
+    {cash?<><p>{cash.periodStart} ～ {cash.periodEnd}<br/>公告 {cash.announcedOn||'來源未提供'} · {cash.unaudited?'首次公告未經查核摘要':'合併財報'}</p><Link href={cash.source}>公司現金流表{cash.page?`第 ${cash.page} 頁`:''}</Link><p className="subtle">{cash.basis==='year-to-date'?'年初至季末累計；最近成功查核 '+taipeiTime(cash.checkedAt):cash.basis}。不與其他累計季度相加，也不等於自由現金流。</p></>:<><p>{verifiedCash.reason}不從淨利推估現金流。</p><Link href="https://mopsfin.twse.com.tw/">公開資訊觀測站財務比較 E 點通</Link><p className="subtle">可用代號 {stock.code} 查原始財報；本站採批次快取逐步回補。</p></>}
    </article>
   </div>
   <div className="analysis-ratios">{[['毛利率',financial?null:stock.profit?.gross,'%',stock.profit?.period],['營業利益率',financial?null:stock.profit?.operating,'%',stock.profit?.period],['淨利率',financial?null:stock.profit?.net,'%',stock.profit?.period],['負債比率',f.balance?.debtRatio,'%',f.balance?.period?.label],['流動比率',financial?null:f.balance?.currentRatio,'%',f.balance?.period?.label]].map(([name,v,u,period])=><div key={name}>{term(name)}<b>{format(v)} {u}</b><small>{financial&&['毛利率','營業利益率','淨利率','流動比率'].includes(name)?'金融業不套一般業比率':period||'尚未提供'}</small></div>)}</div>
   <p className="subtle">財報比率為年初至季末累計，資產負債表為季末時點。公司資料來源：<Link href={stock.sources?.earnings}>損益表</Link>　<Link href={stock.sources?.balance}>資產負債表</Link>。不同會計期間不混加。</p>
   </>}
-  {!fund&&stock.code!=='2330'&&<div className="analysis-ratios"><div>{term('資本支出')}<b>—</b><small>尚缺同季現金購置設備、公告日與原始財報。</small></div><div>{term('自由現金流')}<b>—</b><small>不以淨利或累計 EPS 代替 OCF − 資本支出。</small></div>{financial&&<div>ROE<b>—</b><small>尚缺可比較平均權益與同期淨利；保留官方 P/B。</small></div>}</div>}
+  {!fund&&stock.code!=='2330'&&<div className="analysis-ratios"><div>{term('資本支出')}<b>{format(verifiedCash.capex,0)}</b><small>{verifiedCash.capex!==null?`${verifiedCash.unit} · ${verifiedCash.periodStart} ～ ${verifiedCash.periodEnd}；現金設備支出正值。`:'尚缺同期間現金購置設備與原始財報。'}</small></div><div>{term('自由現金流')}<b>{format(verifiedCash.freeCashFlow,0)}</b><small>{verifiedCash.freeCashFlow!==null?`${verifiedCash.unit} · 同期間 OCF − 現金設備支出；年初累計。`:'不以淨利或累計 EPS 代替 OCF − 資本支出。'}</small></div>{financial&&<div>ROE<b>—</b><small>尚缺可比較平均權益與同期淨利；保留官方 P/B。</small></div>}</div>}
   <div className="analysis-links">{stock.company?.website&&<Link href={stock.company.website}>公司網站</Link>}</div>
  </section>;
 }
@@ -114,6 +116,7 @@ export default function TaiwanStockAnalysis({term,param}){
    {warnings.length>0&&<p className="notice" role="status">{[...new Set(warnings)].join('；')}{filings.warnings?.some(w=>w.startsWith('公司公告更新失敗'))&&value.available?'；沿用已核實首次公告快照及原查核時間，下一季結束仍未核實時停止估值。':''}</p>}
   </section>
   <PriceResearchSummary stock={{...effectiveStock,quote,currency:/^\d{5}[CK]$/.test(code)?'幣別尚未核實':'TWD'}} history={history} valuation={value} snapshot={researchSnapshot} region="TW" busy={busy} term={term}/>
+  <FinancialDataStatus stock={effectiveStock} history={history} valuation={value} coverage={universe.financialCoverage}/>
   {import.meta.env.DEV&&import.meta.env.VITE_TWSTOCK_LOCAL==='1'&&['TWSE','TPEX'].includes(selected.market)&&<QuoteSnapshot key={code} code={code} priceUnit={priceUnit} estimate={value}/>}
   {!entry&&!fund&&<OfficialValuation stock={effectiveStock} term={term}/>}
   <section className="analysis-insights" aria-label="估值與均線分別判讀"><article className="panel"><span className="eyebrow">01 / VERIFIED HISTORICAL VALUATION</span><h2>{busy?'正在核對資料':fund?'基金不適用公司本益比法':value.title}</h2>{!busy&&value.available?<><p>收盤 {format(quote.close)} 元 ÷ 近四季 EPS {format(value.ttm.eps)} 元 ＝ {format(value.pe)} 倍。歷史中段為 {format(value.p25)} ～ {format(value.p75)} 倍。</p><RangePlot value={value} price={quote.close}/>{earningsNote&&<p>{earningsNote}區間最受「近四季獲利能否維持」與「歷史倍數是否仍可比」影響，未使用未公告的預測 EPS。</p>}<p>{value.position==='below'?`目前 ${format(quote.close)} 元低於下緣 ${format(value.low)} 元，倍數低於自身歷史樣本中段；仍需核對獲利能否維持、一次性損益與營運風險。`:value.position==='above'?`目前 ${format(quote.close)} 元高於上緣 ${format(value.high)} 元，需要比歷史樣本更高的定價；歷史區間不能驗證未來成長，也不能預測下跌。`:`目前 ${format(quote.close)} 元介於 ${format(value.low)} 與 ${format(value.high)} 元，屬自身歷史倍數中段，仍不能保證內在價值或買進報酬。`}</p></>:!busy&&<>{fund?<p>以基金淨值與折溢價等指標研究，請勿把公司 EPS 估值套用到基金。</p>:<><p>可查詢此股的行情與已申報財務資料；尚未取得下列估值必要資料：</p><ul>{value.reasons.map(s=><li key={s}>{s}</li>)}</ul><p className="subtle">不以本益比倒推 EPS 冒充已公告財報，也不借用台積電的倍數或財報。下方另提供官方估值與同業分布觀察。</p></>}</>}</article>

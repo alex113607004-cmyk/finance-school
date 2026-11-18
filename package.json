@@ -13,6 +13,8 @@
     "update:market": "node scripts/update-market.mjs",
     "update:analysis": "python3 scripts/update-filings.py && node scripts/update-analysis.mjs",
     "update:universe": "node scripts/update-universe.mjs",
+    "update:financials": "node scripts/update-financials.mjs",
+    "update:financials:offline": "node scripts/update-financials.mjs --offline",
     "history:assets": "node scripts/materialize-history.mjs",
     "predev": "npm run history:assets",
     "prebuild": "npm run history:assets",
