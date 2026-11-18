@@ -1,52 +1,34 @@
 import React from 'react';
-import {render,screen,within} from '@testing-library/react';
+import {render,screen,within,fireEvent,waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {describe,it,expect,vi} from 'vitest';
+import {afterEach,it,expect,vi} from 'vitest';
 import App from './App';
-import {units} from './data';
-
-describe('source-led learning app',()=>{
- it('replaces the old curriculum with 15 lessons, five topics and no retired menus or shortcuts',()=>{
-  render(<App/>);expect(screen.getAllByRole('article')).toHaveLength(15);
-  expect(within(screen.getByRole('navigation',{name:'主題導航'})).getAllByRole('button')).toHaveLength(5);
-  expect(screen.queryByText('實戰試算室')).not.toBeInTheDocument();expect(screen.queryByText('真實歷史案例')).not.toBeInTheDocument();
-  expect(screen.queryByRole('link',{name:/試算|案例/})).not.toBeInTheDocument();
-  expect(screen.getByRole('link',{name:'從第一單元開始'})).toHaveAttribute('href','#unit/start-ownership');
- });
- it('filters topics and searches the new summaries and original publishers',async()=>{
-  const user=userEvent.setup();render(<App/>);
-  await user.click(within(screen.getByRole('navigation',{name:'主題導航'})).getByRole('button',{name:/財報與估值/}));expect(screen.getAllByRole('article')).toHaveLength(3);
-  await user.type(screen.getByRole('searchbox',{name:'搜尋所有教學單元'}),'集保');expect(screen.getAllByRole('article')).toHaveLength(1);
-  expect(screen.getByRole('heading',{name:'集保股權分散：級距與資料基準'})).toBeInTheDocument();
-  await user.clear(screen.getByRole('searchbox'));await user.type(screen.getByRole('searchbox'),'Fidelity');expect(screen.getAllByRole('article')).toHaveLength(3);
- });
- it('puts sourced takeaways before original resources and shows language and publisher',()=>{
-  window.history.replaceState(null,'','#unit/fund-statements');render(<App/>);
-  const top=screen.getByRole('region',{name:'本單元重點整理'}),reading=screen.getByRole('region',{name:'文章與教學影片'});
-  expect(within(top).getAllByRole('listitem')).toHaveLength(3);
-  expect(top.compareDocumentPosition(reading)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(within(top).getAllByRole('link').every(link=>link.href.startsWith('https://'))).toBe(true);
-  expect(within(reading).getByText('英文')).toBeInTheDocument();expect(within(reading).getByText('美國證券交易委員會 SEC')).toBeInTheDocument();
-  expect(within(reading).getAllByRole('link',{name:'閱讀原文'})).toHaveLength(2);
- });
- it('keeps progress and bookmarks on new IDs without marking old units as complete',async()=>{
-  const user=userEvent.setup();localStorage.setItem('finance-school.completed.v2','["s1-1"]');
-  window.history.replaceState(null,'','#unit/start-ownership');const{unmount}=render(<App/>);
-  expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow','0');
-  await user.click(screen.getByRole('button',{name:'收藏這個單元'}));await user.click(screen.getByRole('button',{name:'標記已學會'}));
-  expect(JSON.parse(localStorage.getItem('finance-school.completed.v3'))).toEqual(['start-ownership']);expect(localStorage.getItem('finance-school.completed.v2')).toBe('["s1-1"]');
-  unmount();window.history.replaceState(null,'','#bookmarks');render(<App/>);expect(screen.getAllByRole('article')).toHaveLength(1);
-  await user.click(screen.getByRole('button',{name:'取消收藏：持有股票，究竟持有什麼？'}));expect(screen.getByText('還沒有收藏，先留下一個想讀的單元。')).toBeInTheDocument();
- });
- it.each(['#tools','#cases','#case/1','#lesson/2'])('retires old route %s rather than displaying its former page',hash=>{
-  window.history.replaceState(null,'',hash);render(<App/>);expect(window.location.hash).toBe('#learn');expect(screen.getAllByRole('article')).toHaveLength(15);
- });
- it('shows official video pages through the materials index',async()=>{
-  const user=userEvent.setup();window.history.replaceState(null,'','#sources');render(<App/>);
-  await user.click(screen.getByRole('button',{name:'官方影片',exact:true}));expect(screen.getAllByRole('article')).toHaveLength(4);
-  for(const link of screen.getAllByRole('link',{name:'到原站觀看'})){expect(link.href).toMatch(/^https:\/\/www.twse.com.tw\/zh\/allinone\//);expect(link).toHaveAttribute('target','_blank');}
- });
- it('preserves readable content when browser storage is unavailable',()=>{
-  const spy=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('quota')});render(<App/>);expect(screen.getByRole('status')).toHaveTextContent('瀏覽器無法儲存');spy.mockRestore();
- });
+import {glossary} from './glossary';
+vi.mock('./components/StockAnalysis',()=>({default:({param,symbol,term})=><section aria-label="個股分析頁"><p data-testid="analysis-address">{[param,symbol].filter(Boolean).join('/')}</p>{term('EPS')}</section>}));
+afterEach(()=>vi.restoreAllMocks());
+it('opens stock analysis directly with no learning navigation, progress or course links',()=>{
+ window.history.replaceState(null,'','/');render(<App/>);
+ expect(window.location.hash).toBe('#analysis/TW/2330');expect(screen.getByTestId('analysis-address')).toHaveTextContent('TW/2330');
+ expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();expect(screen.queryByRole('searchbox',{name:'搜尋所有教學單元'})).not.toBeInTheDocument();
+ for(const text of ['學習主題','精選教材','我的收藏','學習進度','台美股看盤','繼續我的學習'])expect(screen.queryByText(text)).not.toBeInTheDocument();
+ expect(document.title).toBe('台美股個股分析｜行情・財報・估值');expect(screen.getByRole('link',{name:/台美股個股分析/})).toHaveAttribute('href','#analysis/TW/2330');
+});
+it.each(['#learn','#unit/fund-pe','#lesson/1','#bookmarks','#sources','#glossary','#market','#tools','#cases','#case/1','#unknown','#%E0%A4%A'])('redirects removed or invalid URL %s to analysis',hash=>{
+ window.history.replaceState(null,'',hash);render(<App/>);expect(window.location.hash).toBe('#analysis/TW/2330');expect(screen.getByRole('region',{name:'個股分析頁'})).toBeInTheDocument();
+});
+it.each([['#analysis/2330','2330'],['#analysis/TW/6488','TW/6488'],['#analysis/us/AAPL','us/AAPL'],['#analysis/US/MSFT','US/MSFT']])('preserves stock URL %s', (hash,address)=>{
+ window.history.replaceState(null,'',hash);render(<App/>);expect(window.location.hash).toBe(hash);expect(screen.getByTestId('analysis-address')).toHaveTextContent(address);
+});
+it('handles market navigation and browser back/forward hash changes',async()=>{
+ render(<App/>);window.history.replaceState(null,'','#analysis/US/MSFT');fireEvent(window,new HashChangeEvent('hashchange'));await waitFor(()=>expect(screen.getByTestId('analysis-address')).toHaveTextContent('US/MSFT'));
+ window.history.replaceState(null,'','#analysis/2330');fireEvent(window,new HashChangeEvent('hashchange'));await waitFor(()=>expect(screen.getByTestId('analysis-address')).toHaveTextContent('2330'));
+});
+it('keeps metric definitions inside analysis without linking to a removed dictionary or lesson',async()=>{
+ const user=userEvent.setup();render(<App/>);await user.click(screen.getByRole('button',{name:'EPS'}));const dialog=screen.getByRole('dialog');expect(dialog).toHaveTextContent(glossary.EPS[0]);expect(within(dialog).queryByRole('link')).not.toBeInTheDocument();await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+it('does not read, overwrite or erase former learning progress and bookmarks',()=>{
+ const keys=['finance-school.completed.v3','finance-school.bookmarks.v3'];for(const key of keys)localStorage.setItem(key,'["fund-pe"]');
+ const get=vi.spyOn(Storage.prototype,'getItem'),set=vi.spyOn(Storage.prototype,'setItem');render(<App/>);
+ for(const key of keys){expect(get).not.toHaveBeenCalledWith(key);expect(set.mock.calls.some(call=>call[0]===key)).toBe(false);}
+ get.mockRestore();set.mockRestore();for(const key of keys)expect(localStorage.getItem(key)).toBe('["fund-pe"]');
 });

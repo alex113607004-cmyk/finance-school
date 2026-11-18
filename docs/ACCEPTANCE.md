@@ -1,3 +1,5 @@
+> 2026-11-18：網站現已僅保留個股分析，以下較舊的教材／導覽驗收為歷史紀錄。最新移除範圍、網址相容與驗收見 [ANALYSIS-ONLY](ANALYSIS-ONLY.md)。
+
 > 此文件保留先前版本的驗收紀錄。舊段落所列「尚未建立 repository／未部署」已由下方「GitHub Pages 與基本面判讀」紀錄取代；目前正式網址為 https://alex113607004-cmyk.github.io/finance-school/#market 。
 
 # 新版驗收紀錄 — 2026/11/17（台北時間）

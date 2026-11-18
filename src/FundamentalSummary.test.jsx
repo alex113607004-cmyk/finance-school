@@ -1,7 +1,8 @@
 import React from 'react';
 import {render,screen,within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {describe,it,expect} from 'vitest';
+import {afterEach,describe,it,expect,vi} from 'vitest';
+afterEach(()=>vi.unstubAllGlobals());
 import fs from 'node:fs';
 import FundamentalSummary from './components/FundamentalSummary';
 import Market from './components/Market';
@@ -39,17 +40,15 @@ describe('per-stock financial evidence in the market flow',()=>{
   expect(report().getByRole('heading',{name:'資料不足，暫不能判斷買進條件'})).toBeInTheDocument();
  });
  it('opens the new financial terms from the actual stock page',async()=>{
-  const user=userEvent.setup();window.history.replaceState(null,'','#market');render(<App/>);
-  const report=within(screen.getByRole('region',{name:'個股基本面摘要與買進條件'}));
+  const user=userEvent.setup();vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));window.history.replaceState(null,'','#analysis/TW/2330');render(<App/>);
+  const report=within(screen.getByRole('region',{name:'個股基本面'}));
   await user.click(report.getByRole('button',{name:'負債比率'}));
   expect(within(screen.getByRole('dialog')).getByText(/負債總計 ÷ 資產總計 × 100%/)).toBeInTheDocument();
   await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));
   await user.click(report.getByRole('button',{name:'流動比率'}));
   expect(within(screen.getByRole('dialog')).getByText(/存貨或應收帳款不一定能立即變現/)).toBeInTheDocument();
   await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));
-  const moving=within(screen.getByRole('region',{name:'五種均線觀察'}));
-  expect(moving.getAllByRole('article')).toHaveLength(5);
-  await user.click(moving.getByRole('button',{name:'年線'}));
-  expect(within(screen.getByRole('dialog')).getByText(/最近 240 個有效交易日/)).toBeInTheDocument();
+  await user.click(screen.getAllByRole('button',{name:'均線'})[0]);
+  expect(within(screen.getByRole('dialog')).getByText(/最近 N 個有效交易日/)).toBeInTheDocument();
  });
 });

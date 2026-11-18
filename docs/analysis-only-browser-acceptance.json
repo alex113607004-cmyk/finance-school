@@ -1,0 +1,91 @@
+{
+  "errors": [],
+  "checks": [
+    {
+      "name": "default analysis",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330",
+      "brand": "台美股個股分析｜行情・財報・估值",
+      "sidebar": 0,
+      "removedLinks": 0
+    },
+    {
+      "name": "drag crosshair",
+      "before": "2026-08-27",
+      "after": "2026-10-19",
+      "changed": true
+    },
+    {
+      "name": "week K",
+      "visible": true
+    },
+    {
+      "name": "month K",
+      "visible": true
+    },
+    {
+      "name": "metric definition",
+      "visible": true,
+      "text": "METRIC DEFINITION / 分析指標說明\nEPS\n\n每股盈餘，將歸屬普通股股東的獲利分攤至每股。基本與稀釋 EPS 的分母可能不同。\n\n例子\n\n公司 EPS 為 5 元，不表示股東一定能領"
+    },
+    {
+      "name": "negative EPS",
+      "text": "EPS 為零或負值，本益比法不適用，暫無適用估值。"
+    },
+    {
+      "name": "legacy redirect",
+      "hash": "#learn",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330"
+    },
+    {
+      "name": "legacy redirect",
+      "hash": "#unit/fund-pe",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330"
+    },
+    {
+      "name": "legacy redirect",
+      "hash": "#bookmarks",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330"
+    },
+    {
+      "name": "legacy redirect",
+      "hash": "#sources",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330"
+    },
+    {
+      "name": "legacy redirect",
+      "hash": "#market",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330"
+    },
+    {
+      "name": "legacy redirect",
+      "hash": "#glossary",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/TW/2330"
+    },
+    {
+      "name": "US search",
+      "url": "http://127.0.0.1:4186/finance-school/#analysis/US/MSFT",
+      "EPS": true,
+      "removedCourseLinks": 0
+    },
+    {
+      "name": "responsive",
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "name": "responsive",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "OTC",
+      "visible": true
+    },
+    {
+      "name": "ETF",
+      "visible": true
+    }
+  ],
+  "browser": "Chromium / desktop and emulated viewport sizes",
+  "checkedOn": "2026-11-18 Asia/Taipei"
+}

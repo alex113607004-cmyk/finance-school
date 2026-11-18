@@ -24,7 +24,6 @@ export default function ResearchFundamentals({snapshot,term= t=>t,label='SEC',no
   })}</div>
   {snapshot?.ttm&&<div className="research-eps"><h3>近四季稀釋 EPS：{snapshot.ttm.available?format(snapshot.ttm.eps)+' '+(metrics.revenue?.currency||'USD')+'／股':'暫無可驗證數值'}</h3><p>依連續四個會計季度的直接稀釋 EPS 相加；不把年度累計值當成單季。{snapshot.ttm.reason}</p><div className="table-scroll"><table><thead><tr><th>會計年度／季度</th><th>期間</th><th>稀釋 EPS</th><th>公告／申報日</th><th>文件</th></tr></thead><tbody>{snapshot.ttm.reports?.map(r=><tr key={r.periodEnd}><td>FY{r.year} Q{r.quarter}</td><td>{r.periodStart} ～ {r.periodEnd}</td><td>{format(r.eps)} {r.currency||metrics.revenue?.currency||'USD'}／股</td><td>{r.announcedOn}</td><td>{r.source?<A href={r.source}>{r.accession||'公司首次公告'}</A>:'尚未核實'}</td></tr>)}</tbody></table></div>{snapshot.ttm.available&&<p className="analysis-formula">{snapshot.ttm.reports.map(r=>format(r.eps)).join(' ＋ ')} ＝ {format(snapshot.ttm.eps)}／股</p>}</div>}
   <div className="research-summary" aria-label="基本面白話摘要"><h3>這些變化可以怎麼讀？</h3>{plainFinancialSummary(snapshot||{available:false,reason:'目前沒有足夠財報數字產生摘要。'}).map((s,i)=><p key={i}>{s}</p>)}<p>營收增加不保證獲利品質改善，現金流也會受收付款時點影響；本頁沒有據此預測股價或保證買進報酬。</p></div>{notes&&<p className="subtle">{notes}</p>}
-  <div className="analysis-course-links"><a href="#unit/fund-pe">EPS 與本益比課程 ↗</a><a href="#unit/fund-statements">財報與現金流課程 ↗</a></div>
  </section>;
 }
 export function etfPremium(quote,nav){
