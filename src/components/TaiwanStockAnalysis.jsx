@@ -5,12 +5,13 @@ import marketBaseline from '../generated/market.json';
 import catalog from '../generated/universe-catalog.json';
 import {createAnalysisClient,emptyHistory,mergeHistory,quoteFromHistory} from '../analysis-client';
 import {MARKET_NAMES,KIND_NAMES,searchStocks,resolveStock,universeCounts} from '../stock-universe';
-import {historicalValuation,maPosition,scenario,taipeiDay,quarterId} from '../stock-analysis';
+import {historicalValuation,scenario,taipeiDay} from '../stock-analysis';
 import {format} from '../domain';
 import {taipeiTime,freshness} from '../freshness';
 import AnalysisChart from './AnalysisChart';
 import PriceResearchSummary from './PriceResearchSummary';
 import FinancialDataStatus from './FinancialDataStatus';
+import {SectionNav,QuickFacts} from './StockPageChrome';
 import {cashflowView} from '../tw-cashflow';
 import QuoteSnapshot from './QuoteSnapshot';
 import ResearchFundamentals,{researchSnapshotTW,ETFReference} from './ResearchFundamentals';
@@ -36,16 +37,11 @@ function Scenario({value}){
  const result=scenario(eps,low,high);
  return <section className="analysis-scenario" aria-label="使用者假設情境試算"><div className="section-title"><div><h3>換個假設，自己算一次</h3><p>下方均為使用者假設，不會改寫原始財報與歷史估值判讀。</p></div><span className="analysis-tag">情境試算</span></div><div className="analysis-scenario-fields">{[['假設近四季 EPS（元／股）',eps,setEPS],['假設本益比下限（倍）',low,setLow],['假設本益比上限（倍）',high,setHigh]].map(([label,v,set])=><label key={label}>{label}<input type="number" step="any" value={v} onChange={e=>set(e.target.value)}/></label>)}</div><output role="status" className="analysis-scenario-result">{result.available?`假設區間 ${format(result.low)} ～ ${format(result.high)} 元／股` :result.reason}</output><p className="subtle">情境用到的倍數與 EPS 由你決定；零或負 EPS 不套用本益比法。這是敏感度分析，不是目標價。</p><button className="secondary" onClick={()=>{setEPS(value.ttm?.eps?.toString()||'');setLow(value.p25?.toFixed(6)||'');setHigh(value.p75?.toFixed(6)||'')}}>還原原始資料的起始值</button></section>;
 }
-function RangePlot({value,price}){
- if(!value.available)return null;
- const min=Math.min(value.low*.85,price*.95),max=Math.max(value.high*1.12,price*1.05),pct=v=>(v-min)/(max-min)*100;
- return <div className="analysis-range" aria-label={`歷史估值區間 ${format(value.low)} 至 ${format(value.high)} 元，收盤 ${format(price)} 元`}><div className="analysis-range-track"><span className="analysis-range-band" style={{left:pct(value.low)+'%',width:(pct(value.high)-pct(value.low))+'%'}}/><i style={{left:pct(price)+'%'}}/></div><div className="analysis-range-labels"><span>P25 下緣<br/><b>{format(value.low)} 元</b></span><span>白線：收盤<br/><b>{format(price)} 元</b></span><span>P75 上緣<br/><b>{format(value.high)} 元</b></span></div></div>;
-}
 function Fundamentals({stock,filings,ttm,term}){
  const f=stock.fundamentals||{},revenue=f.revenue,verifiedCash=cashflowView(stock),cash=filings?.cashflow||(verifiedCash.available?verifiedCash:null),e=f.earnings;
  const fund=['etf','etn','reit'].includes(stock.securityKind),financial=f.kind==='financial';
  return <section className="panel analysis-section" aria-label="個股基本面">
-  <span className="eyebrow">BUSINESS DATA / 各項期間分開列示</span><h2>{fund?'基金資料與估值適用範圍':'公司賺了多少，收到多少現金？'}</h2>
+  <span className="eyebrow">BUSINESS DATA / 各項期間分開列示</span><h2>{fund?'基金資料':'營運與財務指標'}</h2>
   {fund?<p>此標的是 {KIND_NAMES[stock.securityKind]}，不以單一公司的 EPS、毛利率或營業現金流衡量；應查看基金淨值、折溢價、成分、費用及公開說明書。本頁提供真實行情與日線，不套用公司本益比估值。</p>:<>
   <div className="analysis-fund-grid">
    <article><span>{ttm?.available?'近四季稀釋 ':'年初至季末累計基本 '}{term('EPS')}</span><strong>{format(ttm?.available?ttm.eps:e?.epsYtd)} <small>元／股</small></strong>
@@ -92,46 +88,55 @@ export default function TaiwanStockAnalysis({term,param}){
  const knownQuote=entry?.quote;
  const quote=stock&&knownQuote&&(knownQuote.date>stock.quote?.date||knownQuote.date===stock.quote?.date&&knownQuote.checkedAt>(stock.sourceChecks?.quotes||''))?knownQuote:stock?.quote;
  const effectiveStock=knownQuote&&quote===knownQuote?{...stock,quote,sources:{...stock?.sources,quotes:knownQuote.source},sourceChecks:{...stock?.sourceChecks,quotes:knownQuote.checkedAt}}:stock;
- const filings=entry?.filings||{reports:[],warnings:[],basisConfirmed:false,checkedAt:null},value=historicalValuation({quote,history,filings,expectedPeriod:stock?.fundamentals?.earnings?.period}),ma=maPosition(quote,history);
+ const filings=entry?.filings||{reports:[],warnings:[],basisConfirmed:false,checkedAt:null},value=historicalValuation({quote,history,filings,expectedPeriod:stock?.fundamentals?.earnings?.period});
  const researchSnapshot=code==='2330'?researchSnapshotTW(extra2330,value.ttm):undefined;
  const fund=['etf','etn','reit'].includes(selected?.securityKind),busy=checking||publication.busy;
- const priorEPS=filings.reports?.find(r=>r.year===value.ttm?.latest?.year-1&&r.quarter===value.ttm?.latest?.quarter);
- const earningsNote=value.ttm?.available&&priorEPS?`${value.ttm.latest.periodStart} ～ ${value.ttm.latest.periodEnd} 的單季稀釋 EPS ${format(value.ttm.latest.eps)} 元，對照 ${priorEPS.periodStart} ～ ${priorEPS.periodEnd} 的 ${format(priorEPS.eps)} 元${priorEPS.eps>0?'，變化 '+format((value.ttm.latest.eps/priorEPS.eps-1)*100)+'%':''}。`:null;
  const warnings=[...publication.warnings,...(selected?.warnings||[]),...(entry?.warnings||[]),...(filings.warnings||[]),currentLoad?.error,history.reason].filter(Boolean);
  const priceUnit=/^\d{5}[CK]$/.test(code)?'原交易幣別／受益權單位（幣別待核實）':'新台幣元／'+(fund?'受益權單位':'股');
  return <div className="stock-analysis-page">
-  <div className="page-title"><span className="eyebrow">TAIWAN STOCK EXPLORER / 全市場個股查詢</span><h1>從基本面與技術面，評估股價。</h1><p>輸入股票代號或公司名稱，整合估值、營運與均線趨勢；每項判讀保留日期、口徑及來源。</p></div>
-  <div className="analysis-universe-counts" aria-label="股票清單範圍">{Object.entries(counts).map(([m,n])=><span key={m}>{MARKET_NAMES[m]} <b>{n.toLocaleString()}</b> 檔</span>)}<small>含官方清單中的 ETF、ETN 與特別股；不含權證、個別債券及已下市標的。</small></div>
+  <div className="page-title compact-title"><h1>台股個股研究</h1><p>上市・上櫃・興櫃，共 {Object.values(counts).reduce((a,b)=>a+b,0).toLocaleString()} 檔標的</p></div>
   <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="analysis-search">搜尋個股代號或名稱</label><input id="analysis-search" role="combobox" aria-autocomplete="list" aria-expanded={focused&&!!query&&!!suggestions.length} aria-controls="stock-search-results" aria-activedescendant={focused&&suggestions[activeOption]?'stock-option-'+suggestions[activeOption].code:undefined} autoComplete="off" onBlur={e=>{if(!e.currentTarget.parentElement.parentElement.contains(e.relatedTarget))setFocused(false);}} value={query} onFocus={()=>setFocused(true)} onChange={e=>{setQuery(e.target.value);setActiveOption(0);setFocused(true);}} onKeyDown={e=>{if(e.key==='Escape')setFocused(false);if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();setFocused(true);setActiveOption(i=>Math.max(0,Math.min(suggestions.length-1,i+(e.key==='ArrowDown'?1:-1))));}}} placeholder="輸入代號或名稱，例如 2330、鴻海、環球晶"/><button className="primary">分析個股</button></form>
    {focused&&query&&suggestions.length>0&&<ul className="analysis-suggestions" role="listbox" id="stock-search-results" aria-label="股票搜尋結果">{suggestions.map((s,i)=><li role="option" id={'stock-option-'+s.code} aria-selected={i===activeOption} key={s.code} onMouseDown={e=>e.preventDefault()}><button type="button" onClick={()=>choose(s)}><b>{s.code}</b><span>{s.name}<small>{s.company?.fullName}</small></span><em>{MARKET_NAMES[s.market]} · {KIND_NAMES[s.securityKind]||'股票'}</em></button></li>)}</ul>}
   </div>
   <div className="analysis-search-controls"><label>搜尋範圍 <select aria-label="股票市場篩選" value={filter} onChange={e=>{setFilter(e.target.value);setActiveOption(0);setFocused(true);}}><option value="all">全市場</option>{Object.keys(MARKET_NAMES).map(m=><option key={m} value={m}>{MARKET_NAMES[m]}</option>)}</select></label><div className="analysis-recent">{[...new Set([...recent,'2330','2317','6488','0050'])].slice(0,7).filter(c=>universe.stocks[c]).map(c=><button key={c} className={'secondary '+(c===code?'selected':'')} onClick={()=>choose(universe.stocks[c])}>{universe.stocks[c].name} <small>{c}</small></button>)}</div></div>
   {searchError&&<p role="alert" className="error-message">{searchError}</p>}
-  {!selected?<section className="panel empty-state" role="status"><Info size={24}/><h2>{publication.busy?'正在更新全市場清單':'查無代號或名稱'}</h2><p>「{code}」未出現在目前官方清單。請核對代號或選擇搜尋候選；已下市、權證、個別債券與海外股票不在此台股清單內。</p><button className="primary" onClick={()=>choose(universe.stocks['2330'])}>查看台積電完整流程</button></section>:<>
-  <section className="panel analysis-quote" aria-label="個股盤後行情"><div className="section-title"><div><span className="eyebrow">{selected.market} · {selected.code} · {MARKET_NAMES[selected.market]} · {KIND_NAMES[selected.securityKind]||'股票'}</span><h2>{selected.name} <span className="analysis-tag">{selected.market==='ESB'?'成交快照':'盤後'}</span></h2><p className="subtle">{selected.company?.fullName}</p></div><button className="secondary" disabled={busy} onClick={()=>setRefresh(r=>r+1)}><RefreshCw size={14}/>{busy?progress?`載入日線 ${progress.finished}/${progress.total}`:'查詢中…':'重新查詢'}</button></div>
-   <div className="analysis-price"><strong>{format(quote?.close)}</strong><span>{priceUnit}</span>{Number.isFinite(quote?.change)&&<b className={quote.change>0?'gain':quote.change<0?'loss':''}>{quote.change>0?'+':''}{format(quote.change)}（{quote.changePercent>0?'+':''}{format(quote.changePercent)}%）</b>}</div>
-   {!Number.isFinite(quote?.close)&&<p role="status" className="notice">此股票已列入官方名單，但尚無有效成交價；可能暫停交易、今日無成交或來源尚未更新。本頁不借用其他股票價格。</p>}
-   <p>成交量 {format(quote?.volume,0)} {fund?'受益權單位':'股'} · 幣別 TWD（特殊外幣商品另以來源為準）</p><p>{selected.market==='ESB'?'成交快照日期':'交易日'} {quote?.date||'尚未取得'} {quote?.time&&`· ${quote.time.replace(/(\d{2})(\d{2})(\d{2})/,'$1:$2:$3')}`} · {freshness(quote?.date).label}<br/>原始行情擷取 {taipeiTime(effectiveStock?.sourceChecks?.quotes)} · 本次日線查詢 {taipeiTime(currentLoad?.checkedAt)}<br/>行情來源：<Link href={effectiveStock?.sources?.quotes}>{selected.market==='TWSE'?'臺灣證券交易所':'證券櫃檯買賣中心'}</Link></p>
-   <p className="subtle">{selected.market==='TWSE'?'查看時查詢證交所近期日線；財報與全市場清單由排程更新。':selected.market==='TPEX'?'上櫃原始來源限制瀏覽器跨網域讀取，改讀每日更新的官方盤後快照；每次進入會重查最新已發布版本。':'興櫃採議價成交；來源提供最新成交與前日均價，不視為上市櫃收盤價與前收漲跌幅。'} 不把查詢時間當交易時間。</p>
-   {warnings.length>0&&<p className="notice" role="status">{[...new Set(warnings)].join('；')}{filings.warnings?.some(w=>w.startsWith('公司公告更新失敗'))&&value.available?'；沿用已核實首次公告快照及原查核時間，下一季結束仍未核實時停止估值。':''}</p>}
+  {!selected?<section className="panel empty-state" role="status"><Info size={24}/><h2>{publication.busy?'正在更新全市場清單':'查無代號或名稱'}</h2><p>「{code}」未出現在目前官方清單。請核對代號或選擇搜尋結果；不含權證、個別債券及已下市標的。</p><button className="primary" onClick={()=>choose(universe.stocks['2330'])}>查看台積電</button></section>:<>
+  <section className="panel analysis-quote" aria-label="個股盤後行情">
+   <div className="quote-layout"><div><span className="eyebrow">{selected.market} · {selected.code} · {MARKET_NAMES[selected.market]} · {KIND_NAMES[selected.securityKind]||'股票'}</span><h2>{selected.name} <span className="analysis-tag">{selected.market==='ESB'?'成交快照':'盤後'}</span></h2><p className="quote-company">{selected.company?.fullName}</p>
+    <div className="analysis-price"><strong>{format(quote?.close)}</strong><span>{priceUnit}</span>{Number.isFinite(quote?.change)&&<b className={quote.change>0?'gain':quote.change<0?'loss':''}>{quote.change>0?'+':''}{format(quote.change)}（{quote.changePercent>0?'+':''}{format(quote.changePercent)}%）</b>}</div>
+   </div><div className="quote-actions"><button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(r=>r+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?progress?`載入日線 ${progress.finished}/${progress.total}`:'查詢中…':'重新查詢'}</button><p>{selected.market==='ESB'?'成交日期':'交易日'} <b>{quote?.date||'尚未取得'}</b><br/>{quote?.time&&quote.time.replace(/(\d{2})(\d{2})(\d{2})/,'$1:$2:$3')} {freshness(quote?.date).label}</p><p>成交量 <b>{format(quote?.volume,0)}</b> {fund?'受益權單位':'股'}<br/><Link href={effectiveStock?.sources?.quotes}>{selected.market==='TWSE'?'臺灣證券交易所':'證券櫃檯買賣中心'}</Link></p></div></div>
+   {!Number.isFinite(quote?.close)&&<p role="status" className="notice">尚無有效成交價，可能暫停交易、今日無成交或來源尚未更新。</p>}
+   {!fund&&<QuickFacts term={term} items={[
+    {label:'EPS',value:format(value.ttm?.available?value.ttm.eps:effectiveStock.fundamentals?.earnings?.epsYtd),unit:'元／股',note:value.ttm?.available?'近四季稀釋 EPS':`${effectiveStock.fundamentals?.earnings?.period?.label||'期間待確認'} · 累計基本 EPS`},
+    {label:'本益比',value:format(effectiveStock.valuation?.pe),unit:'倍',note:`官方倍數 · ${effectiveStock.valuation?.date||'尚未提供'}`},
+    {label:'營業利益率',value:format(effectiveStock.fundamentals?.kind==='financial'?null:effectiveStock.profit?.operating),unit:'%',note:effectiveStock.fundamentals?.kind==='financial'?'金融業不套一般業比率':effectiveStock.profit?.period||'期間待確認'},
+    {label:'YoY',value:format(effectiveStock.fundamentals?.revenue?.yoy),unit:'%',note:`單月營收年增 · ${effectiveStock.fundamentals?.revenue?.month||'月份待確認'}`},
+   ]}/>}
+   {warnings.length>0&&<details className="quote-update-note"><summary>有 {new Set(warnings).size} 項資料待確認，查看詳情</summary><p className="notice" role="status">{[...new Set(warnings)].join('；')}{filings.warnings?.some(w=>w.startsWith('公司公告更新失敗'))&&value.available?'；沿用已核實首次公告快照及原查核時間，下一季結束仍未核實時停止估值。':''}</p></details>}
   </section>
-  <PriceResearchSummary stock={{...effectiveStock,quote,currency:/^\d{5}[CK]$/.test(code)?'幣別尚未核實':'TWD'}} history={history} valuation={value} snapshot={researchSnapshot} region="TW" busy={busy} term={term}/>
-  <FinancialDataStatus stock={effectiveStock} history={history} valuation={value} coverage={universe.financialCoverage}/>
+  <SectionNav/>
+  <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><div><span className="eyebrow">PRICE ACTION</span><h2>價格走勢</h2></div><span className="chart-basis-tag">盤後 · 未還原價格</span></div>{history.rows.length?<AnalysisChart key={code} history={{...history,currencyLabel:priceUnit,volumeUnit:fund?'受益權單位':'股'}} asOf={taipeiDay()} term={term}/>:<div className="chart-empty" role="status"><Info size={28}/><h3>{checking?'正在載入官方日線':'日線資料暫不可用'}</h3><p>{history.reason||currentLoad?.error||'此標的尚無可核實的日線資料。'}</p></div>}</section>
+  <div id="stock-assessment" tabIndex={-1}><PriceResearchSummary stock={{...effectiveStock,quote,currency:/^\d{5}[CK]$/.test(code)?'幣別尚未核實':'TWD'}} history={history} valuation={value} snapshot={researchSnapshot} region="TW" busy={busy} term={term}/></div>
   {import.meta.env.DEV&&import.meta.env.VITE_TWSTOCK_LOCAL==='1'&&['TWSE','TPEX'].includes(selected.market)&&<QuoteSnapshot key={code} code={code} priceUnit={priceUnit} estimate={value}/>}
-  {!entry&&!fund&&<OfficialValuation stock={effectiveStock} term={term}/>}
-  <section className="analysis-insights" aria-label="估值與均線分別判讀"><article className="panel"><span className="eyebrow">01 / VERIFIED HISTORICAL VALUATION</span><h2>{busy?'正在核對資料':fund?'基金不適用公司本益比法':value.title}</h2>{!busy&&value.available?<><p>收盤 {format(quote.close)} 元 ÷ 近四季 EPS {format(value.ttm.eps)} 元 ＝ {format(value.pe)} 倍。歷史中段為 {format(value.p25)} ～ {format(value.p75)} 倍。</p><RangePlot value={value} price={quote.close}/>{earningsNote&&<p>{earningsNote}區間最受「近四季獲利能否維持」與「歷史倍數是否仍可比」影響，未使用未公告的預測 EPS。</p>}<p>{value.position==='below'?`目前 ${format(quote.close)} 元低於下緣 ${format(value.low)} 元，倍數低於自身歷史樣本中段；仍需核對獲利能否維持、一次性損益與營運風險。`:value.position==='above'?`目前 ${format(quote.close)} 元高於上緣 ${format(value.high)} 元，需要比歷史樣本更高的定價；歷史區間不能驗證未來成長，也不能預測下跌。`:`目前 ${format(quote.close)} 元介於 ${format(value.low)} 與 ${format(value.high)} 元，屬自身歷史倍數中段，仍不能保證內在價值或買進報酬。`}</p></>:!busy&&<>{fund?<p>以基金淨值與折溢價等指標研究，請勿把公司 EPS 估值套用到基金。</p>:<><p>可查詢此股的行情與已申報財務資料；尚未取得下列估值必要資料：</p><ul>{value.reasons.map(s=><li key={s}>{s}</li>)}</ul><p className="subtle">不以本益比倒推 EPS 冒充已公告財報，也不借用台積電的倍數或財報。下方另提供官方估值與同業分布觀察。</p></>}</>}</article>
-   <article className="panel"><span className="eyebrow">02 / PRICE VS. MA20</span><h2>{busy?'正在核對均線':ma.available?`現價${ma.position==='above'?'高於':ma.position==='below'?'低於':'等於'} 20 日均線`:'均線資料不足'}</h2>{ma.available?<><p>MA20 {format(ma.average)}，成交價格 {format(quote.close)}，乖離 {format(ma.distance)}%。</p><p>均線描述價格位置，不能代替公司估值。高於均線不保證繼續漲，低於均線不保證便宜。</p><details><summary>驗算 20 日均線</summary><p className="analysis-formula">{ma.rows[0].date} ～ {ma.rows.at(-1).date}<br/>{ma.rows.map(r=>format(r.close)).join(' ＋ ')}<br/>合計 {format(ma.sum)} ÷ 20 ＝ {format(ma.average,4)}</p></details></>:<p>{history.reason||ma.text}</p>}</article>
+  <div id="stock-fundamentals" tabIndex={-1}>
+   {code==='2330'&&<ResearchFundamentals snapshot={researchSnapshot} term={term} label="TSMC IR" notes="單季、合併財報。淨利歸屬母公司，資本支出採現金購置設備。"/>}
+   {fund&&<ETFReference quote={{...quote,currency:'TWD'}} nav={{available:false}} source={code==='0050'?'https://www.yuantaetfs.com/product/detail/0050/Basic_information':'https://www.twse.com.tw/zh/ETFortune/index'}/>}
+   {!fund&&(code==='2330'?<details className="panel disclosure-panel"><summary>月營收與累計財報<span>更多財務指標</span></summary><Fundamentals stock={effectiveStock} filings={filings} ttm={value.ttm} term={term}/></details>:<Fundamentals stock={effectiveStock} filings={filings} ttm={value.ttm} term={term}/>)}
+   <details className="panel disclosure-panel"><summary>官方估值與同業比較<span>本益比・股價淨值比・殖利率</span></summary><OfficialValuation stock={effectiveStock} term={term}/></details>
+  </div>
+  <section id="stock-valuation" tabIndex={-1} className="panel analysis-section" aria-label="歷史估值驗算"><div className="section-title"><div><span className="eyebrow">VALUATION LAB</span><h2>{fund?'基金估值適用範圍':'估值與情境試算'}</h2></div><span className="analysis-tag">{value.validSamples.length} 筆有效月末樣本</span></div>
+   {fund?<h3>基金不適用公司本益比法</h3>:<p>最新已公告近四季 {term('EPS')} × 歷史{term('本益比')} P25～P75。假設可調整，原始資料維持不變。</p>}
+   <details className="valuation-data-notes"><summary>估值樣本與查核日期</summary><div className="analysis-metadata"><span>有效樣本 <b>{value.validSamples.length}／{value.samples.length} 筆（最低 24）</b></span><span>樣本期間 <b>{value.validSamples[0]?.date||'尚未建立'} ～ {value.validSamples.at(-1)?.date||'—'}</b></span><span>首次公告查核 <b>{taipeiTime(filings.checkedAt)}</b></span></div></details>
+   {entry&&<Computation value={value}/>}{!fund&&<Scenario key={`${code}-${quote?.date}-${value.ttm?.eps}-${value.p25}`} value={value}/>}
   </section>
-  <section className="panel analysis-section"><div className="section-title"><div><span className="eyebrow">PRICE & VOLUME</span><h2>日／週／月 K 與成交量</h2></div>{term('日K線')}</div>{history.rows.length?<AnalysisChart key={code} history={{...history,currencyLabel:priceUnit,volumeUnit:fund?'受益權單位':'股'}} asOf={taipeiDay()} term={term}/>:<p role="status">{checking?'正在載入此股票的官方日線…':history.reason||currentLoad?.error||'此股票尚無可核實日線，不繪製空白或模擬圖表。'}</p>}</section>
-  {code==='2330'&&<ResearchFundamentals snapshot={researchSnapshot} term={term} label="TSMC IR" notes="本段為可核實的季度資料快照，與上方最新行情日期分開。淨利採歸屬母公司；資本支出採現金購置設備，不扣除處分收入。"/>}{fund&&<ETFReference quote={{...quote,currency:'TWD'}} nav={{available:false}} source={code==='0050'?'https://www.yuantaetfs.com/product/detail/0050/Basic_information':'https://www.twse.com.tw/zh/ETFortune/index'}/>}<Fundamentals stock={effectiveStock} filings={filings} ttm={value.ttm} term={term}/>{(entry||fund)&&<OfficialValuation stock={effectiveStock} term={term}/>}
-  <section className="panel analysis-section" aria-label="歷史估值驗算"><span className="eyebrow">SHOW YOUR WORK</span><h2>把估值攤開，從來源算起。</h2><p>最新已公告近四季 {term('EPS')} × 自身歷史{term('本益比')}第 25～75 百分位。只有核實連續四季、首次公告版本與足夠月末樣本時才套用。</p>
-   <div className="analysis-metadata"><span>有效樣本 <b>{value.validSamples.length} 筆／{value.samples.length} 筆（最低 24）</b></span><span>樣本期間 <b>{value.validSamples[0]?.date||'尚未建立'} ～ {value.validSamples.at(-1)?.date||'—'}</b></span><span>公司首次公告查核 <b>{taipeiTime(filings.checkedAt)}</b></span></div>
-   {entry&&<Computation value={value}/>}{!fund&&<Scenario key={`${code}-${quote?.date}-${value.ttm?.eps}-${value.p25}`} value={value}/>}<p className="subtle">試算為你輸入的假設，不會補上缺漏的原始財報。EPS 為零或負值不套用本益比法；歷史區間不是保證合理價。</p>
-  </section>
-  <section className="panel analysis-section"><h2>此股票的資料範圍與來源</h2>{universe.warnings?.length>0&&<details><summary>全市場快照有 {universe.warnings.length} 項來源更新失敗</summary>{universe.warnings.map((w,i)=><p key={i} className="subtle">{w}</p>)}</details>}<p>全市場快照 {taipeiTime(universe.generatedAt)}；{history.rows.length?`日線 ${history.rows[0].date} ～ ${history.rows.at(-1).date}，${history.rows.length} 筆。`:'日線尚未提供。'}價格、K 棒與日均線皆使用同一口徑的未還原價格，成交量為{fund?'受益權單位':'股'}；不計股利再投資、稅費或換匯。上市／上櫃轉板前資料不直接混接。原始財報期間與出表日分別顯示，不將累計 EPS 當近四季。</p>
-   {history.sources.length>0&&<details><summary>查閱此股票歷史行情來源與擷取時間</summary><div className="analysis-source-list">{history.sources.map(s=><p key={s.url}><Link href={s.url}>{s.label||s.month||s.date} {MARKET_NAMES[selected.market]}原始行情</Link> · {taipeiTime(s.checkedAt)}</p>)}</div></details>}
-   <div className="analysis-links">{['EPS','本益比','均線','營業現金流','YoY','週K線','月K線','歷史估值區間'].map(t=><React.Fragment key={t}>{term(t)}</React.Fragment>)}</div><p className="subtle">投資教育與資料分析用途。即時行情仍需可展示授權與後端；<Link href="https://github.com/alex113607004-cmyk/finance-school/blob/main/docs/REALTIME.md">行情介接文件</Link>。</p>
-  </section>
+  <div id="stock-sources" tabIndex={-1}>
+   <FinancialDataStatus stock={effectiveStock} history={history} valuation={value}/>
+   <details className="panel disclosure-panel source-panel"><summary>資料來源與價格口徑<span>查看擷取日期與原始連結</span></summary><div className="disclosure-content"><p>行情擷取 {taipeiTime(effectiveStock?.sourceChecks?.quotes)} · 日線查詢 {taipeiTime(currentLoad?.checkedAt)}。價格與均線採同一未還原口徑，不計股利再投資及稅費。</p><p>全市場快照 {taipeiTime(universe.generatedAt)}；{history.rows.length?`日線 ${history.rows[0].date} ～ ${history.rows.at(-1).date}，${history.rows.length} 筆。`:'日線尚未提供。'}累計與單季財報分開列示，出表日不當作公告日。</p>
+    {selected.market==='ESB'&&<p>興櫃提供最新成交與前日均價，不視為集中市場收盤價。</p>}
+    {universe.warnings?.length>0&&<details><summary>來源更新狀態（{universe.warnings.length} 項）</summary>{universe.warnings.map((w,i)=><p key={i}>{w}</p>)}</details>}
+    {history.sources.length>0&&<details><summary>歷史行情原始來源</summary><div className="analysis-source-list">{history.sources.map(s=><p key={s.url}><Link href={s.url}>{s.label||s.month||s.date} {MARKET_NAMES[selected.market]}原始行情</Link> · {taipeiTime(s.checkedAt)}</p>)}</div></details>}
+   </div></details>
+  </div>
   </>}
  </div>;
 }

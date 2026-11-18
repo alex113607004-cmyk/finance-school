@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-11-18T17:11:53.769Z",
+  "root": "http://127.0.0.1:4190/finance-school/",
+  "status": 200,
+  "errors": [],
+  "drag": {
+    "before": "2026-11-17",
+    "after": "2026-10-14",
+    "passed": true
+  },
+  "weekPartial": true,
+  "monthPartial": true,
+  "definition": true,
+  "sectionJump": true,
+  "calculation": true,
+  "zeroEPS": true,
+  "negativeEPS": true,
+  "auditInitiallyCollapsed": true,
+  "sourceLink": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+  "unrelatedContentRemoved": true,
+  "sizes": [
+    {
+      "label": "desktop",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "label": "ipad",
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "label": "mobile",
+      "width": 390,
+      "overflow": false
+    }
+  ],
+  "stockSwitch": true,
+  "appleEPS": true,
+  "microsoftEPS": true,
+  "explicitUSQuoteGap": true,
+  "smallMobileFailureLayout": {
+    "width": 320,
+    "officialRefresh": "simulated network failure; verified saved snapshots retained",
+    "overflow": false,
+    "rangeNumbers": [
+      "2,263.27",
+      "2,455.35",
+      "2,640.53"
+    ]
+  }
+}
