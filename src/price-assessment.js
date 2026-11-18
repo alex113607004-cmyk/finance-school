@@ -1,6 +1,7 @@
 import {dailyAverages,validCandle} from './stock-analysis.js';
 import {marketDate,quoteStatus} from './security.js';
 import {format} from './domain.js';
+import {cashflowView} from './tw-cashflow.js';
 const finite=Number.isFinite;
 const fundKinds=['etf','etn','reit'];
 const age=(date,today)=>/^\d{4}-\d{2}-\d{2}$/.test(date||'')&&finite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date?(Date.parse(today)-Date.parse(date))/86400000:Infinity;
@@ -73,10 +74,13 @@ export function assessFundamentals(stock,{snapshot,region='TW',now=new Date()}={
    const freshBalance=age(b?.period?.end,today)>=0&&age(b?.period?.end,today)<=200;
    add('balance','負債與流動性',{available:freshBalance&&finite(b?.debtRatio)&&finite(b?.currentRatio),text:`負債比 ${format(b?.debtRatio)}%；流動比 ${format(b?.currentRatio)}%`,period:b?.period?.label||'',sources:[stock.sources?.balance],caution:freshBalance&&finite(b?.equity)&&b.equity<=0,reason:'缺少新近、期間明確的資產負債表。'});
   }else gaps.push('金融業須核對 ROE、資本適足與資產品質；不套一般業毛利或流動比率門檻。');
-  const cash=f.cashflow;
-  const freshCash=finite(cash?.amount)&&age(cash?.periodEnd,today)>=0&&age(cash?.periodEnd,today)<=200;
-  add('cash','營業現金流',{available:freshCash,value:cash?.amount,text:`${format(cash?.amount)} ${cash?.unit||''}`,period:cash?`${cash.periodStart} ～ ${cash.periodEnd}`:'',sources:[cash?.source],caution:freshCash&&cash.amount<0,reason:'缺少同口徑現金流與公告日。'});
-  gaps.push('缺少可驗證的資本支出與自由現金流，無法確認獲利是否轉成現金。');
+  const cash=cashflowView(stock,now),period=cash.available?`${cash.periodStart} ～ ${cash.periodEnd}（年初累計）`:'';
+  for(const [key,label,field]of [['cash','營業現金流','amount'],['capex','現金設備支出','capex'],['freeCashFlow','自由現金流','freeCashFlow']]){
+   const available=cash.available&&finite(cash[field]);
+   add(key,label,{available,value:cash[field],unit:'TWD 百萬元',text:available?`${format(cash[field]/1000)} TWD 百萬元（年初累計）`:'',period,sources:[cash.source],caution:available&&field!=='capex'&&cash[field]<0,reason:cash.reason||'來源未提供此項可核實數字。'});
+  }
+  if(cash.available)gaps.push('現金流來源未列首次公告日；只供最新基本面觀察，不納入歷史 EPS 估值。');
+  if(cash.retained||cash.checkOverdue)gaps.push('現金流來源沿用前次資料或超過 8 天未重新查核，請回查原始版本。');
  }
  const count=rows.filter(r=>r.available).length;
  return {kind:financial?'financial':'company',rows,gaps:[...new Set(gaps)],risks:[...new Set(risks)],available:count>0,title:!count?'基本面資料不足':risks.length?'基本面有需核對的風險':gaps.length?'部分基本面可用，現金品質仍待核對':'已公告基本面可供核對'};
