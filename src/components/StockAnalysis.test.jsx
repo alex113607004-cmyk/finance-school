@@ -12,6 +12,10 @@ describe('stock analysis workflow',()=>{
  it('loads a real stock, labels sources and accounting basis, and keeps metric definitions without retired course links',async()=>{
   setup();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());
   expect(screen.getByRole('heading',{name:'台積電 盤後'})).toBeInTheDocument();
+  expect(document.querySelector('.analysis-insights')).toBeNull();
+  expect(document.querySelector('#stock-chart').compareDocumentPosition(document.querySelector('#stock-assessment'))&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(document.querySelector('.financial-data-status details')).not.toHaveAttribute('open');
+  await userEvent.click(screen.getByText('月營收與累計財報'));
   expect(screen.getByRole('region',{name:'個股基本面'})).toHaveTextContent('年初至季末累計');
   expect(screen.getAllByRole('button',{name:'EPS'}).length).toBeGreaterThan(0);
   expect(screen.getAllByRole('button',{name:'均線'}).length).toBeGreaterThan(0);
@@ -39,7 +43,7 @@ describe('stock analysis workflow',()=>{
   await user.type(input,'2317');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'鴻海 盤後'})).toBeInTheDocument();expect(screen.getByRole('region',{name:'個股基本面'})).toBeInTheDocument();
   expect(screen.getByRole('region',{name:'個股盤後行情'})).not.toHaveTextContent('TWSE · 2330');
   await user.clear(input);await user.type(input,'9999');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'查無代號或名稱'})).toBeInTheDocument();
-  await user.click(screen.getByRole('button',{name:'查看台積電完整流程'}));await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent(format(analysis.stocks[2330].quote.close));
+  await user.click(screen.getByRole('button',{name:'查看台積電'}));await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent(format(analysis.stocks[2330].quote.close));
  },20000);
  it('finds OTC names and separates emerging snapshots and ETFs from corporate EPS',async()=>{
   const user=userEvent.setup();setup();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());const input=screen.getByRole('combobox',{name:'搜尋個股代號或名稱'});
