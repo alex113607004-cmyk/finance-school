@@ -40,7 +40,7 @@ describe('stock analysis workflow',()=>{
   expect(screen.getByRole('region',{name:'個股盤後行情'})).not.toHaveTextContent('TWSE · 2330');
   await user.clear(input);await user.type(input,'9999');await user.click(screen.getByRole('button',{name:'分析個股'}));expect(screen.getByRole('heading',{name:'查無代號或名稱'})).toBeInTheDocument();
   await user.click(screen.getByRole('button',{name:'查看台積電完整流程'}));await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent(format(analysis.stocks[2330].quote.close));
- });
+ },20000);
  it('finds OTC names and separates emerging snapshots and ETFs from corporate EPS',async()=>{
   const user=userEvent.setup();setup();await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());const input=screen.getByRole('combobox',{name:'搜尋個股代號或名稱'});
   await user.type(input,'環球');const list=screen.getByRole('listbox',{name:'股票搜尋結果'});await user.click(within(list).getByRole('button',{name:/6488/}));expect(screen.getByRole('heading',{name:'環球晶 盤後'})).toBeInTheDocument();

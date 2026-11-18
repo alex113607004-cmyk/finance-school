@@ -1,0 +1,35 @@
+{
+  "asOf": "2026-11-17",
+  "code": "2330",
+  "source": "Committed original TWSE STOCK_DAY response bodies; independent Python arithmetic",
+  "price": 2170.0,
+  "mas": {
+    "5": {
+      "sum": 11470.0,
+      "average": 2294.0,
+      "previousAverage": 2317.0,
+      "slope": -23.0,
+      "biasPercent": -5.405405405405405
+    },
+    "20": {
+      "sum": 46490.0,
+      "average": 2324.5,
+      "previousAverage": 2337.0,
+      "slope": -12.5,
+      "biasPercent": -6.646590664659069
+    },
+    "60": {
+      "sum": 144515.0,
+      "average": 2408.5833333333335,
+      "previousAverage": 2412.0833333333335,
+      "slope": -3.5,
+      "biasPercent": -9.905546137079202
+    }
+  },
+  "volume": {
+    "date": "2026-11-17",
+    "value": 59957273,
+    "prior20Mean": 39780969.25,
+    "ratio": 1.5071848205407916
+  }
+}
