@@ -9,6 +9,7 @@ import {WatchlistProvider,WatchlistNotice,useWatchlist} from './components/Watch
 import './analysis-shell.css';
 import './dashboard.css';
 import './research-extras.css';
+import {ForecastProvider} from './ForecastContext';
 
 const defaultRoute='analysis/TW/2330';
 function readRoute(){
@@ -30,7 +31,7 @@ function TermDialog({term,onClose}){
   <button className="icon-button close-dialog" onClick={onClose} aria-label="關閉名詞解釋"><X size={20}/></button>{term&&<><span className="eyebrow">METRIC DEFINITION / 分析指標說明</span><h2 id="term-title">{term}</h2><p>{glossary[term]?.[0]||'此指標的定義尚待核實，請先查閱該欄原始來源與計算口徑。'}</p>{glossary[term]?.[1]&&<div className="analogy-box"><span className="mini-label">例子</span><p>{glossary[term][1]}</p></div>}</>}
  </dialog>;
 }
-export default function App(){return <WatchlistProvider><AnalysisApp/></WatchlistProvider>;}
+export default function App(){return <WatchlistProvider><ForecastProvider><AnalysisApp/></ForecastProvider></WatchlistProvider>;}
 function useNarrowScreen(){
  const [narrow,setNarrow]=useState(()=>window.innerWidth<=1100);
  useEffect(()=>{const query=window.matchMedia?.('(max-width: 1100px)');if(!query)return;setNarrow(query.matches);const update=()=>setNarrow(query.matches);query.addEventListener('change',update);return()=>query.removeEventListener('change',update);},[]);

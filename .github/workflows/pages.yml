@@ -90,6 +90,19 @@ jobs:
         run: npm run update:etf-nav
         env:
           NODE_USE_ENV_PROXY: 1
+      - name: Restore institutional source verification status
+        if: github.event_name != 'pull_request'
+        uses: actions/cache@v4
+        with:
+          path: data/forward-estimates-cache.json
+          key: institutional-forecasts-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            institutional-forecasts-v1-${{ runner.os }}-
+      - name: Verify curated public institutional EPS reports
+        if: github.event_name != 'pull_request'
+        run: npm run update:forecasts
+        env:
+          NODE_USE_ENV_PROXY: 1
       - run: npm test
       - name: Build standalone page
         run: npm run build:pages

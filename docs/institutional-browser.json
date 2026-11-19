@@ -1,0 +1,61 @@
+{
+  "root": "http://127.0.0.1:4198/finance-school/",
+  "checkedAt": "2026-11-19T14:48:01.255Z",
+  "tsmcBroker": {
+    "price": 2100,
+    "eps": 148.64,
+    "pe": 14.13,
+    "calculated": 14.128094725511303
+  },
+  "tsmcMedian": {
+    "price": 2100,
+    "eps": 145.69,
+    "pe": 14.41,
+    "calculated": 14.414167067060196
+  },
+  "sidebarSourceSync": true,
+  "tsmcFY2026": {
+    "price": 2100,
+    "eps": 109.21,
+    "pe": 19.23,
+    "calculated": 19.229008332570277
+  },
+  "hypothesisDoesNotReplaceInstitution": true,
+  "honhai": {
+    "price": 220.5,
+    "eps": 25,
+    "pe": 8.82,
+    "calculated": 8.82
+  },
+  "globalwafers": {
+    "price": 546,
+    "eps": 26.51,
+    "withheldForDates": true
+  },
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "small-mobile",
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "etfUnchanged": true,
+  "noBorrowedUSForecast": true,
+  "failedFetchRetainsOriginalPublication": true,
+  "errors": []
+}
