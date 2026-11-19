@@ -1,0 +1,24 @@
+import React from 'react';
+import {render,screen,act,within} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {it,expect,vi,afterEach} from 'vitest';
+const mock=vi.hoisted(()=>({props:null}));
+vi.mock('./LightweightCandles',()=>({default:props=>{mock.props=props;return <div role="img" aria-label={props.label}/>;}}));
+import AnalysisChart from './AnalysisChart';
+const rows=Array.from({length:150},(_,i)=>({date:new Date(Date.UTC(2025,0,i+1)).toISOString().slice(0,10),open:100+i,high:102+i,low:99+i,close:101+i,volume:1000}));
+afterEach(()=>vi.restoreAllMocks());
+it('synchronizes visible count, slider, readout and raw table after zoom, while presets remain reusable',async()=>{
+ vi.spyOn(navigator,'userAgent','get').mockReturnValue('Chromium');const user=userEvent.setup();
+ const history={rows,market:'TWSE',coverageStart:rows[0].date};
+ const {container,rerender}=render(<AnalysisChart history={history} asOf="2025-05-31" term={t=>t}/>);
+ expect(mock.props.rows).toHaveLength(150);expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','60');
+ const request=mock.props.viewportRequest;act(()=>mock.props.onViewportChange({start:20,end:109,count:90,rows:mock.props.rows,kind:'day'}));
+ const loaded=mock.props.rows;rerender(<AnalysisChart history={{...history}} asOf="2025-05-31" term={t=>t}/>);
+ expect(mock.props.rows).toBe(loaded);expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','90');
+ const select=screen.getByRole('combobox',{name:'K 棒顯示根數'});expect(within(select).getByRole('option',{selected:true})).toHaveTextContent('90 根');
+ expect(screen.getByRole('slider',{name:'選取個股 K 棒'})).toHaveAttribute('max','89');expect(screen.getByTestId('candle-date')).toHaveTextContent(rows[109].date);
+ await user.click(screen.getByText('查看 K 棒與均線原始數字（目前 90 根）'));expect(await screen.findAllByRole('row')).toHaveLength(91);
+ await user.selectOptions(select,'60');expect(mock.props.viewportRequest.count).toBe(60);expect(mock.props.viewportRequest).not.toBe(request);expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','60');
+ await user.selectOptions(select,'5000');expect(mock.props.viewportRequest.count).toBe(Infinity);expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','150');
+ await user.click(screen.getByRole('button',{name:'月 K',exact:true}));expect(mock.props.kind).toBe('month');expect(Number(container.querySelector('.analysis-chart').dataset.visibleCount)).toBe(mock.props.rows.length);
+});
