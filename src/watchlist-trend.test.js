@@ -27,3 +27,6 @@ it('renders flat intraday prices with a finite baseline at the same height',()=>
 it('removes the previous day curve after the market date changes',()=>{
  expect(watchTrend({...stock(),intraday:feed()},null,{now:new Date('2026-11-19T16:01:00Z')}).mode).toBe('missing');
 });
+it('accepts private data only in an authenticated private view without claiming public display rights',()=>{
+ const intraday={...feed(),publicDisplayAllowed:false,accessScope:'personal-authenticated'};expect(watchTrend({...stock(),intraday},null,{now}).mode).toBe('missing');expect(watchTrend({...stock(),intraday,intradayAuthenticated:true},null,{now}).mode).toBe('intraday');
+});
