@@ -1,9 +1,9 @@
 import React from 'react';
 import TaiwanStockAnalysis from './TaiwanStockAnalysis';
 import USStockAnalysis from './USResearchPage';
-import {parseAnalysisAddress,analysisHref} from '../security';
+import {parseAnalysisAddress} from '../security';
 import '../stock-analysis.css';
 export default function StockAnalysis({param,symbol,term=t=>t}){
  const route=parseAnalysisAddress(param,symbol);
- return <><div className="market-workspace-heading"><span>市場研究 <small>RESEARCH DESK</small></span><nav className="analysis-market-switch" aria-label="個股分析市場">{[['TW','台股','2330'],['US','美股','AAPL']].map(([region,label,code])=><a key={region} aria-current={route.region===region?'page':undefined} className={route.region===region?'selected':''} href={analysisHref(region,route.region===region?route.symbol:code)}>{label} <small>{region}</small></a>)}</nav></div>{route.region==='US'?<USStockAnalysis param={route.symbol} term={term}/>:<TaiwanStockAnalysis param={route.symbol} term={term}/>}</>;
+ return route.region==='US'?<USStockAnalysis param={route.symbol} term={term}/>:<TaiwanStockAnalysis param={route.symbol} term={term}/>;
 }
