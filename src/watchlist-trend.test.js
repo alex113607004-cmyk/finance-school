@@ -1,10 +1,29 @@
 import {it,expect} from 'vitest';
-import {watchTrend} from './watchlist-trend';
-import {parseOverviewQuotes} from './market-overview';
-import {latestWatchQuote} from './watchlist-data';
-const now=new Date('2026-11-19T08:00:00Z'),stock=()=>({code:'2330',quote:{open:99,high:102,low:98,close:100,date:'2026-11-19',currency:'TWD'}});
-it('labels actual OHLC positions as a range rather than inventing an intraday path',()=>{const r=watchTrend(stock(),null,{now});expect(r.mode).toBe('range');expect(r.label).toBe('今日高低區間');expect(r.note).toContain('並非分時');});
-it('labels a daily fallback with its actual period and excludes future rows',()=>{const rows=[{date:'2026-11-17',close:90},{date:'2026-11-18',close:95},{date:'2026-11-19',close:100},{date:'2026-11-20',close:101}],r=watchTrend(stock(),{rows},{now});expect(r.mode).toBe('daily');expect(r.points).toHaveLength(3);expect(r.label).toBe('近 3 交易日');expect(r.note).toContain('今日分時尚未接入');});
-it('accepts only sourced displayable intraday points with matching identity, date, currency and ordered timestamps',()=>{const s=stock();s.intraday={id:'TW:2330',date:'2026-11-19',currency:'TWD',publicDisplayAllowed:true,source:'https://example.com/synthetic-feed',rows:[{time:'2026-11-19T01:00:00Z',price:99},{time:'2026-11-19T01:01:00Z',price:100}]};expect(watchTrend(s,null,{now}).mode).toBe('intraday');for(const changed of [{id:'US:2330'},{publicDisplayAllowed:false},{date:'2026-11-18'},{currency:'USD'},{rows:[...s.intraday.rows].reverse()}])expect(watchTrend({...s,intraday:{...s.intraday,...changed}},null,{now}).mode).toBe('range');});
-it('keeps missing data explicit and rejects invalid OHLC and future quotes',()=>{expect(watchTrend({code:'AAPL',quote:{}},null,{region:'US',now}).mode).toBe('missing');expect(watchTrend({...stock(),quote:{...stock().quote,low:110}},null,{now}).mode).toBe('missing');expect(watchTrend({...stock(),quote:{...stock().quote,date:'2099-01-01'}},null,{now}).mode).toBe('missing');});
-it('retains sourced daily OHLC from the overview through quote selection into a same-day mini range',()=>{const s={...stock(),market:'TWSE',securityKind:'stock',sources:{},sourceChecks:{},quote:{...stock().quote,date:'2026-11-18'}},body={stat:'OK',date:'20261119',tables:[{fields:['證券代號','收盤價','成交股數','成交金額','漲跌價差','漲跌(+/-)','開盤價','最高價','最低價'],data:[['2330','100','1000','100000','1','+','99','102','98']]}]},rows=parseOverviewQuotes(body,'TWSE',{'2330':s},{source:'https://example.com/simulated-quotes',checkedAt:now.toISOString()}),selected=latestWatchQuote(s,null,{stocks:rows},now);expect(selected.quote).toMatchObject({open:99,high:102,low:98,close:100,date:'2026-11-19'});expect(watchTrend(selected,null,{now}).mode).toBe('range');});
+import {watchTrend,miniGeometry} from './watchlist-trend';
+const now=new Date('2026-11-19T08:00:00Z');
+const stock=()=>({code:'2330',quote:{open:99,high:102,low:98,close:100,date:'2026-11-19',currency:'TWD'}});
+const feed=()=>({id:'TW:2330',date:'2026-11-19',currency:'TWD',publicDisplayAllowed:true,source:'https://example.com/synthetic-feed',provider:'Synthetic test data',basis:'unadjusted',regularSession:true,open:99,sessionStart:'2026-11-19T09:00:00+08:00',sessionEnd:'2026-11-19T13:30:00+08:00',rows:[{time:'2026-11-19T01:00:00Z',price:100},{time:'2026-11-19T01:01:00Z',price:101}]});
+const trend=(changed={})=>watchTrend({...stock(),intraday:{...feed(),...changed}},null,{now});
+it('does not replace the requested intraday curve with OHLC ranges or historical daily closes',()=>{
+ expect(watchTrend(stock(),null,{now}).mode).toBe('missing');
+ expect(watchTrend(stock(),{rows:[{date:'2026-11-18',close:90},{date:'2026-11-19',close:100}]},{now}).mode).toBe('missing');
+});
+it('uses current session points and the sourced opening price independently of an older daily quote',()=>{
+ const s={...stock(),quote:{...stock().quote,date:'2026-11-18'},intraday:feed()},r=watchTrend(s,null,{now});expect(r.mode).toBe('intraday');expect(r.open).toBe(99);expect(r.points.map(p=>p.value)).toEqual([100,101]);expect(r.label).toBe('今日分時');
+});
+it('rejects wrong identities, dates, currencies, rights, adjustment basis, ordering and missing opening prices',()=>{
+ for(const changes of [{id:'US:2330'},{publicDisplayAllowed:false},{date:'2026-11-18'},{currency:'USD'},{basis:'split-adjusted'},{regularSession:false},{source:'javascript:bad()'},{open:0},{open:null},{rows:[...feed().rows].reverse()},{rows:[feed().rows[0],feed().rows[0]]},{rows:[feed().rows[0]]}])expect(trend(changes).mode,JSON.stringify(changes)).toBe('missing');
+});
+it('rejects future and out-of-session points instead of moving them into the current curve',()=>{
+ for(const time of ['2026-11-19T09:00:00Z','2026-11-19T00:59:00Z','2026-11-19T05:31:00Z','2026-11-18T01:00:00Z'])expect(trend({rows:[feed().rows[0],{time,price:102}]}).mode).toBe('missing');
+ expect(trend({sessionStart:'2026-11-19T08:00:00+08:00'}).mode).toBe('missing');
+});
+it('scales the opening baseline with the prices and leaves the untraded part of the session empty',()=>{
+ const r=trend({open:120}),g=miniGeometry(r);expect(g.openY).toBeGreaterThan(0);expect(g.openY).toBeLessThan(40);expect(g.x(r.points.at(-1).time)).toBeLessThan(5);expect(g.x(r.end)).toBe(116);expect(g.path).not.toMatch(/NaN|Infinity/);expect(g.y(120)).toBe(g.openY);
+});
+it('renders flat intraday prices with a finite baseline at the same height',()=>{
+ const r=trend({open:100,rows:feed().rows.map(p=>({...p,price:100}))}),g=miniGeometry(r);expect(g.path).not.toMatch(/NaN|Infinity/);expect(g.openY).toBe(g.y(100));
+});
+it('removes the previous day curve after the market date changes',()=>{
+ expect(watchTrend({...stock(),intraday:feed()},null,{now:new Date('2026-11-19T16:01:00Z')}).mode).toBe('missing');
+});
