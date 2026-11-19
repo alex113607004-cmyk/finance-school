@@ -4,6 +4,7 @@
 
 正式網站：https://alex113607004-cmyk.github.io/finance-school/
 
+- [自選股清單](https://alex113607004-cmyk.github.io/finance-school/#watchlist/all)
 - [市場總覽：熱門、漲跌排行與漲跌停](https://alex113607004-cmyk.github.io/finance-school/#overview/TW)
 - [台積電 2330](https://alex113607004-cmyk.github.io/finance-school/#analysis/TW/2330)
 - [環球晶 6488](https://alex113607004-cmyk.github.io/finance-school/#analysis/TW/6488)
@@ -12,7 +13,9 @@
 
 ## 目前功能
 
-新增頁首「資料狀態」與逐欄查核表：行情、財報與歷史估值分開標示，提醒行情／官方本益比錯日，提供回補進度、公告日缺口與來源暫停時間。第一階段資料回補仍有外部來源阻塞，因此尚未開發後續自選股等功能。詳見 [資料狀態與驗收](docs/DATA-READINESS.md)、[逐項功能關卡](docs/FEATURE-ROADMAP.md)。
+新增「自選股」：個股與排行可按星號收藏，支援台美股分開識別、清單搜尋、重新開啟保存與跨分頁同步。返回排行可保留篩選、頁碼及縱橫捲動位置；儲存失敗時顯示提示並可重試。清單只存於此瀏覽器，詳見 [功能、保存規則與驗收](docs/WATCHLIST.md)。
+
+新增頁首「資料狀態」與逐欄查核表：行情、財報與歷史估值分開標示，提醒行情／官方本益比錯日，提供回補進度、公告日缺口與來源暫停時間。第一階段資料回補仍有外部來源阻塞，網站持續標示缺口；依使用者最新指示先行第二階段。詳見 [資料狀態與驗收](docs/DATA-READINESS.md)、[逐項功能關卡](docs/FEATURE-ROADMAP.md)。
 
 新增「市場總覽」：不需輸入代號即可瀏覽上市／上櫃普通股與 ETF 的成交熱門、漲幅排行、跌幅排行、收盤漲停和跌停。支援成交量／金額排序、篩選與分頁，點選直接進入既有個股分析。使用同日官方盤後資料和已對齊交易日的官方停板價；不是即時排行。詳見 [來源、分類口徑與驗收](docs/MARKET-OVERVIEW.md)。
 

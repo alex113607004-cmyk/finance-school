@@ -1,3 +1,4 @@
+import {WatchButton} from './WatchlistContext';
 import React,{useEffect,useMemo,useState} from 'react';
 import {Search,RefreshCw,ArrowUpRight,Calculator,Info} from 'lucide-react';
 import baseline from '../generated/analysis.json';
@@ -114,7 +115,7 @@ export default function TaiwanStockAnalysis({term,param}){
      <p className="quote-company">{selected.company?.fullName}</p>
      <p className="quote-market">{selected.market} · {MARKET_NAMES[selected.market]} · {KIND_NAMES[selected.securityKind]||'股票'} · {selected.market==='ESB'?'成交快照':'盤後'}</p>
     </div>
-    <button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(r=>r+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?progress?`載入日線 ${progress.finished}/${progress.total}`:'查詢中…':'重新查詢'}</button>
+    <div className="quote-actions"><button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(r=>r+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?progress?`載入日線 ${progress.finished}/${progress.total}`:'查詢中…':'重新查詢'}</button><WatchButton region="TW" code={selected.code} name={selected.name}/></div>
     <div className="analysis-price"><strong>{format(quote?.close)}</strong><span>{priceUnit}</span>{Number.isFinite(quote?.change)&&<b className={quote.change>0?'gain':quote.change<0?'loss':''}>{quote.change>0?'+':''}{format(quote.change)}（{quote.changePercent>0?'+':''}{format(quote.changePercent)}%）</b>}</div>
     <div className="quote-meta">
      <p>{selected.market==='ESB'?'成交日期':'交易日'} <b>{quote?.date||'尚未取得'}</b><br/>{quote?.time&&quote.time.replace(/(\d{2})(\d{2})(\d{2})/,'$1:$2:$3')} {freshness(quote?.date).label}</p>

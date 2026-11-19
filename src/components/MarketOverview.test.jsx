@@ -31,3 +31,6 @@ it('keeps the original snapshot date visible when refreshing fails and exposes s
  vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));render(<MarketOverview/>);expect(await screen.findByText(/沿用已保存快照與原交易日期/)).toBeInTheDocument();expect(document.querySelector('.ov-date strong').textContent).toBe(savedSnapshot.stocks.filter(s=>s.type==='stock').map(s=>s.date).sort().at(-1));
  await userEvent.click(screen.getByText('排行口徑、交易日期與官方來源'));expect(screen.getAllByRole('link',{name:'官方整批行情 ↗'})).toHaveLength(2);
 });
+it('restores filters, sort and page after leaving and remounting, including after fresh snapshot arrival',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json(fixture())));const user=userEvent.setup(),first=render(<MarketOverview/>);await waitFor(()=>expect(screen.getByRole('button',{name:'重新整理'})).toBeEnabled());await user.selectOptions(screen.getByRole('combobox',{name:'熱門排序依據'}),'turnover');await user.click(screen.getByRole('button',{name:'下一頁排行'}));expect(screen.getByText('第 31～35 檔，共 35 檔')).toBeInTheDocument();first.unmount();render(<MarketOverview/>);await waitFor(()=>expect(screen.getByRole('button',{name:'重新整理'})).toBeEnabled());expect(screen.getByRole('combobox',{name:'熱門排序依據'})).toHaveValue('turnover');expect(screen.getByText('第 31～35 檔，共 35 檔')).toBeInTheDocument();
+});
