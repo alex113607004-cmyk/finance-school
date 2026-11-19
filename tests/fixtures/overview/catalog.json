@@ -1,0 +1,56 @@
+{
+  "2314": {
+    "code": "2314",
+    "name": "台揚",
+    "market": "TWSE",
+    "securityKind": "stock"
+  },
+  "2321": {
+    "code": "2321",
+    "name": "東訊",
+    "market": "TWSE",
+    "securityKind": "stock"
+  },
+  "2330": {
+    "code": "2330",
+    "name": "台積電",
+    "market": "TWSE",
+    "securityKind": "stock"
+  },
+  "3017": {
+    "code": "3017",
+    "name": "奇鋐",
+    "market": "TWSE",
+    "securityKind": "stock"
+  },
+  "3131": {
+    "code": "3131",
+    "name": "弘塑",
+    "market": "TPEX",
+    "securityKind": "stock"
+  },
+  "6148": {
+    "code": "6148",
+    "name": "驊宏資",
+    "market": "TPEX",
+    "securityKind": "stock"
+  },
+  "6488": {
+    "code": "6488",
+    "name": "環球晶",
+    "market": "TPEX",
+    "securityKind": "stock"
+  },
+  "0050": {
+    "code": "0050",
+    "name": "元大台灣50",
+    "market": "TWSE",
+    "securityKind": "etf"
+  },
+  "00679B": {
+    "code": "00679B",
+    "name": "元大美債20年",
+    "market": "TPEX",
+    "securityKind": "etf"
+  }
+}

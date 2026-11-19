@@ -1,0 +1,139 @@
+{
+  "checkedAt": "2026-11-19T06:00:33.055Z",
+  "root": "http://127.0.0.1:4194/finance-school/",
+  "status": 200,
+  "quoteDates": {
+    "TWSE": "2026-11-18",
+    "TPEX": "2026-11-18"
+  },
+  "categories": [
+    {
+      "category": "hot",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 1958,
+      "first": "2409"
+    },
+    {
+      "category": "gainers",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 844,
+      "first": "8054"
+    },
+    {
+      "category": "losers",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 954,
+      "first": "6751"
+    },
+    {
+      "category": "limitUp",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 37,
+      "first": "2449"
+    },
+    {
+      "category": "limitDown",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 13,
+      "first": "2468"
+    },
+    {
+      "category": "hot",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 1958,
+      "first": "2409"
+    },
+    {
+      "category": "hot",
+      "market": "all",
+      "type": "stock",
+      "metric": "turnover",
+      "count": 1958,
+      "first": "2330"
+    },
+    {
+      "category": "limitUp",
+      "market": "TPEX",
+      "type": "stock",
+      "metric": "volume",
+      "count": 16,
+      "first": "6190"
+    },
+    {
+      "category": "limitDown",
+      "market": "TPEX",
+      "type": "stock",
+      "metric": "volume",
+      "count": 9,
+      "first": "6148"
+    },
+    {
+      "category": "hot",
+      "market": "TPEX",
+      "type": "etf",
+      "metric": "turnover",
+      "count": 114,
+      "first": "00679B"
+    },
+    {
+      "category": "hot",
+      "market": "all",
+      "type": "stock",
+      "metric": "volume",
+      "count": 1958,
+      "first": "2409"
+    }
+  ],
+  "pagination": true,
+  "directAnalysisLink": "2330",
+  "returnNavigation": true,
+  "sources": [
+    "https://www.twse.com.tw/exchangeReport/MI_INDEX?date=20261118&type=ALLBUT0999&response=json",
+    "https://www.twse.com.tw/exchangeReport/TWT84U?date=20261118&response=json",
+    "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/18&response=json",
+    "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/17&response=json"
+  ],
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "overflow": false,
+      "tableCanScroll": null
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "overflow": false,
+      "tableCanScroll": null
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "overflow": false,
+      "tableCanScroll": true
+    },
+    {
+      "name": "small-mobile",
+      "width": 320,
+      "overflow": false,
+      "tableCanScroll": true
+    }
+  ],
+  "preservedChartWheel": {
+    "before": 60,
+    "after": 67
+  },
+  "errors": []
+}
