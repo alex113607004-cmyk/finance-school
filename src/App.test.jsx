@@ -5,6 +5,7 @@ import {afterEach,it,expect,vi} from 'vitest';
 import App from './App';
 import {glossary} from './glossary';
 vi.mock('./components/StockAnalysis',()=>({default:({param,symbol,term})=><section aria-label="個股分析頁"><p data-testid="analysis-address">{[param,symbol].filter(Boolean).join('/')}</p>{term('EPS')}</section>}));
+vi.mock('./components/MarketOverview',()=>({default:()=><section aria-label="市場總覽頁"><a href="#analysis/TW/2330">分析台積電</a></section>}));
 afterEach(()=>vi.restoreAllMocks());
 it('opens stock analysis directly with no learning navigation, progress or course links',()=>{
  window.history.replaceState(null,'','/');render(<App/>);
@@ -35,4 +36,13 @@ it('does not read, overwrite or erase former learning progress and bookmarks',()
  const get=vi.spyOn(Storage.prototype,'getItem'),set=vi.spyOn(Storage.prototype,'setItem');render(<App/>);
  for(const key of keys){expect(get).not.toHaveBeenCalledWith(key);expect(set.mock.calls.some(call=>call[0]===key)).toBe(false);}
  get.mockRestore();set.mockRestore();for(const key of keys)expect(localStorage.getItem(key)).toBe('["fund-pe"]');
+});
+it('opens the new overview from navigation and preserves the previously selected stock for returning',async()=>{
+ window.history.replaceState(null,'','#analysis/TW/6488');const user=userEvent.setup();render(<App/>);
+ await user.click(within(screen.getByRole('navigation',{name:'網站導覽'})).getByRole('link',{name:'市場總覽'}));await screen.findByRole('region',{name:'市場總覽頁'});
+ expect(window.location.hash).toBe('#overview/TW');expect(document.title).toBe('市場總覽｜台美股個股分析');expect(screen.getByRole('link',{name:'個股分析',exact:true})).toHaveAttribute('href','#analysis/TW/6488');
+ await user.click(screen.getByRole('link',{name:'分析台積電'}));await waitFor(()=>expect(screen.getByTestId('analysis-address')).toHaveTextContent('TW/2330'));
+});
+it('accepts a direct overview address without changing existing stock URLs',()=>{
+ window.history.replaceState(null,'','#overview');render(<App/>);expect(window.location.hash).toBe('#overview/TW');expect(screen.getByRole('region',{name:'市場總覽頁'})).toBeInTheDocument();expect(screen.getByRole('link',{name:'市場總覽'})).toHaveAttribute('aria-current','page');
 });

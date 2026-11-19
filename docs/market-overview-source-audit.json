@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-11-19T05:59:04.224677+00:00",
+  "snapshotGeneratedAt": "2026-11-19T05:40:45.170Z",
+  "markets": {
+    "TWSE": {
+      "date": "2026-11-18",
+      "status": "retained",
+      "quoteSource": "https://www.twse.com.tw/exchangeReport/MI_INDEX?date=20261118&type=ALLBUT0999&response=json",
+      "checkedAt": "2026-11-19T05:33:15.894Z",
+      "limitSource": "https://www.twse.com.tw/exchangeReport/TWT84U?date=20261118&response=json",
+      "limitCheckedAt": "2026-11-19T05:34:35.670Z",
+      "warnings": [
+        "盤後行情未取得：HTTP 403；HTTP 403",
+        "沿用前次原始資料日期及查核時間。"
+      ],
+      "attemptedAt": "2026-11-19T05:40:47.714Z"
+    },
+    "TPEX": {
+      "date": "2026-11-18",
+      "status": "ok",
+      "quoteSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/18&response=json",
+      "checkedAt": "2026-11-19T05:40:52.152Z",
+      "limitSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/17&response=json",
+      "limitCheckedAt": "2026-11-19T05:40:57.182Z",
+      "warnings": [
+        "官方行情表格無可辨認且有效的股票／ETF成交資料"
+      ]
+    }
+  },
+  "stockAndETFRecords": 2311,
+  "ordinaryStocks": 1958,
+  "ordinaryStockLimitCounts": {
+    "up": 37,
+    "down": 13,
+    "unavailable": 0
+  },
+  "independent2330ChangePercent": 0.2304147465437788,
+  "examples": [
+    {
+      "code": "2330",
+      "market": "TWSE",
+      "quoteDate": "2026-11-18",
+      "close": 2175.0,
+      "volumeShares": 50794225.0,
+      "turnoverTWD": 110637335600.0,
+      "officialUpper": 2385.0,
+      "officialLower": 1955.0,
+      "bandEvidenceDate": "2026-11-18",
+      "verifiedClassification": "none",
+      "quoteSource": "https://www.twse.com.tw/exchangeReport/MI_INDEX?date=20261118&type=ALLBUT0999&response=json",
+      "limitSource": "https://www.twse.com.tw/exchangeReport/TWT84U?date=20261118&response=json"
+    },
+    {
+      "code": "2321",
+      "market": "TWSE",
+      "quoteDate": "2026-11-18",
+      "close": 34.1,
+      "volumeShares": 27868.0,
+      "turnoverTWD": 918533.0,
+      "officialUpper": 34.1,
+      "officialLower": 27.9,
+      "bandEvidenceDate": "2026-11-18",
+      "verifiedClassification": "up",
+      "quoteSource": "https://www.twse.com.tw/exchangeReport/MI_INDEX?date=20261118&type=ALLBUT0999&response=json",
+      "limitSource": "https://www.twse.com.tw/exchangeReport/TWT84U?date=20261118&response=json"
+    },
+    {
+      "code": "2314",
+      "market": "TWSE",
+      "quoteDate": "2026-11-18",
+      "close": 3.95,
+      "volumeShares": 101974.0,
+      "turnoverTWD": 402771.0,
+      "officialUpper": 4.81,
+      "officialLower": 3.95,
+      "bandEvidenceDate": "2026-11-18",
+      "verifiedClassification": "down",
+      "quoteSource": "https://www.twse.com.tw/exchangeReport/MI_INDEX?date=20261118&type=ALLBUT0999&response=json",
+      "limitSource": "https://www.twse.com.tw/exchangeReport/TWT84U?date=20261118&response=json"
+    },
+    {
+      "code": "3131",
+      "market": "TPEX",
+      "quoteDate": "2026-11-18",
+      "close": 1620.0,
+      "volumeShares": 436112.0,
+      "turnoverTWD": 672167365.0,
+      "officialUpper": 1620.0,
+      "officialLower": 1330.0,
+      "bandEvidenceDate": "2026-11-17",
+      "verifiedClassification": "up",
+      "quoteSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/18&response=json",
+      "limitSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/17&response=json"
+    },
+    {
+      "code": "6148",
+      "market": "TPEX",
+      "quoteDate": "2026-11-18",
+      "close": 51.9,
+      "volumeShares": 8926044.0,
+      "turnoverTWD": 484034989.0,
+      "officialUpper": 63.3,
+      "officialLower": 51.9,
+      "bandEvidenceDate": "2026-11-17",
+      "verifiedClassification": "down",
+      "quoteSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/18&response=json",
+      "limitSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/17&response=json"
+    }
+  ],
+  "scope": "Fixed verified 2026-11-18 official reports; future refreshes can change counts. TPEx bands use 2026-11-17 report next-day fields, never 2026-11-18 next-day fields.",
+  "excludedForeignCurrencyCounters": [
+    "00636K",
+    "00657K",
+    "00668K",
+    "00687C"
+  ]
+}

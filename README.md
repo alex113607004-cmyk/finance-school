@@ -4,12 +4,15 @@
 
 正式網站：https://alex113607004-cmyk.github.io/finance-school/
 
+- [市場總覽：熱門、漲跌排行與漲跌停](https://alex113607004-cmyk.github.io/finance-school/#overview/TW)
 - [台積電 2330](https://alex113607004-cmyk.github.io/finance-school/#analysis/TW/2330)
 - [環球晶 6488](https://alex113607004-cmyk.github.io/finance-school/#analysis/TW/6488)
 - [Apple AAPL](https://alex113607004-cmyk.github.io/finance-school/#analysis/US/AAPL)
 - [Microsoft MSFT](https://alex113607004-cmyk.github.io/finance-school/#analysis/US/MSFT)
 
 ## 目前功能
+
+新增「市場總覽」：不需輸入代號即可瀏覽上市／上櫃普通股與 ETF 的成交熱門、漲幅排行、跌幅排行、收盤漲停和跌停。支援成交量／金額排序、篩選與分頁，點選直接進入既有個股分析。使用同日官方盤後資料和已對齊交易日的官方停板價；不是即時排行。詳見 [來源、分類口徑與驗收](docs/MARKET-OVERVIEW.md)。
 
 個股頁已精簡為「價格與 K 線 → 分析摘要 → 基本面 → 估值試算」。刪除重複判讀及開發配置說明，來源與長篇計算可展開查閱；新增頁內導覽及統一桌面、平板、手機的深色介面。詳見 [版面改版與驗收](docs/DASHBOARD-REDESIGN.md)。
 
@@ -47,6 +50,8 @@ npm run preview:pages
 ## 資料更新與部署
 
 台股沿用 TWSE、TPEx、MOPS 與公司公告流程，GitHub Actions 每日台灣時間 **17:00、21:00** 擷取、測試、建置與發布，排程可能延後。進站或按重新查詢會讀最新已發布資料；上市近期日線另向官方查詢，上櫃採同源快照。來源失敗保留原日期，不把查詢時間當成交易時間。
+
+市場總覽跟隨相同排程；可執行 `npm run update:overview` 更新獨立的 `market-overview-data.json`。若上市、上櫃日期不同，合併排行只使用較新日期，另顯示缺少同日資料的市場，避免跨日比較。
 
 現金流另採官方財務比較 E 點通批次快取：每次排程最多 120 檔，逐批回補；既有資料至少相隔 7 天查核。遇 403／429 停止並暫停 24 小時，不能保證所有公司的回補完成日期。可執行 `npm run update:financials:offline` 重建已核實資料，不發出外部請求。
 

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 const html=fs.readFileSync('dist/pages/index.html','utf8');
 const assets={'/index.html':{content:html,type:'text/html; charset=utf-8'},'/market-data.json':{content:fs.readFileSync('dist/pages/market-data.json','utf8'),type:'application/json; charset=utf-8'}};
+assets['/market-overview-data.json']={content:fs.readFileSync('dist/pages/market-overview-data.json','utf8'),type:'application/json; charset=utf-8'};
 assets['/analysis-data.json']={content:fs.readFileSync('dist/pages/analysis-data.json','utf8'),type:'application/json; charset=utf-8'};
 assets['/universe-data.json']={content:fs.readFileSync('dist/pages/universe-data.json','utf8'),type:'application/json; charset=utf-8'};
 assets['/us-data.json']={content:fs.readFileSync('dist/pages/us-data.json','utf8'),type:'application/json; charset=utf-8'};

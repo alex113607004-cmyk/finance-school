@@ -72,6 +72,11 @@ jobs:
           US_MARKET_DATA_LICENSE_URL: ${{ vars.US_MARKET_DATA_LICENSE_URL }}
           US_MARKET_DATA_LICENSE_CHECKED_AT: ${{ vars.US_MARKET_DATA_LICENSE_CHECKED_AT }}
           US_MARKET_DATA_CACHE_POLICY: ${{ vars.US_MARKET_DATA_CACHE_POLICY }}
+      - name: Refresh dated market rankings and official price limits
+        if: github.event_name != 'pull_request'
+        run: npm run update:overview
+        env:
+          NODE_USE_ENV_PROXY: 1
       - run: npm test
       - name: Build standalone page
         run: npm run build:pages
