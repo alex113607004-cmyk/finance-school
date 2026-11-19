@@ -10,7 +10,7 @@ export function latestWatchQuote(stock,entry,overview,now=new Date()){
  add(stock.quote,stock.sources?.quotes,stock.sourceChecks?.quotes);
  if(entry?.history?.market===stock.market)add(entry.quote,entry.quote?.source,entry.quote?.checkedAt);
  const marketQuote=overview?.stocks?.find(s=>s.code===stock.code&&s.market===stock.market);
- if(marketQuote)add({date:marketQuote.date,close:marketQuote.close,change:marketQuote.change,changePercent:marketQuote.changePercent,volume:marketQuote.volume},marketQuote.source,marketQuote.checkedAt);
+ if(marketQuote)add({date:marketQuote.date,close:marketQuote.close,open:marketQuote.open,high:marketQuote.high,low:marketQuote.low,change:marketQuote.change,changePercent:marketQuote.changePercent,volume:marketQuote.volume},marketQuote.source,marketQuote.checkedAt);
  candidates.sort((a,b)=>b.quote.date.localeCompare(a.quote.date)||(Date.parse(b.checkedAt)||0)-(Date.parse(a.checkedAt)||0));
  const selected=candidates[0];return selected?{...stock,quote:selected.quote,sources:{...stock.sources,quotes:selected.source},sourceChecks:{...stock.sourceChecks,quotes:selected.checkedAt}}:stock;
 }

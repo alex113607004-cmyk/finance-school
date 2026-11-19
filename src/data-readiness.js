@@ -2,6 +2,7 @@ import {cashflowView} from './tw-cashflow.js';
 import {freshness} from './freshness.js';
 import {marketDate,quoteStatus} from './security.js';
 import {format} from './domain.js';
+import {etfPremium} from './etf-nav.js';
 const DAY=86400000,finite=Number.isFinite;
 export const READINESS_LABELS={ready:'可查閱',partial:'部分待核對',missing:'尚缺資料',stale:'需重新查核',inapplicable:'不適用'};
 export function validDataDate(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&finite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
@@ -54,7 +55,10 @@ export function dataReadiness({stock={},history={},valuation={},filings={},snaps
  const metrics=financialRows.map(r=>({...r,periodLabel:periodLabel(r.period)}));
  const latestEnd=metrics.filter(r=>r.available).map(r=>r.period.end).sort().at(-1);
  const feedPaused=validDataDate(coverage?.blockedUntil?.slice(0,10))&&Date.parse(coverage.blockedUntil)>now.getTime();
+ const nav=stock.nav,premium=fund?etfPremium({...q,currency},nav,{region,now}):null;
+ const navKnown=nav?.available&&finite(nav.value)&&nav.value>0&&validDataDate(nav.date)&&nav.date<=today,navVerified=navKnown&&safeSource(nav.source)&&finite(Date.parse(nav.checkedAt))&&Date.parse(nav.checkedAt)<=now.getTime()+300000;
+ const fundGroups=fund?[{key:'quote',label:'行情',state:quoteRow.state,detail:q.date||'尚無合格行情',note:quoteRow.reason},{key:'financials',label:'基金淨值',state:navKnown?navVerified?'ready':'partial':'missing',detail:navKnown?`${format(nav.value,4)} ${nav.currency}／單位`:'正式淨值待補',note:navKnown?`淨值日 ${nav.date}；非盤中預估淨值。`:'尚缺可核實正式每日淨值。'},{key:'model',label:'折溢價',state:premium.available?navVerified?'ready':'partial':'missing',detail:premium.available?(premium.value>0?'+':'')+format(premium.value)+'%':'日期／資料待對齊',note:premium.available?'同日收盤價 ÷ 正式淨值 − 1；不套公司本益比法。':premium.reason}]:null;
  return {region,currency,today,busy,quote:quoteRow,financialRows:metrics,pe,officialPE:finite(officialPE?.pe)?{value:officialPE.pe,date:officialPE.date}:null,mismatches,
-  groups:[{key:'quote',label:'行情',state:quoteRow.state,detail:q.date||'尚無合格行情',note:quoteRow.reason},{key:'financials',label:'財報',state:financeState,detail:fund?'基金另查淨值':`${financeAvailable}／${financialRows.length} 項有數值`,note:fund?'公司財報模型不適用':`最近期間 ${latestEnd||'尚未核實'}；公告日與期間詳列查核表。`},{key:'model',label:'歷史估值',state:modelState,detail:modelState==='ready'?`${valuation.validSamples?.length||0} 筆有效樣本`:inapplicable?'模型不適用':'尚未具備條件',note:[...new Set(modelReasons)].join('；')}],
-  modelReasons:[...new Set(modelReasons)],refreshWarnings:refreshWarnings.filter(Boolean),coverage,feedPaused,secAutomaticUpdate:region==='US'?policy.secAutomaticUpdate:null};
+  groups:fundGroups||[{key:'quote',label:'行情',state:quoteRow.state,detail:q.date||'尚無合格行情',note:quoteRow.reason},{key:'financials',label:'財報',state:financeState,detail:`${financeAvailable}／${financialRows.length} 項有數值`,note:`最近期間 ${latestEnd||'尚未核實'}；公告日與期間詳列查核表。`},{key:'model',label:'歷史估值',state:modelState,detail:modelState==='ready'?`${valuation.validSamples?.length||0} 筆有效樣本`:inapplicable?'模型不適用':'尚未具備條件',note:[...new Set(modelReasons)].join('；')}],
+  modelReasons:fund?(premium.available?[]:[premium.reason]):[...new Set(modelReasons)],refreshWarnings:refreshWarnings.filter(Boolean),coverage,feedPaused,secAutomaticUpdate:region==='US'?policy.secAutomaticUpdate:null};
 }

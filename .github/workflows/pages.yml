@@ -77,6 +77,19 @@ jobs:
         run: npm run update:overview
         env:
           NODE_USE_ENV_PROXY: 1
+      - name: Restore verified daily ETF NAV history
+        if: github.event_name != 'pull_request'
+        uses: actions/cache@v4
+        with:
+          path: data/etf-nav-cache.json
+          key: etf-nav-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            etf-nav-v1-${{ runner.os }}-
+      - name: Refresh open-licensed official daily ETF NAV
+        if: github.event_name != 'pull_request'
+        run: npm run update:etf-nav
+        env:
+          NODE_USE_ENV_PROXY: 1
       - run: npm test
       - name: Build standalone page
         run: npm run build:pages

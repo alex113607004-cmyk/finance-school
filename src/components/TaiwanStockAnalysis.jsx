@@ -1,5 +1,7 @@
 import {WatchButton} from './WatchlistContext';
 import React,{useEffect,useMemo,useState} from 'react';
+import ForwardPE from './ForwardPE';
+import {useETFNav} from '../use-etf-nav';
 import {Search,RefreshCw,ArrowUpRight,Calculator,Info} from 'lucide-react';
 import baseline from '../generated/analysis.json';
 import marketBaseline from '../generated/market.json';
@@ -94,8 +96,10 @@ export default function TaiwanStockAnalysis({term,param}){
  const filings=entry?.filings||{reports:[],warnings:[],basisConfirmed:false,checkedAt:null},value=historicalValuation({quote,history,filings,expectedPeriod:stock?.fundamentals?.earnings?.period});
  const researchSnapshot=code==='2330'?researchSnapshotTW(extra2330,value.ttm):undefined;
  const fund=['etf','etn','reit'].includes(selected?.securityKind),busy=checking||publication.busy;
+ const currency=/^\d{5}[CK]$/.test(code)?'未核實':'TWD';
+ const {nav,warning:navWarning}=useETFNav('TW',code,quote,selected?.securityKind==='etf',refresh);
  const warnings=[...publication.warnings,...(selected?.warnings||[]),...(entry?.warnings||[]),...(filings.warnings||[]),currentLoad?.error,history.reason].filter(Boolean);
- const readiness=selected?dataReadiness({stock:effectiveStock,history,valuation:value,filings,snapshot:researchSnapshot,coverage:universe.financialCoverage,busy,refreshWarnings:warnings}):null;
+ const readiness=selected?dataReadiness({stock:fund?{...effectiveStock,nav,currency}:effectiveStock,history,valuation:value,filings,snapshot:researchSnapshot,coverage:universe.financialCoverage,busy,refreshWarnings:warnings}):null;
  const priceUnit=/^\d{5}[CK]$/.test(code)?'原交易幣別／受益權單位（幣別待核實）':'新台幣元／'+(fund?'受益權單位':'股');
  return <div className="stock-analysis-page">
   <div className="page-title compact-title"><h1>台股個股研究</h1><p>上市・上櫃・興櫃，共 {Object.values(counts).reduce((a,b)=>a+b,0).toLocaleString()} 檔標的</p></div>
@@ -105,7 +109,7 @@ export default function TaiwanStockAnalysis({term,param}){
   <div className="analysis-search-controls"><label>搜尋範圍 <select aria-label="股票市場篩選" value={filter} onChange={e=>{setFilter(e.target.value);setActiveOption(0);setFocused(true);}}><option value="all">全市場</option>{Object.keys(MARKET_NAMES).map(m=><option key={m} value={m}>{MARKET_NAMES[m]}</option>)}</select></label><div className="analysis-recent">{[...new Set([...recent,'2330','2317','6488','0050'])].slice(0,7).filter(c=>universe.stocks[c]).map(c=><button key={c} className={'secondary '+(c===code?'selected':'')} onClick={()=>choose(universe.stocks[c])}>{universe.stocks[c].name} <small>{c}</small></button>)}</div></div>
   {searchError&&<p role="alert" className="error-message">{searchError}</p>}
   {!selected?<section className="panel empty-state" role="status"><Info size={24}/><h2>{publication.busy?'正在更新全市場清單':'查無代號或名稱'}</h2><p>「{code}」未出現在目前官方清單。請核對代號或選擇搜尋結果；不含權證、個別債券及已下市標的。</p><button className="primary" onClick={()=>choose(universe.stocks['2330'])}>查看台積電</button></section>:<>
-  <SectionNav/>
+  <SectionNav fund={fund}/>
   <DataReadinessSummary report={readiness} detailsId={readinessId('TW',code)}/>
   <div className="stock-overview">
   <section className="panel analysis-quote" aria-label="個股盤後行情">
@@ -133,21 +137,22 @@ export default function TaiwanStockAnalysis({term,param}){
   </section>
   <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><h2>價格走勢</h2><span className="chart-basis-tag">盤後 · 未還原價格</span></div>{history.rows.length?<AnalysisChart key={code} history={{...history,currencyLabel:priceUnit,volumeUnit:fund?'受益權單位':'股'}} asOf={taipeiDay()} term={term}/>:<div className="chart-empty" role="status"><Info size={28}/><h3>{checking?'正在載入官方日線':'日線資料暫不可用'}</h3><p>{history.reason||currentLoad?.error||'此標的尚無可核實的日線資料。'}</p></div>}</section>
   </div>
-  <div id="stock-assessment" tabIndex={-1}><PriceResearchSummary stock={{...effectiveStock,quote,currency:/^\d{5}[CK]$/.test(code)?'幣別尚未核實':'TWD'}} history={history} valuation={value} snapshot={researchSnapshot} region="TW" busy={busy} term={term}/></div>
+  <div id="stock-assessment" tabIndex={-1}><PriceResearchSummary stock={{...effectiveStock,quote,currency,nav}} history={history} valuation={value} snapshot={researchSnapshot} region="TW" busy={busy} term={term}/></div>
+  {!fund&&<ForwardPE key={'TW:'+code} stock={{...effectiveStock,quote,currency}} region="TW" term={term}/>}
   {import.meta.env.DEV&&import.meta.env.VITE_TWSTOCK_LOCAL==='1'&&['TWSE','TPEX'].includes(selected.market)&&<QuoteSnapshot key={code} code={code} priceUnit={priceUnit} estimate={value}/>}
   <div id="stock-fundamentals" tabIndex={-1}>
    {code==='2330'&&<ResearchFundamentals snapshot={researchSnapshot} term={term} label="TSMC IR" notes="單季、合併財報。淨利歸屬母公司，資本支出採現金購置設備。"/>}
-   {fund&&<ETFReference quote={{...quote,currency:'TWD'}} nav={{available:false}} source={code==='0050'?'https://www.yuantaetfs.com/product/detail/0050/Basic_information':'https://www.twse.com.tw/zh/ETFortune/index'}/>}
+   {fund&&<ETFReference quote={{...quote,currency}} nav={nav} region="TW" term={term} warning={navWarning} source={code==='0050'?'https://www.yuantaetfs.com/product/detail/0050/Basic_information':'https://www.twse.com.tw/zh/ETFortune/index'}/>}
    {!fund&&(code==='2330'?<details className="panel disclosure-panel"><summary>月營收與累計財報<span>更多財務指標</span></summary><Fundamentals stock={effectiveStock} filings={filings} ttm={value.ttm} term={term}/></details>:<Fundamentals stock={effectiveStock} filings={filings} ttm={value.ttm} term={term}/>)}
-   <details className="panel disclosure-panel"><summary>官方估值與同業比較<span>本益比・股價淨值比・殖利率</span></summary><OfficialValuation stock={effectiveStock} term={term}/></details>
+   {!fund&&<details className="panel disclosure-panel"><summary>官方估值與同業比較<span>本益比・股價淨值比・殖利率</span></summary><OfficialValuation stock={effectiveStock} term={term}/></details>}
   </div>
-  <section id="stock-valuation" tabIndex={-1} className="panel analysis-section" aria-label="歷史估值驗算"><div className="section-title"><h2>{fund?'基金估值適用範圍':'估值與情境試算'}</h2><span className="analysis-tag">{value.validSamples.length} 筆有效月末樣本</span></div>
-   {fund?<h3>基金不適用公司本益比法</h3>:<p>最新已公告近四季 {term('EPS')} × 歷史{term('本益比')} P25～P75。假設可調整，原始資料維持不變。</p>}
+  {fund?<section id="stock-valuation" tabIndex={-1} className="panel analysis-section" aria-label="ETF 折溢價驗算"><h2>ETF 折溢價計算方式</h2><h3>基金不適用公司本益比法</h3><p>（同日收盤價 ÷ 正式每單位淨值 − 1）× 100%。價格、淨值不同日或不同幣別時暫停計算。正值為溢價、負值為折價；溢價與折價都不是保證報酬的訊號。</p><p>淨值與來源請見上方「ETF：看淨值與折溢價」。</p></section>:<section id="stock-valuation" tabIndex={-1} className="panel analysis-section" aria-label="歷史估值驗算"><div className="section-title"><h2>估值與情境試算</h2><span className="analysis-tag">{value.validSamples.length} 筆有效月末樣本</span></div>
+   <p>最新已公告近四季 {term('EPS')} × 歷史{term('本益比')} P25～P75。假設可調整，原始資料維持不變。</p>
    <details className="valuation-data-notes"><summary>估值樣本與查核日期</summary><div className="analysis-metadata"><span>有效樣本 <b>{value.validSamples.length}／{value.samples.length} 筆（最低 24）</b></span><span>樣本期間 <b>{value.validSamples[0]?.date||'尚未建立'} ～ {value.validSamples.at(-1)?.date||'—'}</b></span><span>首次公告查核 <b>{taipeiTime(filings.checkedAt)}</b></span></div></details>
    {entry&&<Computation value={value}/>}{!fund&&<Scenario key={`${code}-${quote?.date}-${value.ttm?.eps}-${value.p25}`} value={value}/>}
-  </section>
+  </section>}
   <div id="stock-sources" tabIndex={-1}>
-   <FinancialDataStatus stock={effectiveStock} history={history} valuation={value} report={readiness}/>
+   <FinancialDataStatus stock={{...effectiveStock,quote,nav,currency}} history={history} valuation={value} report={readiness}/>
    <details className="panel disclosure-panel source-panel"><summary>資料來源與價格口徑<span>查看擷取日期與原始連結</span></summary><div className="disclosure-content"><p>行情擷取 {taipeiTime(effectiveStock?.sourceChecks?.quotes)} · 日線查詢 {taipeiTime(currentLoad?.checkedAt)}。價格與均線採同一未還原口徑，不計股利再投資及稅費。</p><p>全市場快照 {taipeiTime(universe.generatedAt)}；{history.rows.length?`日線 ${history.rows[0].date} ～ ${history.rows.at(-1).date}，${history.rows.length} 筆。`:'日線尚未提供。'}累計與單季財報分開列示，出表日不當作公告日。</p>
     {selected.market==='ESB'&&<p>興櫃提供最新成交與前日均價，不視為集中市場收盤價。</p>}
     {universe.warnings?.length>0&&<details><summary>來源更新狀態（{universe.warnings.length} 項）</summary>{universe.warnings.map((w,i)=><p key={i}>{w}</p>)}</details>}
