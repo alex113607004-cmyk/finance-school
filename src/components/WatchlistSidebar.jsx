@@ -6,39 +6,39 @@ import {latestWatchQuote} from '../watchlist-data';
 import {analysisHref,quoteStatus} from '../security';
 import {forwardPE,isFund} from '../forward-pe';
 import {selectNAV,etfPremium} from '../etf-nav';
-import {watchTrend} from '../watchlist-trend';
+import {watchTrend,miniGeometry} from '../watchlist-trend';
+import {useIntraday} from '../use-intraday';
 import {format} from '../domain';
 import WatchlistSearch from './WatchlistSearch';
 import {useForecasts} from '../ForecastContext';
 import {defaultForecast} from '../institutional-forecasts';
 export function MiniTrend({trend}){
- if(trend.mode==='missing')return <div className="mini-trend-empty" aria-label={trend.label}>—</div>;
- if(trend.mode==='range'){
-  const span=trend.high-trend.low||1,x=n=>6+(n-trend.low)/span*108;
-  return <svg viewBox="0 0 120 36" role="img" aria-label={trend.label+'，非分時走勢'}><title>{trend.label}：低 {trend.low}、高 {trend.high}、開 {trend.open}、收 {trend.close}。{trend.note}</title><path d="M6 18H114" className="mini-range-track"/><path d={'M'+x(trend.low)+' 11V25M'+x(trend.high)+' 11V25'} className="mini-range-ticks"/><circle cx={x(trend.open)} cy="18" r="3" className="mini-range-open"/><circle cx={x(trend.close)} cy="18" r="4" className="mini-range-close"/></svg>;
- }
- const values=trend.points.map(p=>p.value),min=Math.min(...values),max=Math.max(...values),span=max-min||1,first=trend.points[0].time,timeSpan=trend.points.at(-1).time-first||1;
- const d=trend.points.map((p,i)=>(i?'L':'M')+(4+(p.time-first)/timeSpan*112).toFixed(2)+' '+(30-(p.value-min)/span*24).toFixed(2)).join(' ');
- return <svg viewBox="0 0 120 36" role="img" aria-label={trend.label+'價格走勢'}><title>{trend.label} {trend.from||''} ～ {trend.to||''}。{trend.note}</title><path d={d} fill="none" stroke="currentColor" strokeWidth="1.7" vectorEffect="non-scaling-stroke"/></svg>;
+ const [cursor,setCursor]=useState(null);
+ if(trend.mode!=='intraday')return <div className="mini-trend-empty" aria-label={trend.label} title={trend.note}>分時資料待接入</div>;
+ const {x,y,openY,path}=miniGeometry(trend),selected=cursor===null?null:trend.points[Math.min(cursor,trend.points.length-1)],last=trend.points.at(-1),time=p=>new Intl.DateTimeFormat('en-GB',{timeZone:trend.currency==='TWD'?'Asia/Taipei':'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(p.time));
+ const move=e=>{const rect=e.currentTarget.getBoundingClientRect(),target=trend.start+Math.max(0,Math.min(1,((e.clientX-rect.left)/rect.width*120-4)/112))*(trend.end-trend.start);setCursor(trend.points.reduce((best,p,i)=>Math.abs(p.time-target)<Math.abs(trend.points[best].time-target)?i:best,0));};
+ return <div className="mini-intraday"><svg viewBox="0 0 120 40" role="img" tabIndex="0" aria-label={trend.label+'價格走勢，虛線為開盤價 '+format(trend.open)} onPointerMove={move} onPointerDown={move} onPointerLeave={()=>setCursor(null)} onFocus={()=>setCursor(trend.points.length-1)} onBlur={()=>setCursor(null)} onKeyDown={e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();setCursor(i=>Math.max(0,Math.min(trend.points.length-1,(i??trend.points.length-1)+(e.key==='ArrowLeft'?-1:1))));}}}><title>{trend.date} · {trend.provider} · {trend.note} 開盤 {format(trend.open)} {trend.currency}；最後分時 {time(last)}：{format(last.value)}。可用左右鍵查看。</title><line x1="4" x2="116" y1={openY} y2={openY} className="mini-open-line" strokeDasharray="3 3"/><path d={path} className="mini-price-path"/>{selected?<><line x1={x(selected.time)} x2={x(selected.time)} y1="3" y2="37" className="mini-cursor"/><circle cx={x(selected.time)} cy={y(selected.value)} r="2.5" className="mini-last-point"/></>:<circle cx={x(last.time)} cy={y(last.value)} r="2" className="mini-last-point"/>}</svg><span className="mini-open-label">┄ 開 {format(trend.open)}</span><output className="mini-readout">{selected?time(selected)+' · '+format(selected.value):time(last)+' 分時快照'}</output></div>;
 }
 export default function WatchlistSidebar({open=true,onClose=()=>{},market='all',onMarketChange=()=>{},currentId,term=t=>t}){
  const list=useWatchlist(),[query,setQuery]=useState(''),{data,busy,warnings,request,refresh}=useWatchlistData(!!list?.items.length,open);
+ const [intradayRevision,setIntradayRevision]=useState(0),intraday=useIntraday(list?.items||[],open,intradayRevision);
  const {publication,choices}=useForecasts();
  const rows=useMemo(()=>list?.items.map(saved=>{
   const raw=saved.region==='TW'?data.universe.stocks?.[saved.symbol]:data.us.stocks?.[saved.id];
   if(!raw)return {...saved,available:false};
   const entry=data.curated.stocks?.[saved.symbol],stock=saved.region==='TW'?latestWatchQuote(raw,entry,data.overview):raw,quote=stock.quote||{},currency=quote.currency||stock.currency||(saved.region==='TW'?/^\d{5}[CK]$/.test(saved.symbol)?'未核實':'TWD':'USD');
   const usable=quoteStatus(quote,{region:saved.region}).usable,nav=saved.region==='TW'?selectNAV(data.etf,'TW',saved.symbol,quote.date):stock.nav;
-  return {...saved,available:true,name:stock.nameZh||stock.name||saved.name,quote,currency,usable,fund:isFund(stock),forward:forwardPE({...stock,currency},{region:saved.region,estimate:stock.forwardEPS||defaultForecast(publication,stock,{region:saved.region,choiceKey:choices?.[saved.id]})}),premium:etfPremium({...quote,currency},nav,{region:saved.region}),trend:watchTrend(stock,saved.region==='TW'?entry?.history:stock.history,{region:saved.region})};
- })||[],[list?.items,data,publication,choices]);
+  return {...saved,available:true,name:stock.nameZh||stock.name||saved.name,quote,currency,usable,fund:isFund(stock),forward:forwardPE({...stock,currency},{region:saved.region,estimate:stock.forwardEPS||defaultForecast(publication,stock,{region:saved.region,choiceKey:choices?.[saved.id]})}),premium:etfPremium({...quote,currency},nav,{region:saved.region}),trend:watchTrend({...stock,currency,intraday:intraday.stocks[saved.id]||stock.intraday},null,{region:saved.region})};
+ })||[],[list?.items,data,publication,choices,intraday.stocks,intraday.clock]);
  const filtered=rows.filter(s=>(market==='all'||s.region===market)&&(!query.trim()||[s.symbol,s.name].some(v=>v.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))));
  if(!list)return null;
  return <div className="watchlist-sidebar-content">
   <div className="sidebar-title"><div><Star size={16}/><h2>自選股 <small>{list.items.length} 檔</small></h2></div><button type="button" onClick={onClose} aria-label="收合自選股側邊欄"><PanelLeftClose size={19}/></button></div>
   <WatchlistSearch universe={data.universe} us={data.us} market={market} busy={busy} onSearch={request}/>
-  <div className="sidebar-filters"><div role="group" aria-label="自選股市場">{[['all','全部'],['TW','台股'],['US','美股']].map(([m,label])=><button type="button" key={m} aria-pressed={m===market} onClick={()=>onMarketChange(m)}>{label}<small>{list.items.filter(s=>m==='all'||s.region===m).length}</small></button>)}</div><button type="button" aria-label="重新整理自選股資料" title="重新整理自選股資料" disabled={busy} onClick={refresh}><RefreshCw size={14} className={busy?'is-spinning':''}/></button></div>
+  <div className="sidebar-filters"><div role="group" aria-label="自選股市場">{[['all','全部'],['TW','台股'],['US','美股']].map(([m,label])=><button type="button" key={m} aria-pressed={m===market} onClick={()=>onMarketChange(m)}>{label}<small>{list.items.filter(s=>m==='all'||s.region===m).length}</small></button>)}</div><button type="button" aria-label="重新整理自選股資料" title="重新整理自選股資料" disabled={busy||intraday.busy} onClick={()=>{refresh();setIntradayRevision(n=>n+1);}}><RefreshCw size={14} className={busy||intraday.busy?'is-spinning':''}/></button></div>
   <label className="sidebar-list-filter"><Search size={13}/><input aria-label="篩選自選股" placeholder="篩選我的自選股" value={query} onChange={e=>setQuery(e.target.value)}/></label>
-  <p className="sidebar-data-note">收盤與來源日期分別標示；小圖期間依標籤，不視為即時行情。</p>
+  <p className="sidebar-data-note">小圖只顯示當日分時；虛線為開盤價。收盤價與分時快照分開標示。</p>
+  {intraday.warning&&<p className="sidebar-data-note" role="status">{intraday.warning}</p>}
   {warnings.length>0&&<details className="sidebar-warnings"><summary>部分資料沿用快照，查看來源狀態</summary>{warnings.map((w,i)=><p key={i}>{w}</p>)}</details>}
   {!list.items.length?<section className="sidebar-empty" aria-label="自選股空清單"><Star size={23}/><h3>建立你的觀察清單</h3><p>在上方搜尋代號或公司名稱，直接加入自選。</p></section>:!filtered.length?<div className="sidebar-empty"><p>此範圍沒有符合的自選股。</p><button type="button" onClick={()=>{setQuery('');onMarketChange('all');}}>顯示全部</button></div>:<ul className="sidebar-stocks" aria-label="自選股清單">{filtered.map(row=><li key={row.id} data-security-id={row.id} className={row.id===currentId?'is-current':''}>
    <div className="sidebar-stock-title"><a href={analysisHref(row.region,row.symbol)} aria-current={row.id===currentId?'page':undefined} aria-label={`分析自選股 ${row.symbol} ${row.name}`}><b>{row.name}</b><span>{row.region} · {row.symbol}</span></a><WatchButton region={row.region} code={row.symbol} name={row.name} compact/></div>

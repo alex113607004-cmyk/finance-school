@@ -1,0 +1,32 @@
+{
+  "root": "http://127.0.0.1:4208/finance-school/",
+  "checkedAt": "2026-11-19T15:14:00.257Z",
+  "realIntradayTested": false,
+  "noFakeDailyFallback": true,
+  "etfMetricUnchanged": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "fixtureOnly": {
+    "dashedOpening": true,
+    "keyboard": true,
+    "pointer": true,
+    "failedRefreshClearsCurve": true
+  },
+  "errors": []
+}
