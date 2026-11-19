@@ -2,6 +2,7 @@
 // first-release filings. Never feed their retrieval dates into PIT valuation.
 import {JSDOM} from 'jsdom';
 import crypto from 'node:crypto';
+import {cashflowView} from '../src/tw-cashflow.js';
 export const MOPS_ORIGIN='https://mopsfin.twse.com.tw';
 export const PRIORITY_CODES=['2330','2317','6488','2454','2308','2382','2303','2603','3231','3711'];
 export const recordKey=s=>`${s.market}:${s.code}`;
@@ -87,8 +88,9 @@ export function attachCashflows(universe,cache,now=new Date()){
   if(!r||stock.securityKind!=='stock'||r.market!==stock.market||r.code!==stock.code||r.periodEnd!==period?.end)continue;
   stock.fundamentals.cashflow=r;stock.sources.cashflow=r.source;stock.sourceChecks.cashflow=r.checkedAt;
   stock.fundamentals.cashflowStatus=attempt?.status==='failed'&&attempt.period===period.end?{status:'retained',reason:attempt.reason,attemptedAt:attempt.at}:{status:'verified',checkedAt:r.checkedAt};
-  if(eligible.some(s=>s===stock)){covered++;if([r.amount,r.capex,r.freeCashFlow].every(Number.isFinite))complete++;}
+  if(eligible.some(s=>s===stock)){const current=cashflowView(stock,now);if(current.available)covered++;if([current.amount,current.capex,current.freeCashFlow].every(Number.isFinite))complete++;}
  }
- universe.financialCoverage={source:'公開資訊觀測站－財務比較 E 點通',sourceURL:MOPS_ORIGIN,eligible:eligible.length,covered,complete,attemptedAt:cache.attemptedAt,updatedAt:cache.updatedAt||null,frequency:'每次排程最多 12 批、每批 10 檔；逐批補齊，既有財報至少相隔 7 天重新查核。',warnings:cache.warnings||[]};
+ const maxBatches=cache.policy?.maxBatches||12;
+ universe.financialCoverage={source:'公開資訊觀測站－財務比較 E 點通',sourceURL:MOPS_ORIGIN,eligible:eligible.length,covered,complete,pending:Math.max(0,eligible.length-complete),blockedUntil:cache.blockedUntil||null,attemptedAt:cache.attemptedAt,updatedAt:cache.updatedAt||null,frequency:`每次排程最多 ${maxBatches} 批、每批 10 檔；逐批補齊，既有財報至少相隔 7 天重新查核。`,warnings:cache.warnings||[]};
  return universe;
 }

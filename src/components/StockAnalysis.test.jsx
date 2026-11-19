@@ -54,6 +54,6 @@ describe('stock analysis workflow',()=>{
  });
  it('reports refresh failure and keeps the last dated snapshot',async()=>{
   vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));render(<StockAnalysis term={term}/>);
-  await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(screen.getByText(/全市場快照本次更新失敗/)).toBeInTheDocument();expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent('保留已保存資料');
+  await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢'})).toBeEnabled());expect(within(screen.getByRole('region',{name:'個股盤後行情'})).getByText(/全市場快照本次更新失敗/)).toBeInTheDocument();expect(screen.getByRole('region',{name:'個股盤後行情'})).toHaveTextContent('保留已保存資料');
  });
 });

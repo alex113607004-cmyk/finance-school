@@ -20,7 +20,7 @@ it('searches names, preserves market in URLs, separates fiscal years and ETF fie
  await user.type(search,'unknown');await user.click(screen.getByRole('button',{name:'分析美股'}));expect(screen.getByRole('alert')).toHaveTextContent('尚未涵蓋');await user.click(screen.getByRole('button',{name:'標普 500 ETF SPY'}));expect(window.location.hash).toBe('#analysis/US/SPY');expect(screen.getByRole('region',{name:'ETF 淨值與折溢價'})).toHaveTextContent('—');expect(screen.queryByRole('region',{name:'美股使用者假設情境試算'})).not.toBeInTheDocument();
 });
 it('keeps a verified SEC fallback when the source fails, with original dates',async()=>{
- vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('network unavailable')}));render(<StockAnalysis param="US" symbol="AAPL" term={term}/>);expect(await screen.findByText(/保留最後已核實快照/)).toBeInTheDocument();expect(screen.getByRole('region',{name:'可驗算季度基本面'})).toHaveTextContent('2026-11-03');
+ vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('network unavailable')}));render(<StockAnalysis param="US" symbol="AAPL" term={term}/>);expect(await screen.findByText(/保留最後已核實快照/,{selector:'p.notice[role="status"]'})).toBeInTheDocument();expect(screen.getByRole('region',{name:'可驗算季度基本面'})).toHaveTextContent('2026-11-03');
 });
 it('calculates ETF premium only for the same date and currency',()=>{
  const quote={price:105,currency:'TWD',date:'2026-11-17'},nav={available:true,value:100,currency:'TWD',date:'2026-11-17'};expect(etfPremium(quote,nav).value).toBeCloseTo(5);expect(etfPremium(quote,{...nav,date:'2026-11-16'}).available).toBe(false);render(<ETFReference quote={quote} nav={nav}/>);expect(screen.getByRole('region',{name:'ETF 淨值與折溢價'})).toHaveTextContent('5.00%');
