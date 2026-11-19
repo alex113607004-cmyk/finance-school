@@ -1,13 +1,14 @@
 import React,{useEffect,useRef,useState} from 'react';
-import {ChartNoAxesCombined,Info,X} from 'lucide-react';
+import {ChartNoAxesCombined,Info,X,PanelLeftOpen} from 'lucide-react';
 import {glossary} from './glossary';
 import {analysisHref,parseAnalysisAddress} from './security';
 import StockAnalysis from './components/StockAnalysis';
 import MarketOverview from './components/MarketOverview';
-import WatchlistPage from './components/WatchlistPage';
+import WatchlistSidebar from './components/WatchlistSidebar';
 import {WatchlistProvider,WatchlistNotice,useWatchlist} from './components/WatchlistContext';
 import './analysis-shell.css';
 import './dashboard.css';
+import './research-extras.css';
 
 const defaultRoute='analysis/TW/2330';
 function readRoute(){
@@ -30,17 +31,27 @@ function TermDialog({term,onClose}){
  </dialog>;
 }
 export default function App(){return <WatchlistProvider><AnalysisApp/></WatchlistProvider>;}
+function useNarrowScreen(){
+ const [narrow,setNarrow]=useState(()=>window.innerWidth<=1100);
+ useEffect(()=>{const query=window.matchMedia?.('(max-width: 1100px)');if(!query)return;setNarrow(query.matches);const update=()=>setNarrow(query.matches);query.addEventListener('change',update);return()=>query.removeEventListener('change',update);},[]);
+ return narrow;
+}
 function AnalysisApp(){
- const [page,param,symbol]=useAnalysisRoute(),[term,setTerm]=useState(null),lastAnalysis=useRef('#analysis/TW/2330'),lastWatchlist=useRef('#watchlist/all'),list=useWatchlist();
+ const [page,param,symbol]=useAnalysisRoute(),[term,setTerm]=useState(null),lastAnalysis=useRef('#analysis/TW/2330'),list=useWatchlist(),narrow=useNarrowScreen();
+ const [sidebarOpen,setSidebarOpen]=useState(()=>readRoute().startsWith('watchlist')||window.innerWidth>1100),[watchMarket,setWatchMarket]=useState('all'),sidebarRef=useRef(null),toggleRef=useRef(null);
  const isOverview=page==='overview',isWatchlist=page==='watchlist',isAnalysis=!isOverview&&!isWatchlist,route=isOverview?{region:'TW',symbol:'2330'}:isWatchlist?{region:param==='all'?null:param,symbol:param==='US'?'AAPL':'2330'}:parseAnalysisAddress(param,symbol);
- useEffect(()=>{setTerm(null);document.title=isOverview?'市場總覽｜台美股個股分析':isWatchlist?'自選股｜台美股個股分析':'台美股個股分析｜行情・財報・估值';if(isAnalysis){lastAnalysis.current=analysisHref(route.region,route.symbol);window.scrollTo?.(0,0);}if(isWatchlist)lastWatchlist.current='#watchlist/'+param;},[page,param,symbol]);
+ useEffect(()=>{setTerm(null);document.title=isOverview?'市場總覽｜台美股個股分析':'台美股個股分析｜行情・財報・估值';if(isAnalysis){lastAnalysis.current=analysisHref(route.region,route.symbol);window.scrollTo?.(0,0);}if(isWatchlist){setSidebarOpen(true);setWatchMarket(param||'all');window.history.replaceState(null,'',lastAnalysis.current);window.dispatchEvent(new HashChangeEvent('hashchange'));}},[page,param,symbol]);
+ useEffect(()=>{if(!narrow||!sidebarOpen)return;const previous=document.body.style.overflow;document.body.style.overflow='hidden';sidebarRef.current?.querySelector('button')?.focus();
+  const key=e=>{if(document.querySelector('dialog[open]'))return;if(e.key==='Escape'){e.preventDefault();setSidebarOpen(false);}if(e.key==='Tab'){const focusable=[...sidebarRef.current.querySelectorAll('a[href],button:not([disabled]),input,select,summary')].filter(el=>el.getClientRects().length);if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}};
+  window.addEventListener('keydown',key);return()=>{document.body.style.overflow=previous;window.removeEventListener('keydown',key);toggleRef.current?.focus({preventScroll:true});};
+ },[narrow,sidebarOpen]);
  function termButton(t){return <button className="term-button" onClick={()=>setTerm(t)}>{t}<Info size={12}/></button>;}
  return <div className="analysis-app">
   <a className="skip-link" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus();}}>跳到主要內容</a>
-  <header className="analysis-header">
+  <header className="analysis-header" inert={narrow&&sidebarOpen?true:undefined}>
    <div className="analysis-header-inner has-page-navigation">
     <a className="analysis-brand" href="#analysis/TW/2330"><span><ChartNoAxesCombined size={21}/></span><b>台美股個股分析</b></a>
-    <nav className="primary-page-nav" aria-label="網站導覽"><a href={isAnalysis?analysisHref(route.region,route.symbol):lastAnalysis.current} aria-current={isAnalysis?'page':undefined}>個股分析</a><a href="#overview/TW" aria-current={isOverview?'page':undefined}>市場總覽</a><a href={isWatchlist?'#watchlist/'+param:lastWatchlist.current} aria-label="自選股" aria-current={isWatchlist?'page':undefined}>自選股{list.items.length>0&&<span className="watch-count" aria-hidden="true">{list.items.length}</span>}</a></nav>
+    <nav className="primary-page-nav" aria-label="網站導覽"><a href={isAnalysis?analysisHref(route.region,route.symbol):lastAnalysis.current} aria-current={isAnalysis?'page':undefined}>個股分析</a><a href="#overview/TW" aria-current={isOverview?'page':undefined}>市場總覽</a><button type="button" className="sidebar-toggle" ref={toggleRef} onClick={()=>setSidebarOpen(v=>!v)} aria-expanded={sidebarOpen} aria-controls="watchlist-sidebar" aria-label="自選股"><PanelLeftOpen size={15}/>自選股{list.items.length>0&&<span className="watch-count" aria-hidden="true">{list.items.length}</span>}</button></nav>
     <nav className="analysis-market-switch" aria-label={isWatchlist?'自選股市場切換':'個股分析市場'}>
      {[['TW','台股','2330'],['US','美股','AAPL']].map(([region,label,code])=>{
       const current=route.region===region;
@@ -49,8 +60,13 @@ function AnalysisApp(){
     </nav>
    </div>
   </header>
-  <main id="main-content" className="analysis-main" tabIndex={-1}><WatchlistNotice/>{isOverview?<MarketOverview/>:isWatchlist?<WatchlistPage key={param} market={param} term={termButton}/>:<StockAnalysis term={termButton} param={param} symbol={symbol}/>}</main>
-  <footer className="analysis-footer"><span>台美股個股分析 <small>MARKET RESEARCH</small></span><p>{isOverview?'排行依已發布盤後資料，交易日期與來源詳列於本頁。':isWatchlist?'自選清單保存在此瀏覽器，行情與財報日期依各欄標示。':'歷史估值供研究參考，資料日期與來源依各欄標示。'}</p></footer>
+  {!sidebarOpen&&<WatchlistNotice/>}
+  <div className={'analysis-workspace'+(sidebarOpen?' sidebar-is-open':'')}>
+   {narrow&&sidebarOpen&&<button type="button" tabIndex={-1} className="sidebar-backdrop" aria-label="關閉自選股側邊欄" onClick={()=>setSidebarOpen(false)}/>}
+   <aside id="watchlist-sidebar" ref={sidebarRef} hidden={!sidebarOpen} className="watchlist-sidebar" role={narrow?'dialog':'complementary'} aria-modal={narrow&&sidebarOpen?true:undefined} aria-label="自選股側邊欄" onClick={e=>{if(narrow&&e.target.closest('a[href^="#analysis/"]'))setSidebarOpen(false);}}><WatchlistSidebar open={sidebarOpen} onClose={()=>setSidebarOpen(false)} market={watchMarket} onMarketChange={setWatchMarket} currentId={isAnalysis?route.region+':'+route.symbol:null} term={termButton}/>{sidebarOpen&&<WatchlistNotice/>}</aside>
+   <main id="main-content" className="analysis-main" tabIndex={-1} inert={narrow&&sidebarOpen?true:undefined}>{isOverview?<MarketOverview/>:<StockAnalysis term={termButton} param={isWatchlist?'TW':param} symbol={isWatchlist?'2330':symbol}/>}</main>
+  </div>
+  <footer className="analysis-footer" inert={narrow&&sidebarOpen?true:undefined}><span>台美股個股分析 <small>MARKET RESEARCH</small></span><p>{isOverview?'排行依已發布盤後資料，交易日期與來源詳列於本頁。':'歷史估值供研究參考，資料日期與來源依各欄標示。'}</p></footer>
   <TermDialog term={term} onClose={()=>setTerm(null)}/>
  </div>;
 }

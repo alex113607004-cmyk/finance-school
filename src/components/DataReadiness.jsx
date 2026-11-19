@@ -14,7 +14,7 @@ export function openReadiness(id){
 export function DataReadinessSummary({report,detailsId}){
  return <section className="data-readiness-summary" aria-label="資料狀態摘要" aria-busy={report.busy}>
   <div className="readiness-title"><span><Database size={14}/>資料狀態</span><button type="button" onClick={()=>openReadiness(detailsId)}>查看缺口與來源<ArrowRight size={13}/></button></div>
-  <div className="readiness-groups">{report.groups.map(g=><article key={g.key} data-state={g.state} aria-label={`${g.label}資料狀態`}><div><b>{g.label}</b><span>{report.busy?'核對中':READINESS_LABELS[g.state]}</span></div><strong>{g.detail}</strong><small>{g.key==='financials'?g.state==='partial'?'期間、公告日仍需分別核對':g.state==='ready'?'各項期間與公告日可查閱':g.state==='inapplicable'?'基金使用專屬資料':'詳見待補欄位':g.key==='model'&&g.state==='missing'?'依缺漏原因停止計算':g.note}</small></article>)}</div>
+  <div className="readiness-groups">{report.groups.map(g=><article key={g.key} data-state={g.state} aria-label={`${g.label}資料狀態`}><div><b>{g.label}</b><span>{report.busy?'核對中':READINESS_LABELS[g.state]}</span></div><strong>{g.detail}</strong><small>{g.label==='基金淨值'||g.label==='折溢價'?g.note:g.key==='financials'?g.state==='partial'?'期間、公告日仍需分別核對':g.state==='ready'?'各項期間與公告日可查閱':g.state==='inapplicable'?'基金使用專屬資料':'詳見待補欄位':g.key==='model'&&g.state==='missing'?'依缺漏原因停止計算':g.note}</small></article>)}</div>
   {report.mismatches.map(m=><p key={m} className="readiness-alert readiness-date-alert"><Clock3 size={13}/><span>{m}{report.pe&&<small>同日重算本益比 {format(report.pe.value)} 倍，展開查核表看算式。</small>}</span></p>)}
   {report.refreshWarnings.length>0&&<p className="readiness-alert"><AlertCircle size={13}/>本次部分來源未更新，顯示原日期快照；可展開查核失敗項目。</p>}
  </section>;

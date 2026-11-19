@@ -1,5 +1,6 @@
 import {WatchButton} from './WatchlistContext';
 import React,{useEffect,useMemo,useState} from 'react';
+import ForwardPE from './ForwardPE';
 import {Search,RefreshCw} from 'lucide-react';
 import fallback from '../generated/us-summary.json';
 import {loadUSPublication,searchUS} from '../us-client';
@@ -20,6 +21,7 @@ export function USScenario({value}){
  return <section className="analysis-scenario" aria-label="美股使用者假設情境試算"><h3>調整 EPS／倍數，觀察假設的影響</h3><p>下面是使用者假設，不會補上行情或改寫歷史估值。</p><div className="analysis-scenario-fields">{[['假設近四季 EPS（USD／股）',eps,setEPS],['假設本益比下限（倍）',low,setLow],['假設本益比上限（倍）',high,setHigh]].map(([label,v,set])=><label key={label}>{label}<input type="number" step="any" value={v} onChange={e=>set(e.target.value)}/></label>)}</div><output role="status" className="analysis-scenario-result">{result.available?`假設價格區間 USD ${format(result.low)} ～ ${format(result.high)}／股`:result.reason}</output></section>;
 }
 export function USValuation({stock,value}){
+ if(stock.securityKind==='etf')return <section className="panel analysis-section" aria-label="ETF 折溢價驗算"><h2>ETF 折溢價計算方式</h2><p>以同日、同幣別收盤價與正式每單位淨值計算（市價 ÷ 淨值 − 1）× 100%。正值為溢價、負值為折價；缺少資料時暫停計算。</p></section>;
  const latest=stock.snapshot?.metrics?.eps,prior=stock.snapshot?.prior?.metrics?.eps;
  return <section className="panel analysis-section" aria-label="美股歷史估值驗算"><span className="eyebrow">VALUATION / POINT IN TIME</span><h2>估值與情境試算</h2><p>{value.title}</p>{value.available?<><p>現價 USD {format(stock.quote.price)}，{value.title}。以最新直接申報四季稀釋 EPS {format(value.ttm.eps)} × P25 {format(value.p25)} 至 P75 {format(value.p75)}，得到 USD {format(value.low)} ～ {format(value.high)}／股；中位數 USD {format(value.median)}。</p><p>歷史倍數能否延續與獲利能否維持，是最影響結果的兩個假設。區間不保證報酬，也不等於買進指令。</p></>:<ul>{value.reasons.map(r=><li key={r}>{r}</li>)}</ul>}
   <p>最新已公告近四季 {value.ttm?.available?format(value.ttm.eps)+' USD／股':'EPS 待核實'}；有效月末樣本 {value.validSamples.length}／{value.samples.length} 筆，最低 24 筆。樣本期間 {value.validSamples[0]?.date||'尚無'} ～ {value.validSamples.at(-1)?.date||'尚無'}。</p>
@@ -41,7 +43,7 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
   <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="us-analysis-search">搜尋美股代號或公司名稱</label><input id="us-analysis-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="AAPL、Apple、蘋果、MSFT、微軟" autoComplete="off"/><button className="primary">分析美股</button></form>{query&&suggestions.length>0&&<ul className="analysis-suggestions" aria-label="美股搜尋結果">{suggestions.map(s=><li key={s.id}><button onClick={()=>choose(s)}><b>{s.code}</b><span>{s.nameZh}<small>{s.name}</small></span><em>{s.market}</em></button></li>)}</ul>}</div>
   <div className="analysis-recent">{Object.values(publication.stocks).map(s=><button key={s.id} className={'secondary '+(s.code===code?'selected':'')} onClick={()=>choose(s)}>{s.nameZh} <small>{s.code}</small></button>)}</div>{error&&<p role="alert" className="error-message">{error}</p>}{warning&&<p className="notice" role="status">{warning}</p>}
   {!stock?<section className="panel empty-state"><h2>美股資料尚未涵蓋</h2><p>{code} 尚無經核實的財報與行情，請選擇搜尋結果。</p></section>:<>
-   <SectionNav/>
+   <SectionNav fund={fund}/>
    <DataReadinessSummary report={readiness} detailsId={readinessId('US',stock.code)}/>
    <div className="stock-overview">
    <section className="panel analysis-quote" aria-label="美股行情狀態">
@@ -68,7 +70,8 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
    <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><h2>價格走勢</h2><span className="chart-basis-tag">{status.usable?status.label:'行情尚未提供'}</span></div>{stock.history?.rows?.length?<AnalysisChart key={stock.id} history={{...stock.history,currencyLabel:'USD／股',volumeUnit:'股'}} asOf={marketDate(new Date(),'US')} term={term}/>:<div className="chart-empty" role="status"><Search size={28}/><h3>此標的暫無可用行情</h3><p>財報可正常查閱，日／週／月 K 與均線等待行情資料。</p></div>}</section>
    </div>
    <div id="stock-assessment" tabIndex={-1}><PriceResearchSummary stock={stock} history={stock.history} valuation={value} snapshot={stock.snapshot} region="US" busy={busy} term={term}/></div>
-   <div id="stock-fundamentals" tabIndex={-1}>{fund?<ETFReference quote={q} nav={stock.nav} source={stock.sources.issuer}/>:<ResearchFundamentals snapshot={stock.snapshot} term={term} notes={stock.code==='AAPL'?'Apple 採 52／53 週會計年度。FY2026 四季直接 EPS 相加 8.97，與全年加權股數法 8.98 不混用。':'Microsoft 於 6 月結束會計年度。FY2026 Q4 直接 EPS 4.81，不以全年減前三季的 4.80 代替。'}/>}</div>
+   {!fund&&<ForwardPE key={stock.id} stock={stock} region="US" term={term}/>}
+   <div id="stock-fundamentals" tabIndex={-1}>{fund?<ETFReference quote={q} nav={stock.nav} source={stock.sources.issuer} region="US" term={term}/>:<ResearchFundamentals snapshot={stock.snapshot} term={term} notes={stock.code==='AAPL'?'Apple 採 52／53 週會計年度。FY2026 四季直接 EPS 相加 8.97，與全年加權股數法 8.98 不混用。':'Microsoft 於 6 月結束會計年度。FY2026 Q4 直接 EPS 4.81，不以全年減前三季的 4.80 代替。'}/>}</div>
    <div id="stock-valuation" tabIndex={-1}><USValuation stock={stock} value={value}/></div>
    <div id="stock-sources" tabIndex={-1}><details className="panel disclosure-panel source-panel"><summary>資料來源與查核<span>SEC 原始文件與資料狀態</span></summary><div className="disclosure-content"><ReadinessDetails report={readiness} id={readinessId('US',stock.code)}/><p>{publication.policy?.secAutomaticUpdate?'財報隨排程查核，來源可能延後或失敗。':'SEC 自動更新未啟用，使用已核實財報快照。重新查詢會讀最新已發布版本。'}</p>{stock.sourceChecks&&Object.entries(stock.sourceChecks).map(([k,s])=><p key={k}><Link href={s.url}>{k==='facts'?'SEC Company Facts':'SEC Submissions'}</Link> · 查核 {s.checkedAt||'尚未成功'}</p>)}<p>CIK {stock.cik||'不適用'}。各指標的會計期間、申報日與文件編號詳列於原始數字。</p>{!status.usable&&<p>{q.reason||status.reason}</p>}{q.sourceURL&&<Link href={q.sourceURL}>行情來源與涵蓋範圍</Link>}{stock.warnings?.map((w,i)=><p className="notice" key={i}>{w}</p>)}</div></details></div>
   </>}

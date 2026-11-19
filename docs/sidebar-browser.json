@@ -1,0 +1,46 @@
+{
+  "root": "http://127.0.0.1:4198/finance-school/",
+  "checkedAt": "2026-11-19T14:08:58.532Z",
+  "sidebarSearchAndSave": true,
+  "collapseWithoutNavigation": true,
+  "forwardScenario": {
+    "price": 2100,
+    "assumedEPS": 100,
+    "expectedPE": 21
+  },
+  "metricDefinition": true,
+  "kSwitchesPreserved": true,
+  "etf": {
+    "text": "ETF：看淨值與折溢價基金淨值90.05002026-11-19 · TWD／受益權單位參考收盤價90.202026-11-19 · TWD折溢價+0.17%溢價 · 同日收盤與正式淨值（90.2000 ÷ 90.0500 − 1）× 100% ＝ 0.1666%正值表示溢價、負值表示折價。折價不保證便宜，還需觀察追蹤差異、費用、流動性與海外市場時差。ETF 使用每受益權單位淨值，不以發行公司或成分股 EPS 計算本益比。官方每日淨值原始檔 ↗資料欄位與開放授權 ↗發行人／官方基金資料 ↗來源查核 2026/11/19 21:56:14（台北）；查核時間不是淨值日期。",
+    "formulaVisible": true
+  },
+  "usQuoteGapPreserved": true,
+  "spyUsesETFFields": true,
+  "reloadPreserved": true,
+  "crossTabSync": true,
+  "mobileFocusAndAutoClose": true,
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "small-mobile",
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "legacyWatchlistURL": true,
+  "errors": []
+}

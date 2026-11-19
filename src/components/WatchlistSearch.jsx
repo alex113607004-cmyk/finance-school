@@ -1,4 +1,4 @@
-import React,{useId,useMemo,useRef,useState} from 'react';
+import React,{useEffect,useId,useMemo,useRef,useState} from 'react';
 import {ArrowUpRight,Search,X} from 'lucide-react';
 import {analysisHref} from '../security';
 import {searchWatchTargets} from '../watchlist-search';
@@ -7,6 +7,7 @@ import {WatchButton} from './WatchlistContext';
 
 export default function WatchlistSearch({universe,us,market='all',busy=false,onSearch}){
  const [query,setQuery]=useState(''),[scope,setScope]=useState(market),[submitted,setSubmitted]=useState(false),input=useRef(null),id=useId();
+ useEffect(()=>setScope(market),[market]);
  const {items,hasMore}=useMemo(()=>searchWatchTargets(universe,us,query,scope),[universe,us,query,scope]);
  const hasQuery=!!query.trim();
  function submit(e){e.preventDefault();setSubmitted(true);onSearch();input.current?.focus();}

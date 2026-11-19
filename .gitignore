@@ -13,3 +13,4 @@ src/generated/histories/
 
 # Research-only quotes must never enter public snapshots.
 .local/
+data/etf-nav-cache.json

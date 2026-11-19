@@ -1,6 +1,8 @@
 import React from 'react';
 import {plainFinancialSummary} from '../sec-financials';
 import {format} from '../domain';
+import {etfPremium} from '../etf-nav';
+export {etfPremium} from '../etf-nav';
 const titles={revenue:'營收',revenueYoY:'營收年增率',grossMargin:'毛利率',operatingMargin:'營業利益率',netIncome:'淨利',operatingCashFlow:'營業現金流',capex:'資本支出',freeCashFlow:'自由現金流'};
 const A=({href,children})=><a className="text-link" href={href} target="_blank" rel="noopener noreferrer">{children} ↗</a>;
 export function FactSources({metric}){
@@ -23,10 +25,4 @@ export default function ResearchFundamentals({snapshot,term= t=>t,label='SEC',no
   <div className="research-summary" aria-label="基本面白話摘要"><h3>營運重點</h3>{plainFinancialSummary(snapshot||{available:false,reason:'目前沒有足夠財報數字產生摘要。'}).slice(0,2).map((s,i)=><p key={i}>{s}</p>)}<details><summary>現金流解讀與比較口徑</summary>{plainFinancialSummary(snapshot||{available:false}).slice(2).map((s,i)=><p key={i}>{s}</p>)}{notes&&<p className="subtle">{notes}</p>}</details></div>
  </section>;
 }
-export function etfPremium(quote,nav){
- const price=quote?.price??quote?.close;
- if(!nav?.available||!Number.isFinite(nav.value)||nav.value<=0)return {available:false,reason:'尚無可核實基金淨值。'};
- if(!Number.isFinite(price)||price<=0||quote.date!==nav.date||quote.currency!==nav.currency)return {available:false,reason:'價格與淨值未同日、同幣別，折溢價不混算。'};
- return {available:true,value:(price/nav.value-1)*100};
-}
-export function ETFReference({quote,nav,source}){const result=etfPremium(quote,nav);return <section className="panel analysis-section" aria-label="ETF 淨值與折溢價"><h2>ETF：看淨值與折溢價</h2><div className="analysis-ratios"><div>每單位淨值<b>{nav?.available?format(nav.value):'—'}</b><small>{nav?.date||'日期尚未取得'} · {nav?.currency||quote?.currency||'幣別待核實'}</small></div><div>折溢價<b>{result.available?format(result.value)+'%':'—'}</b><small>{result.reason||'（價格 ÷ 淨值 − 1）× 100%'}</small></div></div><p>ETF 不使用發行公司或成分股的 EPS 代替基金淨值。</p>{source&&<A href={source}>發行人／官方基金資料</A>}</section>}
+export function ETFReference({quote,nav,source,region='TW',term=t=>t,warning=''}){const result=etfPremium(quote,nav,{region});return <section className="panel analysis-section etf-reference" aria-label="ETF 淨值與折溢價"><h2>ETF：看淨值與折溢價</h2><div className="analysis-ratios"><div>{term('基金淨值')}<b>{nav?.available?format(nav.value,4):'—'}</b><small>{nav?.date||'日期尚未取得'} · {nav?.currency||quote?.currency||'幣別待核實'}／受益權單位</small></div><div>參考收盤價<b>{format(quote?.price??quote?.close)}</b><small>{quote?.date||'交易日待確認'} · {quote?.currency||'幣別待確認'}</small></div><div>{term('折溢價')}<b>{result.available?(result.value>0?'+':'')+format(result.value)+'%':'—'}</b><small>{result.available?result.label+' · 同日收盤與正式淨值':result.reason}</small></div></div>{result.available&&<p className="analysis-formula">（{format(result.price,4)} ÷ {format(result.nav,4)} − 1）× 100% ＝ {format(result.value,4)}%</p>}<p>正值表示溢價、負值表示折價。折價不保證便宜，還需觀察追蹤差異、費用、流動性與海外市場時差。</p><p>ETF 使用每受益權單位淨值，不以發行公司或成分股 EPS 計算本益比。</p>{nav?.source&&<A href={nav.source}>官方每日淨值原始檔</A>}{nav?.dataset&&<A href={nav.dataset}>資料欄位與開放授權</A>}{source&&<A href={source}>發行人／官方基金資料</A>}{nav?.checkedAt&&<p className="subtle">來源查核 {new Date(nav.checkedAt).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false})}（台北）；查核時間不是淨值日期。</p>}{warning&&<p className="notice">{warning}</p>}</section>}

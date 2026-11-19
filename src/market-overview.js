@@ -17,7 +17,8 @@ export function parseOverviewQuotes(body,market,universe,{source,checkedAt}){
    const change=market==='TWSE'?(s==='+'&&raw!==null?raw:s==='-'&&raw!==null?-raw:s===''&&raw===0?0:null):raw;
    const previous=change!==null?price-change:null;
    const nameColumn=at(['證券名稱','名稱']);
-   out.push({id:`TW:${market}:${code}`,code,name:nameColumn>=0?String(r[nameColumn]).trim():registered.name,market,type:registered.securityKind,date,close:price,change,changePercent:previous>0?change/previous*100:null,volume:v*(f[volume]==='成交股數'?1:1000),turnover,source,checkedAt,limit:{status:'unavailable',reason:'尚無同日官方停板價。'}});
+   const open=numeric(r[at(['開盤價','開盤'])]),high=numeric(r[at(['最高價','最高'])]),low=numeric(r[at(['最低價','最低'])]),validRange=[open,high,low].every(n=>n>0)&&high>=Math.max(open,price)&&low<=Math.min(open,price);
+   out.push({id:`TW:${market}:${code}`,code,name:nameColumn>=0?String(r[nameColumn]).trim():registered.name,market,type:registered.securityKind,date,close:price,open:validRange?open:null,high:validRange?high:null,low:validRange?low:null,change,changePercent:previous>0?change/previous*100:null,volume:v*(f[volume]==='成交股數'?1:1000),turnover,source,checkedAt,limit:{status:'unavailable',reason:'尚無同日官方停板價。'}});
   }
  }
  if(!out.length)throw Error('官方行情表格無可辨認且有效的股票／ETF成交資料');

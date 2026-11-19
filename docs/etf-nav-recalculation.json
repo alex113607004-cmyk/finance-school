@@ -1,0 +1,14 @@
+{
+  "code": "0050",
+  "region": "TW",
+  "date": "2026-11-19",
+  "currency": "TWD",
+  "close": 90.2,
+  "nav": 90.05,
+  "premiumPercent": 0.1665741254858412,
+  "formula": "(90.20 / 90.05 - 1) * 100",
+  "priceSource": "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20261101&stockNo=0050",
+  "navSource": "https://www.sitca.org.tw/MemberK0000/F/03/nav.csv",
+  "navDataset": "https://data.gov.tw/dataset/11109",
+  "navCheckedAt": "2026-11-19T13:56:14.751Z"
+}

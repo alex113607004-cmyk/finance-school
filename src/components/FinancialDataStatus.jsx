@@ -4,11 +4,14 @@ import {taipeiTime} from '../freshness';
 import {format} from '../domain';
 import '../financial-data.css';
 import {ReadinessDetails,readinessId} from './DataReadiness';
+import {etfPremium} from '../etf-nav';
 export default function FinancialDataStatus({stock,history,valuation,report,now=new Date()}){
  const f=stock.fundamentals||{},c=cashflowView(stock,now),fund=['etf','etn','reit'].includes(stock.securityKind);
+ const nav=stock.nav,premium=fund?etfPremium({...stock.quote,currency:stock.currency||'TWD'},nav,{now}):null;
  const rows=fund?[
   ['行情',stock.quote?.close>0,stock.quote?.date,stock.sources?.quotes],
-  ['基金淨值',false,'尚缺同日淨值，不套公司本益比估值。'],
+  ['基金淨值',!!nav?.available,nav?.available?`${nav.date} · ${nav.currency}／單位`:'尚缺正式淨值，不套公司本益比估值。',nav?.source],
+  ['同日折溢價',premium.available,premium.available?`${format(premium.value,4)}% · 同日同幣別`:premium.reason,nav?.source],
  ]:[
   ['近四季稀釋 EPS',!!valuation.ttm?.available,valuation.ttm?.available?`至 ${valuation.ttm.latest.periodEnd}`:'缺少連續四季直接稀釋 EPS 與可核實公告日。',valuation.ttm?.latest?.source],
   ['月營收年增',Number.isFinite(f.revenue?.yoy),f.revenue?.month,stock.sources?.revenue],
