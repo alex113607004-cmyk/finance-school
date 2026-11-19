@@ -6,6 +6,7 @@ describe('K-line viewport and actual data coverage',()=>{
   expect(visibleCandleWindow(150,latestCandleRange(150,60))).toEqual({start:90,end:149,count:60});
   expect(visibleCandleWindow(20,latestCandleRange(20,60))).toEqual({start:0,end:19,count:20});
   expect(visibleCandleWindow(150,latestCandleRange(150,5000)).count).toBe(150);
+  expect(visibleCandleWindow(6001,latestCandleRange(6001,Infinity)).count).toBe(6001);
   expect(visibleCandleWindow(1,latestCandleRange(1,60)).count).toBe(1);
  });
  it('uses native strict-range rounding for partial edge bars without counting empty future space',()=>{

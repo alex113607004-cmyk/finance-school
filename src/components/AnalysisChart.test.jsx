@@ -19,6 +19,6 @@ it('synchronizes visible count, slider, readout and raw table after zoom, while 
  expect(screen.getByRole('slider',{name:'選取個股 K 棒'})).toHaveAttribute('max','89');expect(screen.getByTestId('candle-date')).toHaveTextContent(rows[109].date);
  await user.click(screen.getByText('查看 K 棒與均線原始數字（目前 90 根）'));expect(await screen.findAllByRole('row')).toHaveLength(91);
  await user.selectOptions(select,'60');expect(mock.props.viewportRequest.count).toBe(60);expect(mock.props.viewportRequest).not.toBe(request);expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','60');
- await user.selectOptions(select,'5000');expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','150');
+ await user.selectOptions(select,'5000');expect(mock.props.viewportRequest.count).toBe(Infinity);expect(container.querySelector('.analysis-chart')).toHaveAttribute('data-visible-count','150');
  await user.click(screen.getByRole('button',{name:'月 K',exact:true}));expect(mock.props.kind).toBe('month');expect(Number(container.querySelector('.analysis-chart').dataset.visibleCount)).toBe(mock.props.rows.length);
 });
