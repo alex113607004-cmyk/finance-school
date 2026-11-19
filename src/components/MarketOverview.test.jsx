@@ -3,6 +3,7 @@ import {render,screen,within,waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {it,expect,vi,afterEach} from 'vitest';
 import MarketOverview from './MarketOverview';
+import savedSnapshot from '../generated/market-overview.json';
 const fixture=()=>({schemaVersion:1,generatedAt:'2026-11-19T05:00:00Z',markets:{TWSE:{date:'2026-11-18',status:'ok',warnings:[]},TPEX:{date:'2026-11-18',status:'ok',warnings:[]}},stocks:Array.from({length:40},(_,i)=>{
  const code=String(6000+i),market=i%2?'TPEX':'TWSE',close=100+i,change=i%3===0?1:i%3===1?-1:0;
  return {id:`TW:${market}:${code}`,code,name:`模擬標的${i}`,market,type:i%8===0?'etf':'stock',date:'2026-11-18',close,change,changePercent:change,volume:(i+1)*10000,turnover:(40-i)*100000,limit:{status:i===4?'up':i===5?'down':'none',upper:i===4?close:close+10,lower:i===5?close:close-10}};
@@ -27,6 +28,6 @@ it('filters markets and ETFs and distinguishes volume popularity from amount ran
  await user.click(within(screen.getByRole('group',{name:'排行市場'})).getByRole('button',{name:'全部市場',exact:true}));await user.selectOptions(screen.getByRole('combobox',{name:'排行標的類型'}),'etf');expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(6);expect(screen.getByRole('link',{name:'查看 6000 模擬標的0 個股分析'})).toBeInTheDocument();
 });
 it('keeps the original snapshot date visible when refreshing fails and exposes sources on request',async()=>{
- vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));render(<MarketOverview/>);expect(await screen.findByText(/沿用已保存快照與原交易日期/)).toBeInTheDocument();expect(document.querySelector('.ov-date strong').textContent).toMatch(/^2026-/);
+ vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));render(<MarketOverview/>);expect(await screen.findByText(/沿用已保存快照與原交易日期/)).toBeInTheDocument();expect(document.querySelector('.ov-date strong').textContent).toBe(savedSnapshot.stocks.filter(s=>s.type==='stock').map(s=>s.date).sort().at(-1));
  await userEvent.click(screen.getByText('排行口徑、交易日期與官方來源'));expect(screen.getAllByRole('link',{name:'官方整批行情 ↗'})).toHaveLength(2);
 });

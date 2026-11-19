@@ -52,5 +52,11 @@
     "name": "元大美債20年",
     "market": "TPEX",
     "securityKind": "etf"
+  },
+  "00636K": {
+    "code": "00636K",
+    "name": "國泰中國A50+U",
+    "market": "TWSE",
+    "securityKind": "etf"
   }
 }

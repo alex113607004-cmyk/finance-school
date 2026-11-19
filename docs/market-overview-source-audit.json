@@ -27,7 +27,7 @@
       ]
     }
   },
-  "stockAndETFRecords": 2315,
+  "stockAndETFRecords": 2311,
   "ordinaryStocks": 1958,
   "ordinaryStockLimitCounts": {
     "up": 37,
@@ -107,5 +107,11 @@
       "limitSource": "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/17&response=json"
     }
   ],
-  "scope": "Fixed verified 2026-11-18 official reports; future refreshes can change counts. TPEx bands use 2026-11-17 report next-day fields, never 2026-11-18 next-day fields."
+  "scope": "Fixed verified 2026-11-18 official reports; future refreshes can change counts. TPEx bands use 2026-11-17 report next-day fields, never 2026-11-18 next-day fields.",
+  "excludedForeignCurrencyCounters": [
+    "00636K",
+    "00657K",
+    "00668K",
+    "00687C"
+  ]
 }

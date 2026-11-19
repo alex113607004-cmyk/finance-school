@@ -15,6 +15,7 @@ describe('official dated market rankings',()=>{
   const s=tw().find(s=>s.code==='2330');expect(s.close).toBe(2175);expect(s.change).toBe(5);expect(s.changePercent).toBeCloseTo(5/2170*100,10);expect(s.volume).toBe(50794225);expect(s.date).toBe('2026-11-18');
   const q=ot().find(s=>s.code==='6488'),raw=tpex.tables[0].data.find(r=>r[0]==='6488');expect(q.volume).toBe(Number(raw[8].replaceAll(',','')));expect(q.market).toBe('TPEX');
  });
+ it('excludes foreign-currency ETF counters from the TWD price and amount rankings',()=>{expect(parseOverviewQuotes(twse,'TWSE',catalog,meta).some(s=>s.code==='00636K')).toBe(false);});
  it('identifies actual limits without requiring exactly ten percent, and keeps ordinary prices separate',()=>{
   const all=[...tw(),...ot()];for(const code of ['2321','3017','3131'])expect(all.find(s=>s.code===code).limit.status).toBe('up');for(const code of ['2314','6148'])expect(all.find(s=>s.code===code).limit.status).toBe('down');expect(all.find(s=>s.code==='2330').limit.status).toBe('none');expect(all.find(s=>s.code==='3131').changePercent).not.toBe(10);
  });

@@ -10,7 +10,7 @@ export function parseOverviewQuotes(body,market,universe,{source,checkedAt}){
   if([id,close,volume,amount,ch].some(i=>i<0))continue;
   for(const r of t.data||[]){
    const code=String(r[id]),registered=universe[code];
-   if(!registered||registered.market!==market||!['stock','etf'].includes(registered.securityKind)||seen.has(code))continue;
+   if(!registered||registered.market!==market||!['stock','etf'].includes(registered.securityKind)||/^\d{5}[CK]$/.test(code)||seen.has(code))continue;
    const price=numeric(r[close]),v=numeric(r[volume]),turnover=numeric(r[amount]);
    if(!(price>0)||v===null||v<=0||turnover===null||turnover<0)continue;
    seen.add(code);const raw=numeric(r[ch]),s=sign>=0?text(r[sign]):null;
