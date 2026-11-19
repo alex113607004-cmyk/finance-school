@@ -11,6 +11,8 @@ import {taipeiTime,freshness} from '../freshness';
 import AnalysisChart from './AnalysisChart';
 import PriceResearchSummary from './PriceResearchSummary';
 import FinancialDataStatus from './FinancialDataStatus';
+import {dataReadiness} from '../data-readiness';
+import {DataReadinessSummary,readinessId} from './DataReadiness';
 import {SectionNav,QuickFacts} from './StockPageChrome';
 import {cashflowView} from '../tw-cashflow';
 import QuoteSnapshot from './QuoteSnapshot';
@@ -92,6 +94,7 @@ export default function TaiwanStockAnalysis({term,param}){
  const researchSnapshot=code==='2330'?researchSnapshotTW(extra2330,value.ttm):undefined;
  const fund=['etf','etn','reit'].includes(selected?.securityKind),busy=checking||publication.busy;
  const warnings=[...publication.warnings,...(selected?.warnings||[]),...(entry?.warnings||[]),...(filings.warnings||[]),currentLoad?.error,history.reason].filter(Boolean);
+ const readiness=selected?dataReadiness({stock:effectiveStock,history,valuation:value,filings,snapshot:researchSnapshot,coverage:universe.financialCoverage,busy,refreshWarnings:warnings}):null;
  const priceUnit=/^\d{5}[CK]$/.test(code)?'原交易幣別／受益權單位（幣別待核實）':'新台幣元／'+(fund?'受益權單位':'股');
  return <div className="stock-analysis-page">
   <div className="page-title compact-title"><h1>台股個股研究</h1><p>上市・上櫃・興櫃，共 {Object.values(counts).reduce((a,b)=>a+b,0).toLocaleString()} 檔標的</p></div>
@@ -102,6 +105,7 @@ export default function TaiwanStockAnalysis({term,param}){
   {searchError&&<p role="alert" className="error-message">{searchError}</p>}
   {!selected?<section className="panel empty-state" role="status"><Info size={24}/><h2>{publication.busy?'正在更新全市場清單':'查無代號或名稱'}</h2><p>「{code}」未出現在目前官方清單。請核對代號或選擇搜尋結果；不含權證、個別債券及已下市標的。</p><button className="primary" onClick={()=>choose(universe.stocks['2330'])}>查看台積電</button></section>:<>
   <SectionNav/>
+  <DataReadinessSummary report={readiness} detailsId={readinessId('TW',code)}/>
   <div className="stock-overview">
   <section className="panel analysis-quote" aria-label="個股盤後行情">
    <div className="quote-layout">
@@ -120,7 +124,7 @@ export default function TaiwanStockAnalysis({term,param}){
    {!Number.isFinite(quote?.close)&&<p role="status" className="notice">尚無有效成交價，可能暫停交易、今日無成交或來源尚未更新。</p>}
    {!fund&&<QuickFacts term={term} items={[
     {label:'EPS',value:format(value.ttm?.available?value.ttm.eps:effectiveStock.fundamentals?.earnings?.epsYtd),unit:'元／股',note:value.ttm?.available?'近四季稀釋 EPS':`${effectiveStock.fundamentals?.earnings?.period?.label||'期間待確認'} · 累計基本 EPS`},
-    {label:'本益比',value:format(effectiveStock.valuation?.pe),unit:'倍',note:`官方倍數 · ${effectiveStock.valuation?.date||'尚未提供'}`},
+    {label:'本益比',value:format(readiness.pe?.value??effectiveStock.valuation?.pe),unit:'倍',note:readiness.pe?`本頁重算 · ${readiness.pe.date}`:`官方倍數${readiness.mismatches.length?'（不同日）':''} · ${effectiveStock.valuation?.date||'尚未提供'}`},
     {label:'營業利益率',value:format(effectiveStock.fundamentals?.kind==='financial'?null:effectiveStock.profit?.operating),unit:'%',note:effectiveStock.fundamentals?.kind==='financial'?'金融業不套一般業比率':effectiveStock.profit?.period||'期間待確認'},
     {label:'YoY',value:format(effectiveStock.fundamentals?.revenue?.yoy),unit:'%',note:`單月營收年增 · ${effectiveStock.fundamentals?.revenue?.month||'月份待確認'}`},
    ]}/>}
@@ -142,7 +146,7 @@ export default function TaiwanStockAnalysis({term,param}){
    {entry&&<Computation value={value}/>}{!fund&&<Scenario key={`${code}-${quote?.date}-${value.ttm?.eps}-${value.p25}`} value={value}/>}
   </section>
   <div id="stock-sources" tabIndex={-1}>
-   <FinancialDataStatus stock={effectiveStock} history={history} valuation={value}/>
+   <FinancialDataStatus stock={effectiveStock} history={history} valuation={value} report={readiness}/>
    <details className="panel disclosure-panel source-panel"><summary>資料來源與價格口徑<span>查看擷取日期與原始連結</span></summary><div className="disclosure-content"><p>行情擷取 {taipeiTime(effectiveStock?.sourceChecks?.quotes)} · 日線查詢 {taipeiTime(currentLoad?.checkedAt)}。價格與均線採同一未還原口徑，不計股利再投資及稅費。</p><p>全市場快照 {taipeiTime(universe.generatedAt)}；{history.rows.length?`日線 ${history.rows[0].date} ～ ${history.rows.at(-1).date}，${history.rows.length} 筆。`:'日線尚未提供。'}累計與單季財報分開列示，出表日不當作公告日。</p>
     {selected.market==='ESB'&&<p>興櫃提供最新成交與前日均價，不視為集中市場收盤價。</p>}
     {universe.warnings?.length>0&&<details><summary>來源更新狀態（{universe.warnings.length} 項）</summary>{universe.warnings.map((w,i)=><p key={i}>{w}</p>)}</details>}

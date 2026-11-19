@@ -7,6 +7,7 @@ if(cache.schemaVersion!==1||!cache.records)throw Error('現金流快取格式不
 cache.attempts||={};cache.warnings||=[];
 const maxBatches=Number(process.env.MOPS_MAX_BATCHES||12);
 if(!Number.isInteger(maxBatches)||maxBatches<1||maxBatches>30)throw Error('MOPS_MAX_BATCHES 必須為 1～30');
+cache.policy={maxBatches,batchSize:10,ttlDays:7};
 if(!offline&&(!cache.blockedUntil||now>=Date.parse(cache.blockedUntil))){
  cache.warnings=[];
  cache.attemptedAt=now.toISOString();

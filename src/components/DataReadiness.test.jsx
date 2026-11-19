@@ -1,0 +1,18 @@
+import React from 'react';
+import {render,screen,within} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {it,expect} from 'vitest';
+import {DataReadinessSummary,ReadinessDetails} from './DataReadiness';
+const report=()=>({region:'TW',busy:false,secAutomaticUpdate:null,mismatches:['行情日期 2026-11-19，官方本益比日期 2026-11-18；兩者不是同日資料。'],pe:{value:10,date:'2026-11-19',formula:'100 ÷ 10 = 10 倍'},officialPE:{value:11,date:'2026-11-18'},quote:{key:'quote',label:'行情',value:100,available:true,unit:'TWD／股',period:{end:'2026-11-19'},state:'ready',checkedAt:'2026-11-19T06:00:00Z',source:'https://example.com/simulated-quote'},financialRows:[{key:'eps',label:'近四季稀釋 EPS',value:10,available:true,unit:'TWD／股',periodLabel:'2025-10-01 ～ 2026-09-30',state:'partial',announcedOn:null,checkedAt:'2026-11-19T06:00:00Z',source:'https://example.com/simulated-report',reason:'首次公告日未提供；查核日不當成公告日。'}],groups:[{key:'quote',label:'行情',state:'ready',detail:'2026-11-19',note:'盤後'},{key:'financials',label:'財報',state:'partial',detail:'1／5 項有數值',note:'期間與公告日待確認'},{key:'model',label:'歷史估值',state:'missing',detail:'尚未具備條件',note:'樣本不足'}],modelReasons:['有效月末樣本不足 24 筆。'],refreshWarnings:['HTTP 403'],feedPaused:true,coverage:{eligible:100,complete:12,blockedUntil:'2026-11-20T00:00:00Z',frequency:'每次最多 120 家',updatedAt:'2026-11-18T00:00:00Z',attemptedAt:'2026-11-19T00:00:00Z',sourceURL:'https://mopsfin.twse.com.tw'}});
+it('opens all disclosure ancestors from the compact status strip and exposes original source metadata',async()=>{
+ const r=report();render(<><DataReadinessSummary report={r} detailsId="test-readiness"/><details data-testid="outer"><summary>更多資料</summary><ReadinessDetails report={r} id="test-readiness"/></details></>);
+ expect(screen.getByLabelText('行情資料狀態')).toHaveTextContent('可查閱');expect(screen.getByLabelText('財報資料狀態')).toHaveTextContent('部分待核對');expect(document.querySelector('#test-readiness').open).toBe(false);
+ await userEvent.click(screen.getByRole('button',{name:'查看缺口與來源'}));expect(screen.getByTestId('outer').open).toBe(true);expect(document.querySelector('#test-readiness').open).toBe(true);
+ const table=screen.getByRole('table');expect(table).toHaveTextContent('來源未提供');expect(within(table).getByRole('row',{name:/近四季稀釋 EPS/})).toHaveTextContent('查核日不當成公告日');expect(within(table).getByRole('row',{name:/近四季稀釋 EPS/})).toHaveTextContent('2026-09-30');expect(within(table).getAllByRole('link',{name:'查原始數字 ↗'})[1]).toHaveAttribute('href','https://example.com/simulated-report');
+});
+it('shows scoped cashflow coverage and the source pause without promising a completed backfill',()=>{
+ render(<ReadinessDetails report={report()} id="test-readiness"/>);document.querySelector('details').open=true;const area=screen.getByLabelText('官方現金流回補進度');expect(area).toHaveTextContent('12／100');expect(area).toHaveTextContent('88 家待補齊');expect(area).toHaveTextContent('官方來源暫停回補至');expect(area).toHaveTextContent('不代表四季 EPS 或歷史估值已完成');expect(screen.getByRole('progressbar')).toHaveAttribute('value','12');expect(screen.getByRole('progressbar')).toHaveAttribute('max','100');
+});
+it('keeps missing US quotes distinct from readable SEC statements and explains opt-in automatic updates',()=>{
+ const r=report();r.region='US';r.coverage=null;r.groups[0]={...r.groups[0],state:'missing',detail:'尚無合格行情'};r.groups[1]={...r.groups[1],state:'ready',detail:'5／5 項有數值'};render(<><DataReadinessSummary report={r} detailsId="test-readiness"/><ReadinessDetails report={r} id="test-readiness"/></>);expect(screen.getByLabelText('行情資料狀態')).toHaveTextContent('尚缺資料');expect(screen.getByLabelText('財報資料狀態')).toHaveTextContent('可查閱');document.querySelector('details').open=true;expect(screen.getByText(/SEC 自動更新尚未啟用/)).toBeVisible();
+});

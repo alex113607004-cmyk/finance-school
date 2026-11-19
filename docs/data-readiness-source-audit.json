@@ -1,0 +1,686 @@
+{
+  "checkedAt": "2026-11-19T07:51:39.237043+00:00",
+  "phase": 1,
+  "status": "UI implementation and validation; full financial backfill blocked",
+  "backfill": {
+    "source": "公開資訊觀測站－財務比較 E 點通",
+    "sourceURL": "https://mopsfin.twse.com.tw",
+    "eligible": 1946,
+    "covered": 51,
+    "complete": 51,
+    "pending": 1895,
+    "blockedUntil": "2026-11-19T16:08:34.864Z",
+    "attemptedAt": "2026-11-18T16:08:14.895Z",
+    "updatedAt": "2026-11-18T16:08:33.035Z",
+    "frequency": "每次排程最多 12 批、每批 10 檔；逐批補齊，既有財報至少相隔 7 天重新查核。",
+    "warnings": [
+      "官方來源限制存取，暫停新請求至 2026-11-19T16:08:34.864Z，保留既有查核日期。"
+    ]
+  },
+  "pauseVerification": {
+    "networkRequests": 0,
+    "recordsPreserved": 51,
+    "successfulCheckPreserved": "2026-11-18T16:08:33.035Z",
+    "command": "Node guard asserted pause is active, injected failing fetch, imported update-financials.mjs and verified records + updatedAt unchanged."
+  },
+  "alternativeXBRLProbe": {
+    "url": "https://mopsov.twse.com.tw/server-java/FileDownLoad?functionName=t164sb01&step=9&co_id=6488&year=2026&season=3&report_id=C",
+    "checkedAt": "2026-11-19T07:48:04.971Z",
+    "error": "The operation was aborted due to timeout"
+  },
+  "references": [
+    {
+      "project": "whchien/twmops",
+      "license": "MIT",
+      "licenseURL": "https://github.com/whchien/twmops/blob/main/LICENSE",
+      "licenseBlobSHA": "15bed9fd8f31d5ab2bae39355f043958e6a48ec8",
+      "reviewedFiles": [
+        "twmops/clients/xbrl_client.py",
+        "twmops/models/financial.py"
+      ],
+      "decision": "Reference only. Statement model lacks first filing date / document-version provenance required for PIT valuation; official download probe timed out. No code copied or package installed."
+    },
+    {
+      "project": "joy40217/TWSE-daily",
+      "licenseCheck": "Root LICENSE returned 404; do not infer permission to copy code.",
+      "referenceURL": "https://github.com/joy40217/TWSE-daily",
+      "decision": "Reference only: dated snapshots and correction-aware refresh. Do not use derived Q4 EPS for the diluted-EPS model."
+    },
+    {
+      "project": "FinMind/FinMind",
+      "license": "Apache-2.0 (software)",
+      "referenceURL": "https://github.com/FinMind/FinMind",
+      "decision": "Not enabled. Software license does not establish financial-data plan / public redistribution rights."
+    }
+  ],
+  "officialSemantics": "https://mopsfin.twse.com.tw/terms",
+  "nextPhaseStarted": false,
+  "examples": [
+    {
+      "region": "TW",
+      "code": "2330",
+      "groups": [
+        {
+          "key": "quote",
+          "label": "行情",
+          "state": "ready",
+          "detail": "2026-11-17",
+          "note": "來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "key": "financials",
+          "label": "財報",
+          "state": "partial",
+          "detail": "5／5 項有數值",
+          "note": "最近期間 2026-10-31；公告日與期間詳列查核表。"
+        },
+        {
+          "key": "model",
+          "label": "歷史估值",
+          "state": "ready",
+          "detail": "34 筆有效樣本",
+          "note": ""
+        }
+      ],
+      "calculatedPE": {
+        "value": 22.084266232444534,
+        "date": "2026-11-17",
+        "eps": 98.26,
+        "formula": "2,170.00 ÷ 98.26 ＝ 22.0843 倍"
+      },
+      "officialPE": {
+        "value": 22.54,
+        "date": "2026-11-16"
+      },
+      "datesNotice": [
+        "行情日期 2026-11-17，官方本益比日期 2026-11-16；兩者不是同日資料。"
+      ],
+      "financialRows": [
+        {
+          "key": "eps",
+          "label": "近四季稀釋 EPS",
+          "value": 98.26,
+          "available": true,
+          "unit": "TWD／股",
+          "period": {
+            "start": "2025-10-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-15",
+          "checkedAt": "2026-11-17T07:09:30.517697+00:00",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/526b65af7305df2dde6b9ece6812b1fdf1e49f9b/3Q26%20EarningsRelease.pdf",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2025-10-01 ～ 2026-09-30"
+        },
+        {
+          "key": "revenue",
+          "label": "月營收年增",
+          "value": 59.709757600700904,
+          "available": true,
+          "unit": "%",
+          "period": {
+            "start": "2026-10-01",
+            "end": "2026-10-31"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-17T06:54:09.200Z",
+          "source": "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+          "state": "partial",
+          "reason": "月營收期間為 2026-10；來源未列首次公告日。",
+          "periodLabel": "2026-10-01 ～ 2026-10-31"
+        },
+        {
+          "key": "operatingCashFlow",
+          "label": "營業現金流",
+          "value": 919776000000,
+          "available": true,
+          "unit": "TWD",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-15",
+          "checkedAt": "2026-11-17T12:21:44.289991+00:00",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        },
+        {
+          "key": "capex",
+          "label": "現金設備支出",
+          "value": 443206000000,
+          "available": true,
+          "unit": "TWD",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-15",
+          "checkedAt": "2026-11-17T12:21:44.289991+00:00",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "自由現金流",
+          "value": 476570000000,
+          "available": true,
+          "unit": "TWD",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-15",
+          "checkedAt": "2026-11-17T12:21:44.289991+00:00",
+          "source": "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        }
+      ]
+    },
+    {
+      "region": "TW",
+      "code": "2317",
+      "groups": [
+        {
+          "key": "quote",
+          "label": "行情",
+          "state": "ready",
+          "detail": "2026-11-17",
+          "note": "來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "key": "financials",
+          "label": "財報",
+          "state": "partial",
+          "detail": "4／5 項有數值",
+          "note": "最近期間 2026-10-31；公告日與期間詳列查核表。"
+        },
+        {
+          "key": "model",
+          "label": "歷史估值",
+          "state": "missing",
+          "detail": "尚未具備條件",
+          "note": "缺少已核實的四季 EPS 與歷史樣本。"
+        }
+      ],
+      "calculatedPE": null,
+      "officialPE": {
+        "value": 13.22,
+        "date": "2026-11-16"
+      },
+      "datesNotice": [
+        "行情日期 2026-11-17，官方本益比日期 2026-11-16；兩者不是同日資料。"
+      ],
+      "financialRows": [
+        {
+          "key": "eps",
+          "label": "近四季稀釋 EPS",
+          "value": null,
+          "available": false,
+          "unit": "TWD／股",
+          "period": null,
+          "announcedOn": null,
+          "checkedAt": null,
+          "source": null,
+          "state": "missing",
+          "reason": "缺少連續四季直接稀釋 EPS、原始文件或可核實公告日。",
+          "periodLabel": "期間尚待確認"
+        },
+        {
+          "key": "revenue",
+          "label": "月營收年增",
+          "value": 45.730399518079835,
+          "available": true,
+          "unit": "%",
+          "period": {
+            "start": "2026-10-01",
+            "end": "2026-10-31"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-17T06:54:09.200Z",
+          "source": "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+          "state": "partial",
+          "reason": "月營收期間為 2026-10；來源未列首次公告日。",
+          "periodLabel": "2026-10-01 ～ 2026-10-31"
+        },
+        {
+          "key": "operatingCashFlow",
+          "label": "營業現金流",
+          "value": -125723025,
+          "available": true,
+          "unit": "新台幣千元",
+          "period": {
+            "start": "2026-01-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-18T16:08:17.291Z",
+          "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+          "state": "partial",
+          "reason": "年初累計合併現金流；來源未列首次公告日，不納入歷史估值。",
+          "periodLabel": "2026-01-01 ～ 2026-09-30"
+        },
+        {
+          "key": "capex",
+          "label": "現金設備支出",
+          "value": 161725656,
+          "available": true,
+          "unit": "新台幣千元",
+          "period": {
+            "start": "2026-01-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-18T16:08:17.291Z",
+          "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+          "state": "partial",
+          "reason": "年初累計合併現金流；來源未列首次公告日，不納入歷史估值。",
+          "periodLabel": "2026-01-01 ～ 2026-09-30"
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "自由現金流",
+          "value": -287448681,
+          "available": true,
+          "unit": "新台幣千元",
+          "period": {
+            "start": "2026-01-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-18T16:08:17.291Z",
+          "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+          "state": "partial",
+          "reason": "年初累計合併現金流；來源未列首次公告日，不納入歷史估值。",
+          "periodLabel": "2026-01-01 ～ 2026-09-30"
+        }
+      ]
+    },
+    {
+      "region": "TW",
+      "code": "6488",
+      "groups": [
+        {
+          "key": "quote",
+          "label": "行情",
+          "state": "ready",
+          "detail": "2026-11-17",
+          "note": "來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "key": "financials",
+          "label": "財報",
+          "state": "partial",
+          "detail": "4／5 項有數值",
+          "note": "最近期間 2026-10-31；公告日與期間詳列查核表。"
+        },
+        {
+          "key": "model",
+          "label": "歷史估值",
+          "state": "missing",
+          "detail": "尚未具備條件",
+          "note": "缺少已核實的四季 EPS 與歷史樣本。"
+        }
+      ],
+      "calculatedPE": null,
+      "officialPE": {
+        "value": 32.49,
+        "date": "2026-11-16"
+      },
+      "datesNotice": [
+        "行情日期 2026-11-17，官方本益比日期 2026-11-16；兩者不是同日資料。"
+      ],
+      "financialRows": [
+        {
+          "key": "eps",
+          "label": "近四季稀釋 EPS",
+          "value": null,
+          "available": false,
+          "unit": "TWD／股",
+          "period": null,
+          "announcedOn": null,
+          "checkedAt": null,
+          "source": null,
+          "state": "missing",
+          "reason": "缺少連續四季直接稀釋 EPS、原始文件或可核實公告日。",
+          "periodLabel": "期間尚待確認"
+        },
+        {
+          "key": "revenue",
+          "label": "月營收年增",
+          "value": 11.190897518901265,
+          "available": true,
+          "unit": "%",
+          "period": {
+            "start": "2026-10-01",
+            "end": "2026-10-31"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-17T08:34:42.088Z",
+          "source": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O",
+          "state": "partial",
+          "reason": "月營收期間為 2026-10；來源未列首次公告日。",
+          "periodLabel": "2026-10-01 ～ 2026-10-31"
+        },
+        {
+          "key": "operatingCashFlow",
+          "label": "營業現金流",
+          "value": 6379662,
+          "available": true,
+          "unit": "新台幣千元",
+          "period": {
+            "start": "2026-01-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-18T16:04:57.211Z",
+          "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+          "state": "partial",
+          "reason": "年初累計合併現金流；來源未列首次公告日，不納入歷史估值。",
+          "periodLabel": "2026-01-01 ～ 2026-09-30"
+        },
+        {
+          "key": "capex",
+          "label": "現金設備支出",
+          "value": 8875540,
+          "available": true,
+          "unit": "新台幣千元",
+          "period": {
+            "start": "2026-01-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-18T16:04:57.211Z",
+          "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+          "state": "partial",
+          "reason": "年初累計合併現金流；來源未列首次公告日，不納入歷史估值。",
+          "periodLabel": "2026-01-01 ～ 2026-09-30"
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "自由現金流",
+          "value": -2495878,
+          "available": true,
+          "unit": "新台幣千元",
+          "period": {
+            "start": "2026-01-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": null,
+          "checkedAt": "2026-11-18T16:04:57.211Z",
+          "source": "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+          "state": "partial",
+          "reason": "年初累計合併現金流；來源未列首次公告日，不納入歷史估值。",
+          "periodLabel": "2026-01-01 ～ 2026-09-30"
+        }
+      ]
+    },
+    {
+      "region": "TW",
+      "code": "0050",
+      "groups": [
+        {
+          "key": "quote",
+          "label": "行情",
+          "state": "ready",
+          "detail": "2026-11-17",
+          "note": "來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "key": "financials",
+          "label": "財報",
+          "state": "inapplicable",
+          "detail": "基金另查淨值",
+          "note": "公司財報模型不適用"
+        },
+        {
+          "key": "model",
+          "label": "歷史估值",
+          "state": "inapplicable",
+          "detail": "模型不適用",
+          "note": "基金應使用同日淨值與折溢價，不套公司本益比法。；缺少已核實的四季 EPS 與歷史樣本。"
+        }
+      ],
+      "calculatedPE": null,
+      "officialPE": null,
+      "datesNotice": [],
+      "financialRows": []
+    },
+    {
+      "region": "US",
+      "code": "AAPL",
+      "groups": [
+        {
+          "key": "quote",
+          "label": "行情",
+          "state": "missing",
+          "detail": "尚無合格行情",
+          "note": "公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。"
+        },
+        {
+          "key": "financials",
+          "label": "財報",
+          "state": "ready",
+          "detail": "5／5 項有數值",
+          "note": "最近期間 2026-09-26；公告日與期間詳列查核表。"
+        },
+        {
+          "key": "model",
+          "label": "歷史估值",
+          "state": "missing",
+          "detail": "尚未具備條件",
+          "note": "公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。；價格與 EPS 的分割／股數基準尚未核實。；有效月末樣本 0 筆，至少需要 24 筆。"
+        }
+      ],
+      "calculatedPE": null,
+      "financialRows": [
+        {
+          "key": "eps",
+          "label": "近四季稀釋 EPS",
+          "value": 8.97,
+          "available": true,
+          "unit": "USD／股",
+          "period": {
+            "start": "2025-09-28",
+            "end": "2026-09-26"
+          },
+          "announcedOn": "2026-11-02",
+          "checkedAt": "2026-11-17T12:15:40.613Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000024/a8-kex991q4202609262026.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2025-09-28 ～ 2026-09-26"
+        },
+        {
+          "key": "revenue",
+          "label": "季度營收年增",
+          "value": 11.721937032771844,
+          "available": true,
+          "unit": "%",
+          "period": {
+            "start": "2026-06-28",
+            "end": "2026-09-26"
+          },
+          "announcedOn": "2026-11-03",
+          "checkedAt": "2026-11-17T12:15:40.613Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-06-28 ～ 2026-09-26"
+        },
+        {
+          "key": "operatingCashFlow",
+          "label": "營業現金流",
+          "value": 28101000000,
+          "available": true,
+          "unit": "USD",
+          "period": {
+            "start": "2026-06-28",
+            "end": "2026-09-26"
+          },
+          "announcedOn": "2026-11-03",
+          "checkedAt": "2026-11-17T12:15:40.613Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-06-28 ～ 2026-09-26"
+        },
+        {
+          "key": "capex",
+          "label": "現金設備支出",
+          "value": 2242000000,
+          "available": true,
+          "unit": "USD",
+          "period": {
+            "start": "2026-06-28",
+            "end": "2026-09-26"
+          },
+          "announcedOn": "2026-11-03",
+          "checkedAt": "2026-11-17T12:15:40.613Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-06-28 ～ 2026-09-26"
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "自由現金流",
+          "value": 25859000000,
+          "available": true,
+          "unit": "USD",
+          "period": {
+            "start": "2026-06-28",
+            "end": "2026-09-26"
+          },
+          "announcedOn": "2026-11-03",
+          "checkedAt": "2026-11-17T12:15:40.613Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-06-28 ～ 2026-09-26"
+        }
+      ]
+    },
+    {
+      "region": "US",
+      "code": "MSFT",
+      "groups": [
+        {
+          "key": "quote",
+          "label": "行情",
+          "state": "missing",
+          "detail": "尚無合格行情",
+          "note": "公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。"
+        },
+        {
+          "key": "financials",
+          "label": "財報",
+          "state": "ready",
+          "detail": "5／5 項有數值",
+          "note": "最近期間 2026-09-30；公告日與期間詳列查核表。"
+        },
+        {
+          "key": "model",
+          "label": "歷史估值",
+          "state": "missing",
+          "detail": "尚未具備條件",
+          "note": "公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。；價格與 EPS 的分割／股數基準尚未核實。；有效月末樣本 0 筆，至少需要 24 筆。"
+        }
+      ],
+      "calculatedPE": null,
+      "financialRows": [
+        {
+          "key": "eps",
+          "label": "近四季稀釋 EPS",
+          "value": 19.16,
+          "available": true,
+          "unit": "USD／股",
+          "period": {
+            "start": "2025-10-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-28",
+          "checkedAt": "2026-11-17T12:15:43.721Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2025-10-01 ～ 2026-09-30"
+        },
+        {
+          "key": "revenue",
+          "label": "季度營收年增",
+          "value": 18.804475171552525,
+          "available": true,
+          "unit": "%",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-28",
+          "checkedAt": "2026-11-17T12:15:43.721Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        },
+        {
+          "key": "operatingCashFlow",
+          "label": "營業現金流",
+          "value": 58000000000,
+          "available": true,
+          "unit": "USD",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-28",
+          "checkedAt": "2026-11-17T12:15:43.721Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        },
+        {
+          "key": "capex",
+          "label": "現金設備支出",
+          "value": 39367000000,
+          "available": true,
+          "unit": "USD",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-28",
+          "checkedAt": "2026-11-17T12:15:43.721Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        },
+        {
+          "key": "freeCashFlow",
+          "label": "自由現金流",
+          "value": 18633000000,
+          "available": true,
+          "unit": "USD",
+          "period": {
+            "start": "2026-07-01",
+            "end": "2026-09-30"
+          },
+          "announcedOn": "2026-10-28",
+          "checkedAt": "2026-11-17T12:15:43.721Z",
+          "source": "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+          "state": "ready",
+          "reason": "",
+          "periodLabel": "2026-07-01 ～ 2026-09-30"
+        }
+      ]
+    }
+  ]
+}

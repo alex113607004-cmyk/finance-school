@@ -1,0 +1,278 @@
+{
+  "checkedAt": "2026-11-19T08:01:41.197Z",
+  "root": "http://127.0.0.1:4196/finance-school/",
+  "pages": [
+    {
+      "region": "TW",
+      "code": "2330",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "ready",
+          "text": "行情核對中2026-11-17來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "partial",
+          "text": "財報核對中5／5 項有數值期間、公告日仍需分別核對"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "ready",
+          "text": "歷史估值核對中34 筆有效樣本"
+        }
+      ],
+      "rows": [
+        "行情2,170.00TWD／股可查閱來源尚未提供今日資料，或今日休市2026-11-17不適用（行情）2026/11/17 15:09:32查原始數字 ↗",
+        "近四季稀釋 EPS98.26TWD／股可查閱2025-10-01 ～ 2026-09-302026-10-152026/11/17 15:09:30查原始數字 ↗",
+        "月營收年增59.71%部分待核對月營收期間為 2026-10；來源未列首次公告日。2026-10-01 ～ 2026-10-31來源未提供2026/11/17 14:54:09查原始數字 ↗",
+        "營業現金流919,776,000,000.00TWD可查閱2026-07-01 ～ 2026-09-302026-10-152026/11/17 20:21:44查原始數字 ↗",
+        "現金設備支出443,206,000,000.00TWD可查閱2026-07-01 ～ 2026-09-302026-10-152026/11/17 20:21:44查原始數字 ↗",
+        "自由現金流476,570,000,000.00TWD可查閱2026-07-01 ～ 2026-09-302026-10-152026/11/17 20:21:44查原始數字 ↗"
+      ],
+      "links": [
+        "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20261101&stockNo=2330",
+        "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/526b65af7305df2dde6b9ece6812b1fdf1e49f9b/3Q26%20EarningsRelease.pdf",
+        "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+        "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+        "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4",
+        "https://investor.tsmc.com/chinese/encrypt/files/encrypt_file/reports/2026-10/3a94d1034b9e6b22446b674f7aaf3d088a12a193/FS.pdf#page=4"
+      ],
+      "peCheck": {
+        "price": 2170,
+        "eps": 98.26,
+        "displayed": 22.08,
+        "independent": 22.084266232444534
+      }
+    },
+    {
+      "region": "TW",
+      "code": "2317",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "ready",
+          "text": "行情核對中2026-11-17來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "partial",
+          "text": "財報核對中4／5 項有數值期間、公告日仍需分別核對"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "missing",
+          "text": "歷史估值核對中尚未具備條件依缺漏原因停止計算"
+        }
+      ],
+      "rows": [
+        "行情219.00TWD／股可查閱來源尚未提供今日資料，或今日休市2026-11-17不適用（行情）2026/11/17 14:54:15查原始數字 ↗",
+        "近四季稀釋 EPS—TWD／股尚缺資料缺少連續四季直接稀釋 EPS、原始文件或可核實公告日。期間尚待確認來源未提供尚未成功查詢來源尚待提供",
+        "月營收年增45.73%部分待核對月營收期間為 2026-10；來源未列首次公告日。2026-10-01 ～ 2026-10-31來源未提供2026/11/17 14:54:09查原始數字 ↗",
+        "營業現金流-125,723,025.00新台幣千元部分待核對年初累計合併現金流；來源未列首次公告日，不納入歷史估值。2026-01-01 ～ 2026-09-30來源未提供2026/11/19 00:08:17查原始數字 ↗",
+        "現金設備支出161,725,656.00新台幣千元部分待核對年初累計合併現金流；來源未列首次公告日，不納入歷史估值。2026-01-01 ～ 2026-09-30來源未提供2026/11/19 00:08:17查原始數字 ↗",
+        "自由現金流-287,448,681.00新台幣千元部分待核對年初累計合併現金流；來源未列首次公告日，不納入歷史估值。2026-01-01 ～ 2026-09-30來源未提供2026/11/19 00:08:17查原始數字 ↗"
+      ],
+      "links": [
+        "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20261101&stockNo=2317",
+        "https://openapi.twse.com.tw/v1/opendata/t187ap05_L",
+        "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+        "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+        "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2330&companyId=2317&companyId=2454&companyId=2308&companyId=2382&companyId=2303&companyId=2603&companyId=3231&companyId=3711&companyId=1101&ys=20263&ylabel=%E4%BB%9F%E5%85%83"
+      ],
+      "peCheck": null
+    },
+    {
+      "region": "TW",
+      "code": "6488",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "ready",
+          "text": "行情可查閱2026-11-17來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "partial",
+          "text": "財報部分待核對4／5 項有數值期間、公告日仍需分別核對"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "missing",
+          "text": "歷史估值尚缺資料尚未具備條件依缺漏原因停止計算"
+        }
+      ],
+      "rows": [
+        "行情546.00TWD／股可查閱來源尚未提供今日資料，或今日休市2026-11-17不適用（行情）2026/11/17 16:34:58查原始數字 ↗",
+        "近四季稀釋 EPS—TWD／股尚缺資料缺少連續四季直接稀釋 EPS、原始文件或可核實公告日。期間尚待確認來源未提供尚未成功查詢來源尚待提供",
+        "月營收年增11.19%部分待核對月營收期間為 2026-10；來源未列首次公告日。2026-10-01 ～ 2026-10-31來源未提供2026/11/17 16:34:42查原始數字 ↗",
+        "營業現金流6,379,662.00新台幣千元部分待核對年初累計合併現金流；來源未列首次公告日，不納入歷史估值。2026-01-01 ～ 2026-09-30來源未提供2026/11/19 00:04:57查原始數字 ↗",
+        "現金設備支出8,875,540.00新台幣千元部分待核對年初累計合併現金流；來源未列首次公告日，不納入歷史估值。2026-01-01 ～ 2026-09-30來源未提供2026/11/19 00:04:57查原始數字 ↗",
+        "自由現金流-2,495,878.00新台幣千元部分待核對年初累計合併現金流；來源未列首次公告日，不納入歷史估值。2026-01-01 ～ 2026-09-30來源未提供2026/11/19 00:04:57查原始數字 ↗"
+      ],
+      "links": [
+        "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date=2026/11/17&response=json",
+        "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O",
+        "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+        "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83",
+        "https://mopsfin.twse.com.tw/compare/report?compareItem=CashflowStatement&quarter=false&companyId=2317&companyId=6488&companyId=2330&ys=20263&ylabel=%E4%BB%9F%E5%85%83"
+      ],
+      "peCheck": null
+    },
+    {
+      "region": "TW",
+      "code": "0050",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "ready",
+          "text": "行情核對中2026-11-17來源尚未提供今日資料，或今日休市"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "inapplicable",
+          "text": "財報核對中基金另查淨值基金使用專屬資料"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "inapplicable",
+          "text": "歷史估值核對中模型不適用基金應使用同日淨值與折溢價，不套公司本益比法。；財報版本或普通股每股口徑尚待確認。；公司公告查核時間未確認。；當時已公告的連續四季稀釋 EPS 不足或口徑未確認。；有效月末樣本 0 筆，至少需要 24 筆。"
+        }
+      ],
+      "rows": [
+        "行情94.00TWD／受益權單位可查閱來源尚未提供今日資料，或今日休市2026-11-17不適用（行情）2026/11/17 14:54:19查原始數字 ↗"
+      ],
+      "links": [
+        "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20261101&stockNo=0050"
+      ],
+      "peCheck": null
+    },
+    {
+      "region": "US",
+      "code": "AAPL",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "missing",
+          "text": "行情尚缺資料尚無合格行情公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "ready",
+          "text": "財報可查閱5／5 項有數值各項期間與公告日可查閱"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "missing",
+          "text": "歷史估值尚缺資料尚未具備條件依缺漏原因停止計算"
+        }
+      ],
+      "rows": [
+        "行情—USD／股尚缺資料公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。日期未提供不適用（行情）尚未成功查詢來源尚待提供",
+        "近四季稀釋 EPS8.97USD／股可查閱2025-09-28 ～ 2026-09-262026-11-022026/11/17 20:15:40查原始數字 ↗",
+        "季度營收年增11.72%可查閱2026-06-28 ～ 2026-09-262026-11-032026/11/17 20:15:40查原始數字 ↗",
+        "營業現金流28,101,000,000.00USD可查閱2026-06-28 ～ 2026-09-262026-11-032026/11/17 20:15:40查原始數字 ↗",
+        "現金設備支出2,242,000,000.00USD可查閱2026-06-28 ～ 2026-09-262026-11-032026/11/17 20:15:40查原始數字 ↗",
+        "自由現金流25,859,000,000.00USD可查閱2026-06-28 ～ 2026-09-262026-11-032026/11/17 20:15:40查原始數字 ↗"
+      ],
+      "links": [
+        "https://www.sec.gov/Archives/edgar/data/320193/000032019326000024/a8-kex991q4202609262026.htm",
+        "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+        "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+        "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+        "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm"
+      ],
+      "peCheck": null
+    },
+    {
+      "region": "US",
+      "code": "MSFT",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "missing",
+          "text": "行情尚缺資料尚無合格行情公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "ready",
+          "text": "財報可查閱5／5 項有數值各項期間與公告日可查閱"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "missing",
+          "text": "歷史估值尚缺資料尚未具備條件依缺漏原因停止計算"
+        }
+      ],
+      "rows": [
+        "行情—USD／股尚缺資料公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。日期未提供不適用（行情）尚未成功查詢來源尚待提供",
+        "近四季稀釋 EPS19.16USD／股可查閱2025-10-01 ～ 2026-09-302026-10-282026/11/17 20:15:43查原始數字 ↗",
+        "季度營收年增18.80%可查閱2026-07-01 ～ 2026-09-302026-10-282026/11/17 20:15:43查原始數字 ↗",
+        "營業現金流58,000,000,000.00USD可查閱2026-07-01 ～ 2026-09-302026-10-282026/11/17 20:15:43查原始數字 ↗",
+        "現金設備支出39,367,000,000.00USD可查閱2026-07-01 ～ 2026-09-302026-10-282026/11/17 20:15:43查原始數字 ↗",
+        "自由現金流18,633,000,000.00USD可查閱2026-07-01 ～ 2026-09-302026-10-282026/11/17 20:15:43查原始數字 ↗"
+      ],
+      "links": [
+        "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+        "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+        "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+        "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm",
+        "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm"
+      ],
+      "peCheck": null
+    },
+    {
+      "region": "US",
+      "code": "SPY",
+      "states": [
+        {
+          "label": "行情資料狀態",
+          "state": "missing",
+          "text": "行情尚缺資料尚無合格行情未設定可公開展示的 ETF 行情來源。"
+        },
+        {
+          "label": "財報資料狀態",
+          "state": "inapplicable",
+          "text": "財報不適用基金另查淨值基金使用專屬資料"
+        },
+        {
+          "label": "歷史估值資料狀態",
+          "state": "inapplicable",
+          "text": "歷史估值不適用模型不適用基金應使用同日淨值與折溢價，不套公司本益比法。；ETF 使用淨值及折溢價，不套用公司 EPS 本益比法。"
+        }
+      ],
+      "rows": [
+        "行情—USD／受益權單位尚缺資料未設定可公開展示的 ETF 行情來源。日期未提供不適用（行情）尚未成功查詢來源尚待提供"
+      ],
+      "links": [],
+      "peCheck": null
+    }
+  ],
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "overflow": false,
+      "tableScrollable": null
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "overflow": false,
+      "tableScrollable": null
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "overflow": false,
+      "tableScrollable": true
+    },
+    {
+      "name": "small-mobile",
+      "width": 320,
+      "overflow": false,
+      "tableScrollable": true
+    }
+  ],
+  "errors": []
+}
