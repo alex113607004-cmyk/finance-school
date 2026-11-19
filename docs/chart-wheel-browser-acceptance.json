@@ -1,0 +1,66 @@
+{
+  "checkedAt": "2026-11-19T02:39:33.929Z",
+  "root": "http://127.0.0.1:4192/finance-school/",
+  "status": 200,
+  "errors": [],
+  "initial": {
+    "visible": 60,
+    "total": 696
+  },
+  "zoomOut": 140,
+  "dropdown": "140 根",
+  "zoomIn": 87,
+  "sliderMax": 86,
+  "MA": {
+    "before": 87,
+    "after": 87
+  },
+  "allZoom": {
+    "visible": 696,
+    "total": 696
+  },
+  "oldest": "2024-01-02",
+  "periods": [
+    {
+      "kind": "week",
+      "before": 149,
+      "after": 102,
+      "total": 149
+    },
+    {
+      "kind": "month",
+      "before": 35,
+      "after": 24,
+      "total": 35
+    }
+  ],
+  "crosshair": {
+    "before": "2026-11-18",
+    "after": "2026-10-22"
+  },
+  "rawRows": 60,
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "before": 60,
+      "after": 83,
+      "overflow": false
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "before": 83,
+      "after": 113,
+      "overflow": false
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "before": 113,
+      "after": 155,
+      "overflow": false
+    }
+  ],
+  "pageStayedStill": true
+}
