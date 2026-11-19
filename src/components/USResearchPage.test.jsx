@@ -10,7 +10,7 @@ afterEach(()=>vi.unstubAllGlobals());
 it('loads Apple SEC data with periods, sources, explicit quote gaps and scenario EPS feedback',async()=>{
  vi.stubGlobal('fetch',vi.fn(async()=>Response.json(us)));const user=userEvent.setup();render(<StockAnalysis param="US" symbol="AAPL" term={term}/>);
  await waitFor(()=>expect(screen.getByRole('button',{name:'重新查詢美股'})).toBeEnabled());expect(document.querySelector('a[href^="#unit/"]')).toBeNull();
- expect(within(screen.getByRole('navigation',{name:'個股分析市場'})).getByRole('link',{name:'美股 US'})).toHaveAttribute('aria-current','page');expect(screen.getByRole('region',{name:'美股行情狀態'})).toHaveTextContent('行情資料暫不可用');
+ expect(screen.getByRole('region',{name:'美股行情狀態'})).toHaveTextContent('行情資料暫不可用');
  const financials=screen.getByRole('region',{name:'可驗算季度基本面'});expect(financials).toHaveTextContent(us.stocks['US:AAPL'].snapshot.ttm.eps.toFixed(2)+' USD／股');expect(financials).toHaveTextContent(us.stocks['US:AAPL'].snapshot.latest.start+' ～ '+us.stocks['US:AAPL'].snapshot.latest.end);expect(financials).toHaveTextContent('自由現金流');expect(within(financials).getAllByRole('link',{name:/原始來源/}).length).toBeGreaterThan(2);
  const valuation=screen.getByRole('region',{name:'美股歷史估值驗算'});expect(valuation).toHaveTextContent('暫無適用估值');const input=screen.getByRole('spinbutton',{name:'假設近四季 EPS（USD／股）'});await user.clear(input);await user.type(input,'0');expect(screen.getByRole('region',{name:'美股使用者假設情境試算'})).toHaveTextContent('EPS 為零或負值');
 });

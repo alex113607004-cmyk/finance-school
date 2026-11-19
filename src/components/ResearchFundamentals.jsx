@@ -13,8 +13,8 @@ export function researchSnapshotTW(extra,ttm){
 }
 export default function ResearchFundamentals({snapshot,term= t=>t,label='SEC',notes}){
  const metrics=snapshot?.metrics||{};
- return <section className="panel analysis-section research-fundamentals" aria-label="可驗算季度基本面"><span className="eyebrow">FINANCIAL RESEARCH / {label}</span><h2>季度基本面</h2>
-  <p>{snapshot?.latest?`會計年度 FY${snapshot.latest.fiscalYear} Q${snapshot.latest.fiscalQuarter} · ${snapshot.latest.start||snapshot.latest.metrics?.revenue?.start||'起日待核實'} ～ ${snapshot.latest.end}`:'尚無完整可核實季度'}。金額以原幣百萬元顯示，展開可看未縮放原始值。</p>
+ return <section className="panel analysis-section research-fundamentals" aria-label="可驗算季度基本面"><h2>季度基本面</h2>
+  <p>{label} · {snapshot?.latest?`會計年度 FY${snapshot.latest.fiscalYear} Q${snapshot.latest.fiscalQuarter} · ${snapshot.latest.start||snapshot.latest.metrics?.revenue?.start||'起日待核實'} ～ ${snapshot.latest.end}`:'尚無完整可核實季度'}。金額以原幣百萬元顯示，展開可看未縮放原始值。</p>
   <div className="research-metric-grid">{['revenue','revenueYoY','grossMargin','operatingMargin','operatingCashFlow','capex','freeCashFlow'].map(key=>{
    const m=metrics[key],percent=['revenueYoY','grossMargin','operatingMargin'].includes(key),currency=m?.currency||metrics.revenue?.currency||'USD',unit=percent?'%':`${currency} 百萬元`;
    const first=m?.sources?.[0];const display=key==='revenueYoY'?m?.value:m?.value;

@@ -21,7 +21,11 @@ it.each([['#analysis/2330','2330'],['#analysis/TW/6488','TW/6488'],['#analysis/u
 });
 it('handles market navigation and browser back/forward hash changes',async()=>{
  render(<App/>);window.history.replaceState(null,'','#analysis/US/MSFT');fireEvent(window,new HashChangeEvent('hashchange'));await waitFor(()=>expect(screen.getByTestId('analysis-address')).toHaveTextContent('US/MSFT'));
+ const markets=within(screen.getByRole('navigation',{name:'個股分析市場'}));
+ expect(markets.getByRole('link',{name:'美股 US'})).toHaveAttribute('aria-current','page');
+ expect(markets.getByRole('link',{name:'美股 US'})).toHaveAttribute('href','#analysis/US/MSFT');
  window.history.replaceState(null,'','#analysis/2330');fireEvent(window,new HashChangeEvent('hashchange'));await waitFor(()=>expect(screen.getByTestId('analysis-address')).toHaveTextContent('2330'));
+ expect(markets.getByRole('link',{name:'台股 TW'})).toHaveAttribute('aria-current','page');
 });
 it('keeps metric definitions inside analysis without linking to a removed dictionary or lesson',async()=>{
  const user=userEvent.setup();render(<App/>);await user.click(screen.getByRole('button',{name:'EPS'}));const dialog=screen.getByRole('dialog');expect(dialog).toHaveTextContent(glossary.EPS[0]);expect(within(dialog).queryByRole('link')).not.toBeInTheDocument();await user.click(screen.getByRole('button',{name:'關閉名詞解釋'}));expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

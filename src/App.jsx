@@ -1,6 +1,7 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {ChartNoAxesCombined,Info,X} from 'lucide-react';
 import {glossary} from './glossary';
+import {analysisHref,parseAnalysisAddress} from './security';
 import StockAnalysis from './components/StockAnalysis';
 import './analysis-shell.css';
 import './dashboard.css';
@@ -26,11 +27,22 @@ function TermDialog({term,onClose}){
 }
 export default function App(){
  const [,param,symbol]=useAnalysisRoute(),[term,setTerm]=useState(null);
+ const route=parseAnalysisAddress(param,symbol);
  useEffect(()=>{setTerm(null);document.title='台美股個股分析｜行情・財報・估值';},[param,symbol]);
  function termButton(t){return <button className="term-button" onClick={()=>setTerm(t)}>{t}<Info size={12}/></button>;}
  return <div className="analysis-app">
   <a className="skip-link" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus();}}>跳到主要內容</a>
-  <header className="analysis-header"><div className="analysis-header-inner"><a className="analysis-brand" href="#analysis/TW/2330"><span><ChartNoAxesCombined size={24}/></span><div><b>台美股個股分析</b><small>MARKET RESEARCH</small></div></a><span className="analysis-header-note"><span className="tiny-dot"/>從數據，看見價格的脈絡</span></div></header>
+  <header className="analysis-header">
+   <div className="analysis-header-inner">
+    <a className="analysis-brand" href="#analysis/TW/2330"><span><ChartNoAxesCombined size={21}/></span><b>台美股個股分析</b></a>
+    <nav className="analysis-market-switch" aria-label="個股分析市場">
+     {[['TW','台股','2330'],['US','美股','AAPL']].map(([region,label,code])=>{
+      const current=route.region===region;
+      return <a key={region} aria-current={current?'page':undefined} className={current?'selected':''} href={analysisHref(region,current?route.symbol:code)}>{label} <small>{region}</small></a>;
+     })}
+    </nav>
+   </div>
+  </header>
   <main id="main-content" className="analysis-main" tabIndex={-1}><StockAnalysis term={termButton} param={param} symbol={symbol}/></main>
   <footer className="analysis-footer"><span>台美股個股分析 <small>MARKET RESEARCH</small></span><p>歷史估值供研究參考，資料日期與來源依各欄標示。</p></footer>
   <TermDialog term={term} onClose={()=>setTerm(null)}/>

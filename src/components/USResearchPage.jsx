@@ -37,7 +37,19 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
   <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="us-analysis-search">搜尋美股代號或公司名稱</label><input id="us-analysis-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="AAPL、Apple、蘋果、MSFT、微軟" autoComplete="off"/><button className="primary">分析美股</button></form>{query&&suggestions.length>0&&<ul className="analysis-suggestions" aria-label="美股搜尋結果">{suggestions.map(s=><li key={s.id}><button onClick={()=>choose(s)}><b>{s.code}</b><span>{s.nameZh}<small>{s.name}</small></span><em>{s.market}</em></button></li>)}</ul>}</div>
   <div className="analysis-recent">{Object.values(publication.stocks).map(s=><button key={s.id} className={'secondary '+(s.code===code?'selected':'')} onClick={()=>choose(s)}>{s.nameZh} <small>{s.code}</small></button>)}</div>{error&&<p role="alert" className="error-message">{error}</p>}{warning&&<p className="notice" role="status">{warning}</p>}
   {!stock?<section className="panel empty-state"><h2>美股資料尚未涵蓋</h2><p>{code} 尚無經核實的財報與行情，請選擇搜尋結果。</p></section>:<>
-   <section className="panel analysis-quote" aria-label="美股行情狀態"><div className="quote-layout"><div><span className="eyebrow">{stock.id} · {stock.market}</span><h2>{stock.nameZh} <span className="analysis-tag">{status.label}</span></h2><p className="quote-company">{stock.name}</p><div className="analysis-price"><strong>{status.usable?format(q.price):'—'}</strong><span>USD／{fund?'受益權單位':'股'}</span>{status.usable&&Number.isFinite(q.changePercent)&&<b className={q.change>0?'gain':q.change<0?'loss':''}>{format(q.change)}（{format(q.changePercent)}%）</b>}</div></div><div className="quote-actions"><button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(n=>n+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?'查詢中…':'重新查詢美股'}</button><p>{status.usable?`交易日 ${q.date}`:'SEC 財報資料'}<br/>幣別 USD</p>{status.usable&&<p>成交量 {format(q.volume,0)} 股<br/>{q.timestamp}</p>}</div></div>
+   <SectionNav/>
+   <div className="stock-overview">
+   <section className="panel analysis-quote" aria-label="美股行情狀態">
+    <div className="quote-layout">
+     <div className="quote-heading">
+      <h2>{stock.nameZh} <span className="quote-symbol">{stock.code}</span></h2>
+      <p className="quote-company">{stock.name}</p>
+      <p className="quote-market">{stock.market} · {status.label}</p>
+     </div>
+     <button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(n=>n+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?'查詢中…':'重新查詢美股'}</button>
+     <div className="analysis-price"><strong>{status.usable?format(q.price):'—'}</strong><span>USD／{fund?'受益權單位':'股'}</span>{status.usable&&Number.isFinite(q.changePercent)&&<b className={q.change>0?'gain':q.change<0?'loss':''}>{format(q.change)}（{format(q.changePercent)}%）</b>}</div>
+     <div className="quote-meta"><p>{status.usable?`交易日 ${q.date}`:'SEC 財報資料'}</p>{status.usable&&<p>成交量 {format(q.volume,0)} 股<br/>{q.timestamp}</p>}</div>
+    </div>
     {!status.usable&&<p className="notice">行情資料暫不可用，可先查看已核實財報；價格與估值不以模擬數字補齊。</p>}
     {status.usable&&<p className="quote-market-meta">來源 {q.source} · {q.exchangeCoverage} · {status.label} · 延遲 {q.delayMinutes??'未提供'} 分鐘</p>}
     {!fund&&<QuickFacts term={term} items={[
@@ -48,8 +60,8 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
     ]}/>}
     {Object.values(q.sessions||{}).some(Boolean)&&<div className="research-session-grid">{[['pre','盤前'],['regular','正常盤'],['post','盤後']].filter(([key])=>q.sessions?.[key]).map(([key,label])=><div key={key}>{label}<b>{format(q.sessions[key].price)} USD</b><small>{q.sessions[key].timestamp}</small></div>)}</div>}
    </section>
-   <SectionNav/>
-   <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><div><span className="eyebrow">PRICE ACTION</span><h2>價格走勢</h2></div><span className="chart-basis-tag">{status.usable?status.label:'行情尚未提供'}</span></div>{stock.history?.rows?.length?<AnalysisChart key={stock.id} history={{...stock.history,currencyLabel:'USD／股',volumeUnit:'股'}} asOf={marketDate(new Date(),'US')} term={term}/>:<div className="chart-empty" role="status"><Search size={28}/><h3>此標的暫無可用行情</h3><p>財報可正常查閱，日／週／月 K 與均線等待行情資料。</p></div>}</section>
+   <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><h2>價格走勢</h2><span className="chart-basis-tag">{status.usable?status.label:'行情尚未提供'}</span></div>{stock.history?.rows?.length?<AnalysisChart key={stock.id} history={{...stock.history,currencyLabel:'USD／股',volumeUnit:'股'}} asOf={marketDate(new Date(),'US')} term={term}/>:<div className="chart-empty" role="status"><Search size={28}/><h3>此標的暫無可用行情</h3><p>財報可正常查閱，日／週／月 K 與均線等待行情資料。</p></div>}</section>
+   </div>
    <div id="stock-assessment" tabIndex={-1}><PriceResearchSummary stock={stock} history={stock.history} valuation={value} snapshot={stock.snapshot} region="US" busy={busy} term={term}/></div>
    <div id="stock-fundamentals" tabIndex={-1}>{fund?<ETFReference quote={q} nav={stock.nav} source={stock.sources.issuer}/>:<ResearchFundamentals snapshot={stock.snapshot} term={term} notes={stock.code==='AAPL'?'Apple 採 52／53 週會計年度。FY2026 四季直接 EPS 相加 8.97，與全年加權股數法 8.98 不混用。':'Microsoft 於 6 月結束會計年度。FY2026 Q4 直接 EPS 4.81，不以全年減前三季的 4.80 代替。'}/>}</div>
    <div id="stock-valuation" tabIndex={-1}><USValuation stock={stock} value={value}/></div>
