@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-19T13:15:28.571Z",
+  "root": "http://127.0.0.1:4198/finance-school/",
+  "searchAndAdd": {
+    "tw": "TW:2330",
+    "otc": "TW:6488",
+    "etf": "TW:0050",
+    "us": "US:AAPL",
+    "aliases": [
+      "臺積電",
+      "TSMC",
+      "Apple",
+      "微軟"
+    ],
+    "routeUnchanged": true
+  },
+  "marketFilterAndIndependentListFilter": true,
+  "removeAndReAdd": true,
+  "unknownAndClear": true,
+  "reloadPreserved": true,
+  "crossTabSync": true,
+  "openAnalysisAndReturn": true,
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "small-mobile",
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "broadSearchLimitedToEight": true,
+  "errors": []
+}
