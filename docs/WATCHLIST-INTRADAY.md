@@ -1,5 +1,7 @@
 # 自選股當日分時與開盤虛線
 
+2026-11-20 後續依使用者要求改為個人自用模式，私人行情需要獨立存取密碼；最新部署與 Secret 設定見 [私人分時設定](PRIVATE-INTRADAY-SETUP.md)。下方初版公開展示設定已由個人模式取代，不能用個人 Key 啟用公開傳播。
+
 查核日：2026-11-19（台灣時間）。本次只修改側欄小圖與可選分時介接；主圖日／週／月 K、估值、法人預估、ETF 折溢價及收藏保留。
 
 ## 目前交付狀態
@@ -12,7 +14,7 @@
 
 ## 可選後端與設定
 
-前端 `VITE_INTRADAY_API_ORIGIN` 只接受 HTTPS origin（本機 loopback 可用 HTTP）。前端以 `GET /api/intraday?region=TW&symbol=2330` 取得正規化資料；市場是識別的一部分，不送瀏覽器憑證。後端來源可替換，只要符合 `src/watchlist-trend.js` 的驗證口徑。沒有設定時不發出分時查詢。
+前端 `VITE_INTRADAY_API_ORIGIN` 只接受 HTTPS origin（本機 loopback 可用 HTTP）。前端以 `GET /api/intraday?region=TW&symbol=2330` 取得正規化資料；市場是識別的一部分。個人版需另組存取密碼，詳見 [私人分時設定](PRIVATE-INTRADAY-SETUP.md)。後端來源可替換，只要符合 `src/watchlist-trend.js` 的驗證口徑。沒有設定時不發出分時查詢。
 
 `worker/intraday.mjs` 是獨立可選 Cloudflare Worker，不會由 GitHub Pages 執行，亦未於本次自動部署。其 Fugle adapter 使用官方 [1 分 K API](https://developer.fugle.tw/docs/data/http-api/intraday/candles/) 與 [Quote API 的 openPrice](https://developer.fugle.tw/docs/data/http-api/intraday/quote/)，不取含試撮的 lastPrice。不需要安裝 SDK；憑證只從後端 Secret 取得。
 
@@ -22,11 +24,11 @@
 | --- | --- | --- |
 | 後端 Secret | `FUGLE_API_KEY` | 有效方案憑證，不能放 GitHub Pages 或 VITE 變數 |
 | 後端變數 | `INTRADAY_ALLOWED_ORIGIN=https://alex113607004-cmyk.github.io` | 前端來源；本機測試改為實際 localhost origin |
-| 後端變數 | `INTRADAY_PUBLIC_DISPLAY_CONFIRMED=true` | 維護者已核對該方案允許本站公開展示；預設停用 |
-| 後端變數 | `INTRADAY_LICENSE_URL` | 可回查的契約／方案依據 HTTPS 連結，不能以 API 文件代替授權 |
+| 後端 Secret | `INTRADAY_ACCESS_PASSWORD` | 與 Fugle Key 不同的 32～128 碼私人存取密碼 |
+| 後端變數 | `INTRADAY_PERSONAL_USE_CONFIRMED=true` | 個人自用，未設定時停止行情查詢 |
 | GitHub repository Actions variable | `VITE_INTRADAY_API_ORIGIN` | 已部署的分時後端 origin；變更後需重新執行 Pages 建置 |
 
-公開部署前按實際方案設定主機端限流及配額；目前每檔每次讀取兩個 upstream 端點，不自動輪詢、不共享快取，回應 `Cache-Control: no-store`。只有設定憑證與明確展示條件才呼叫上游；錯誤不回傳金鑰、認證 header 或上游原文。CORS 限定前端 origin，但 CORS 不代替主機端的用量保護。
+按實際方案設定配額；目前每檔每次讀取兩個 upstream 端點，不自動輪詢、不共享快取，回應 `Cache-Control: no-store`。只有設定憑證、個人模式及通過私人密碼驗證才呼叫上游；錯誤不回傳金鑰、認證 header 或上游原文。CORS 限定前端 origin，但 CORS 不代替密碼驗證或主機端的用量保護。
 
 台股 adapter 目前只支援 TWSE／TPEx；美股需要另接符合展示條件及美東時區的來源，現有美股財報與缺口照常顯示。使用條件查核參考 [證交所交易資訊使用規範](https://www.twse.com.tw/zh/products/information/use.html)，不因公開可讀就假定可再散布。
 

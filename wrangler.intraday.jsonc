@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "finance-school-intraday",
+  "main": "worker/intraday.mjs",
+  "compatibility_date": "2026-11-19",
+  "workers_dev": true,
+  "keep_vars": true,
+  "vars": {
+    "INTRADAY_ALLOWED_ORIGIN": "https://alex113607004-cmyk.github.io"
+  }
+}

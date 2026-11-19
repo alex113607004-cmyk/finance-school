@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-11-19T16:07:55.134Z",
+  "fixtureOnly": true,
+  "realFugleKeyTested": false,
+  "anonymousRejected": true,
+  "noRequestBeforeUnlock": true,
+  "wrongPasswordRejected": true,
+  "authenticatedPrivateCurve": true,
+  "noCredentialPersistence": true,
+  "noFugleKeyInPage": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "lockClearsCurve": true,
+  "reloadRequiresPassword": true,
+  "otherOriginRejected": true,
+  "errors": []
+}
