@@ -1,12 +1,13 @@
 import React from 'react';
 import {render,screen,within,fireEvent,waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {afterEach,it,expect,vi} from 'vitest';
+import {beforeEach,afterEach,it,expect,vi} from 'vitest';
 import App from './App';
 import {glossary} from './glossary';
 vi.mock('./components/StockAnalysis',()=>({default:({param,symbol,term})=><section aria-label="個股分析頁"><p data-testid="analysis-address">{[param,symbol].filter(Boolean).join('/')}</p>{term('EPS')}</section>}));
 vi.mock('./components/MarketOverview',()=>({default:()=><section aria-label="市場總覽頁"><a href="#analysis/TW/2330">分析台積電</a></section>}));
-afterEach(()=>vi.restoreAllMocks());
+beforeEach(()=>vi.stubGlobal('fetch',vi.fn(()=>new Promise(()=>{}))));
+afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals();});
 it('opens stock analysis directly with no learning navigation, progress or course links',()=>{
  window.history.replaceState(null,'','/');render(<App/>);
  expect(window.location.hash).toBe('#analysis/TW/2330');expect(screen.getByTestId('analysis-address')).toHaveTextContent('TW/2330');

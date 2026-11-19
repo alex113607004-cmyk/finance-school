@@ -15,6 +15,7 @@
     "update:universe": "node scripts/update-universe.mjs",
     "update:overview": "node scripts/update-overview.mjs",
     "update:etf-nav": "node scripts/update-etf-nav.mjs",
+    "update:forecasts": "node scripts/update-forecasts.mjs",
     "update:financials": "node scripts/update-financials.mjs",
     "update:financials:offline": "node scripts/update-financials.mjs --offline",
     "history:assets": "node scripts/materialize-history.mjs",
