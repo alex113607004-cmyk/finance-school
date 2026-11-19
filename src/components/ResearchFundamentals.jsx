@@ -1,5 +1,5 @@
 import React from 'react';
-import {compareMetrics,plainFinancialSummary} from '../sec-financials';
+import {plainFinancialSummary} from '../sec-financials';
 import {format} from '../domain';
 const titles={revenue:'營收',revenueYoY:'營收年增率',grossMargin:'毛利率',operatingMargin:'營業利益率',netIncome:'淨利',operatingCashFlow:'營業現金流',capex:'資本支出',freeCashFlow:'自由現金流'};
 const A=({href,children})=><a className="text-link" href={href} target="_blank" rel="noopener noreferrer">{children} ↗</a>;
@@ -7,10 +7,7 @@ export function FactSources({metric}){
  const sources=[...new Map((metric?.sources||[]).map(s=>[[s.accession,s.start,s.end,s.tag,s.value].join('|'),s])).values()];
  return <details className="research-fact-details"><summary>原始數字與算式</summary>{metric?.formula&&<p className="analysis-formula">{metric.formula}</p>}<p>本欄原始值：{format(metric?.value,metric?.unit==='percent'?4:2)} {metric?.unit}</p>{sources.map((s,i)=><div key={i}><b>{s.tag}：{format(s.value,2)} {s.unit}</b><p>{s.start||'時點'} ～ {s.end} · {s.currency||s.unit}<br/>公告／申報日 {s.filed} · {s.form}<br/>文件編號 {s.accession}</p><A href={s.source}>回查原始文件</A></div>)}</details>;
 }
-export function researchSnapshotTW(extra,ttm){
- const comparisons=Object.fromEntries(['revenue','netIncome','operatingCashFlow','capex','freeCashFlow'].map(k=>[k,compareMetrics(extra.metrics[k],extra.prior.metrics[k])]));
- return {available:true,checkedAt:extra.checkedAt,latest:extra.latest,prior:extra.prior,ttm,metrics:{...extra.metrics,revenueYoY:comparisons.revenue},comparisons};
-}
+export {researchSnapshotTW} from '../research-snapshot';
 export default function ResearchFundamentals({snapshot,term= t=>t,label='SEC',notes}){
  const metrics=snapshot?.metrics||{};
  return <section className="panel analysis-section research-fundamentals" aria-label="可驗算季度基本面"><h2>季度基本面</h2>

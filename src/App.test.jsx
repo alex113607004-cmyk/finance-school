@@ -46,3 +46,11 @@ it('opens the new overview from navigation and preserves the previously selected
 it('accepts a direct overview address without changing existing stock URLs',()=>{
  window.history.replaceState(null,'','#overview');render(<App/>);expect(window.location.hash).toBe('#overview/TW');expect(screen.getByRole('region',{name:'市場總覽頁'})).toBeInTheDocument();expect(screen.getByRole('link',{name:'市場總覽'})).toHaveAttribute('aria-current','page');
 });
+it('opens the dedicated watchlist without affecting analysis URLs or old learning favorites',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));window.history.replaceState(null,'','#watchlist');render(<App/>);expect(window.location.hash).toBe('#watchlist/all');expect(document.title).toBe('自選股｜台美股個股分析');expect(screen.getByRole('region',{name:'自選股空清單'})).toBeInTheDocument();expect(screen.getByRole('link',{name:'自選股',exact:true})).toHaveAttribute('aria-current','page');vi.unstubAllGlobals();
+});
+it('lets market navigation filter the watchlist while preserving the previously selected analysis address',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));window.history.replaceState(null,'','#analysis/US/MSFT');const user=userEvent.setup();render(<App/>);await user.click(screen.getByRole('link',{name:'自選股',exact:true}));await screen.findByRole('heading',{name:/自選股/});expect(screen.getByRole('link',{name:'個股分析',exact:true})).toHaveAttribute('href','#analysis/US/MSFT');await user.click(within(screen.getByRole('navigation',{name:'自選股市場切換'})).getByRole('link',{name:'美股 US'}));await waitFor(()=>expect(window.location.hash).toBe('#watchlist/US'));vi.unstubAllGlobals();
+});
+
+it('keeps existing metric definitions available on the new watchlist page',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>{throw Error('offline')}));localStorage.setItem('finance-school.watchlist.v1',JSON.stringify({schemaVersion:1,items:[{id:'TW:2330',region:'TW',symbol:'2330',name:'台積電',addedAt:new Date().toISOString()}]}));window.history.replaceState(null,'','#watchlist/all');render(<App/>);await userEvent.click(await screen.findByRole('button',{name:'EPS',exact:true}));expect(screen.getByRole('dialog')).toHaveTextContent(glossary.EPS[0]);vi.unstubAllGlobals();});

@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-11-19T09:09:04.440Z",
+  "root": "http://127.0.0.1:4198/finance-school/",
+  "added": {
+    "individual": "TW:2330",
+    "ranking": "TW:2409",
+    "us": "US:AAPL"
+  },
+  "reloadPreserved": true,
+  "crossTabSync": true,
+  "watchlistQueryPreserved": true,
+  "returnRestoration": [
+    {
+      "name": "desktop",
+      "before": {
+        "y": 780,
+        "left": 0,
+        "page": "第 31～60 檔，共 984 檔"
+      },
+      "after": {
+        "y": 780,
+        "left": 0,
+        "page": "第 31～60 檔，共 984 檔",
+        "filters": [
+          "上櫃"
+        ]
+      }
+    },
+    {
+      "name": "mobile",
+      "before": {
+        "y": 1345,
+        "left": 64,
+        "page": "第 31～60 檔，共 984 檔"
+      },
+      "after": {
+        "y": 1345,
+        "left": 64,
+        "page": "第 31～60 檔，共 984 檔",
+        "filters": [
+          "上櫃"
+        ]
+      }
+    }
+  ],
+  "rankingReloadPreserved": true,
+  "sizes": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "ipad",
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "small-mobile",
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "quotaFailureAndRetry": true,
+  "errors": []
+}

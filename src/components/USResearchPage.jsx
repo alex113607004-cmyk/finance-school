@@ -1,3 +1,4 @@
+import {WatchButton} from './WatchlistContext';
 import React,{useEffect,useMemo,useState} from 'react';
 import {Search,RefreshCw} from 'lucide-react';
 import fallback from '../generated/us-summary.json';
@@ -50,7 +51,7 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
       <p className="quote-company">{stock.name}</p>
       <p className="quote-market">{stock.market} · {status.label}</p>
      </div>
-     <button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(n=>n+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?'查詢中…':'重新查詢美股'}</button>
+     <div className="quote-actions"><button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(n=>n+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?'查詢中…':'重新查詢美股'}</button><WatchButton region="US" code={stock.code} name={stock.nameZh||stock.name}/></div>
      <div className="analysis-price"><strong>{status.usable?format(q.price):'—'}</strong><span>USD／{fund?'受益權單位':'股'}</span>{status.usable&&Number.isFinite(q.changePercent)&&<b className={q.change>0?'gain':q.change<0?'loss':''}>{format(q.change)}（{format(q.changePercent)}%）</b>}</div>
      <div className="quote-meta"><p>{status.usable?`交易日 ${q.date}`:'SEC 財報資料'}</p>{status.usable&&<p>成交量 {format(q.volume,0)} 股<br/>{q.timestamp}</p>}</div>
     </div>
