@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-11-20T02:09:16.891Z",
+  "syntheticIdentityAndQuotes": true,
+  "realEmailDeliveryTested": false,
+  "realFugleKeyTested": false,
+  "anonymousHTMLBlocked": true,
+  "ownerSessionAndSameOriginSnapshots": true,
+  "noSecondPasswordOrBrowserKey": true,
+  "openingLineAndIntraday": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "expiredSessionClearsCurve": true,
+  "otherEmailBlocked": true,
+  "errors": []
+}

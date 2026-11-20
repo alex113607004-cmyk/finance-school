@@ -2,7 +2,9 @@
 
 繁體中文的個股研究網站，集中查看行情、K 線、均線、基本面與歷史估值。
 
-主要使用方式已依需求改為 **Windows 本機版，免登入、免另設密碼**：[下載 ZIP](https://alex113607004-cmyk.github.io/finance-school/downloads/finance-school-windows-local.zip)。安裝 Node.js LTS 後，解壓縮並雙擊「啟動本機版.cmd」，第一次在本機頁面儲存 Fugle Key 即可；Key 只留在你的電腦。詳見 [本機使用與驗收](docs/LOCAL-WINDOWS.md)。
+新增 **私人雲端版，Email 驗證碼登入**：手機、平板和電腦都開啟 [私人 Worker 網址](https://finance-school.alexchen109.workers.dev/)，不用另設密碼，電腦也不必開機。須先依 [Cloudflare 設定指南](docs/EMAIL-ACCESS-CLOUD.md) 啟用 Access、允許自己的 Email 並保存後端 Key；尚未設定時程式拒絕提供私人頁面及行情。真實收信與 Key 查詢仍需本人完成驗證。
+
+保留 **Windows 本機版，免登入、免另設密碼**：[下載 ZIP](https://alex113607004-cmyk.github.io/finance-school/downloads/finance-school-windows-local.zip)。安裝 Node.js LTS 後，解壓縮並雙擊「啟動本機版.cmd」，第一次在本機頁面儲存 Fugle Key 即可；Key 只留在你的電腦。詳見 [本機使用與驗收](docs/LOCAL-WINDOWS.md)。
 
 正式網站：https://alex113607004-cmyk.github.io/finance-school/
 
@@ -15,7 +17,7 @@
 
 ## 目前功能
 
-自選股使用可收合側邊欄，直接搜尋、加入／移除與切換分析，保留原有收藏與跨分頁同步；手機及平板改為抽屜。小圖只接受當日分時，提供開盤價虛線及時間／價格游標，不以近20日線或高低區間替代。**本機版直接向 Fugle 查詢，首次保存 Key 後免登入；不再預設使用 Cloudflare 或私人密碼。** 真實資料仍依自己的 Key、方案與當日資料可用性。詳見 [本機設定](docs/LOCAL-WINDOWS.md)、[圖表口徑](docs/WATCHLIST-INTRADAY.md)。舊 `#watchlist/all`／`TW`／`US` 網址繼續開啟側欄；原雲端密碼版僅保留 [歷史紀錄](docs/PRIVATE-INTRADAY-SETUP.md)。
+自選股使用可收合側邊欄，直接搜尋、加入／移除與切換分析，保留原有收藏與跨分頁同步；手機及平板改為抽屜。小圖只接受當日分時，提供開盤價虛線及時間／價格游標，不以近20日線或高低區間替代。**私人雲端版以 Cloudflare Access Email PIN 驗證本人，Key 放後端；Windows 本機版首次保存 Key 後免登入。** 真實資料仍依自己的 Key、方案與當日資料可用性。詳見 [私人雲端設定](docs/EMAIL-ACCESS-CLOUD.md)、[本機設定](docs/LOCAL-WINDOWS.md)、[圖表口徑](docs/WATCHLIST-INTRADAY.md)。舊 `#watchlist/all`／`TW`／`US` 網址繼續開啟側欄；原雲端密碼版僅保留 [歷史紀錄](docs/PRIVATE-INTRADAY-SETUP.md)。
 
 一般股票頁的「前瞻本益比」採具名機構年度 EPS 預估：首批為 2330／2317／6488 的 FactSet 調查中位數（鉅亨網公開報導），另有 2330 的摩根士丹利預估（經濟日報轉述）。可切換年度與來源，以實際股價重算，並同步自選側欄；顯示預估期間、報導日及原文連結。原文未區分基本／稀釋 EPS 時明列口徑，不冒稱稀釋 EPS。其餘標的尚缺來源，不外推或套用其他公司預估。使用者假設另收在試算中，不覆寫機構數值。詳見 [來源、引用範圍、更新與驗算](docs/INSTITUTIONAL-FORECASTS.md)。
 

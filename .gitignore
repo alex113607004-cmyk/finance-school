@@ -17,3 +17,4 @@ data/etf-nav-cache.json
 data/forward-estimates-cache.json
 .dev.vars*
 .wrangler/
+worker/generated/
