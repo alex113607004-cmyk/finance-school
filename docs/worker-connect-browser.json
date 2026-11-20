@@ -1,0 +1,28 @@
+{
+  "root": "http://127.0.0.1:4214/finance-school/",
+  "checkedAt": "2026-11-20T00:46:57.815Z",
+  "workerOrigin": "https://finance-school.alexchen109.workers.dev",
+  "passwordFormVisible": true,
+  "noCredentialsEntered": true,
+  "noFugleDataClaimed": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "noRequestBeforePassword": true,
+  "errors": []
+}

@@ -1,5 +1,7 @@
 # 個人自用 Fugle 分時行情設定
 
+2026-11-20 已確認使用者建立的 Production Worker 為 `https://finance-school.alexchen109.workers.dev`，實際名稱是 `finance-school`。前端以公開網址設定接線，仍須本人保存 Secret 並解鎖；網址本身不含金鑰或密碼。當次未登入查核得到 503「私人行情後端尚未完成設定」，CORS origin 正確，尚不能宣稱真實行情已可讀。
+
 本版本依使用者確認的「僅本人使用」設計。GitHub Pages 保留公開盤後資料；Fugle 分時 API 需要另一組私人存取密碼才能查詢。取得個人 Key 不表示取得公開散布授權，本版本不對未驗證訪客提供 Fugle 行情。
 
 ## 1. 建立 Cloudflare 後端
@@ -10,13 +12,13 @@
 
 | 欄位 | 填入 |
 | --- | --- |
-| 名稱 | `finance-school-intraday` |
+| 名稱 | `finance-school`（與實際建立的 Worker 一致） |
 | Production branch | `main` |
 | Root directory | 專案根目錄 `/` |
 | Build command | 留空；後端單一模組不需建置 React |
 | Deploy command | `npx wrangler@4.165.0 deploy --config wrangler.intraday.jsonc` |
 
-按 Deploy。這只部署 `worker/intraday.mjs`，不替換原 GitHub Pages。先不設定金鑰也可以部署，但後端預設停止行情查詢。部署成功會得到 `https://finance-school-intraday.<你的子網域>.workers.dev`。
+按 Deploy。這只部署 `worker/intraday.mjs`，不替換原 GitHub Pages。先不設定金鑰也可以部署，但後端預設停止行情查詢。此帳號已建立的網址為 `https://finance-school.alexchen109.workers.dev`。
 
 若採本機 CLI，可在專案根目錄執行 `npx wrangler login` 及上述 deploy command；Secret 請用 Dashboard 或互動式 `npx wrangler secret put NAME --config wrangler.intraday.jsonc`，不把值寫在命令參數、公開檔案或聊天。Dashboard 建立流程依 [Cloudflare 官方文件](https://developers.cloudflare.com/workers/get-started/dashboard/)。
 
@@ -36,9 +38,9 @@
 
 ## 3. 連回 GitHub Pages
 
-將 Worker 的 **HTTPS origin**（只有網址，不含 API Key、密碼、query 或 `/api/intraday`）提供給維護者，或自行於 GitHub repository → Settings → Secrets and variables → Actions → Variables 新增：
+目前公開 origin 已設定於 `src/intraday-config.js`，為 `https://finance-school.alexchen109.workers.dev`；解鎖介面與資料查詢共用同一設定。GitHub 連線沒有 Actions 變數管理權限，因此以已獲授權的專案程式設定接線，不放入任何 Secret。若維護者日後需要覆寫，可於 GitHub repository → Settings → Secrets and variables → Actions → Variables 設定：
 
-`VITE_INTRADAY_API_ORIGIN=https://finance-school-intraday.<你的子網域>.workers.dev`
+`VITE_INTRADAY_API_ORIGIN=https://finance-school.alexchen109.workers.dev`
 
 重新執行 Pages 工作流程。網站側欄會出現「私人分時行情」：輸入第二步自己設定的 **私人存取密碼**，按「解鎖分時行情」。此欄不是填 Fugle API Key。
 
@@ -62,4 +64,6 @@
 
 Wrangler 4.165.0 的 `deploy --dry-run --config wrangler.intraday.jsonc` 通過，產物 5.75 KiB；未部署到使用者帳號，也未讀取本機環境金鑰。
 
-尚需使用者在自己的 Cloudflare 帳號部署與保存 Secret、提供 Worker origin，才能完成真實 Fugle Key／方案與正式網站的驗收。開發者未取得你的金鑰，也未宣稱真實行情已接通。
+使用者已提供 Production Worker origin；仍需於自己的 Cloudflare 帳號完成 Secret／個人開關設定，並在網站自行輸入私人密碼，才能完成真實 Fugle Key／方案與正式網站的驗收。開發者未取得你的金鑰，也未宣稱真實行情已接通。
+
+接線後再次通過 48 檔案／308 項測試及 Pages 建置，公開產物含正確 Production origin。來源初查 API 503、CORS origin 正確；這只證明私人 handler 已部署，無法證明 Secret 或真實行情已完成。[接線瀏覽器紀錄](worker-connect-browser.json) 驗證正式子路徑、私人密碼欄位、未輸入密碼零行情請求及 1440／820／390／320px 版面。

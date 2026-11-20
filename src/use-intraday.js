@@ -1,7 +1,8 @@
 import {useEffect,useState} from 'react';
 import {loadIntraday} from './intraday-client.js';
+import {configuredIntradayOrigin} from './intraday-config.js';
 export function useIntraday(items,enabled,revision,accessPassword=''){
- const [state,setState]=useState({stocks:{},busy:false,warning:''}),ids=items.map(s=>s.id).sort().join(','),origin=import.meta.env.VITE_INTRADAY_API_ORIGIN||'';
+ const [state,setState]=useState({stocks:{},busy:false,warning:''}),ids=items.map(s=>s.id).sort().join(','),origin=configuredIntradayOrigin();
  const [clock,setClock]=useState(()=>Date.now());
  useEffect(()=>{if(!enabled)return;const timer=setInterval(()=>setClock(Date.now()),60000);return()=>clearInterval(timer);},[enabled]);
  useEffect(()=>{
