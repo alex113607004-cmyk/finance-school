@@ -25,3 +25,7 @@ it('stops additional batches after a rejected access password',async()=>{
  vi.stubEnv('VITE_INTRADAY_API_ORIGIN','https://example.com');const fetcher=vi.fn(async()=>new Response('',{status:401}));vi.stubGlobal('fetch',fetcher);
  const many=Array.from({length:10},(_,i)=>({id:'TW:'+String(2330+i)})),{result}=renderHook(()=>useIntraday(many,true,0,'synthetic-private-access-password-1234567890'));await waitFor(()=>expect(result.current.warning).toContain('密碼不正確'));expect(fetcher).toHaveBeenCalledTimes(3);expect(result.current.stocks).toEqual({});
 });
+it('loads local-only quotes without any access password and clears them when the local key is removed',async()=>{
+ const meta=document.createElement('meta');meta.name='finance-school-mode';meta.content='local';document.head.append(meta);vi.stubGlobal('location',{hostname:'127.0.0.1',origin:'http://127.0.0.1:4178'});const fetcher=vi.fn(async()=>Response.json({schemaVersion:1,intraday:{id:'TW:2330',accessScope:'local-only'}}));vi.stubGlobal('fetch',fetcher);
+ try{const {result,rerender}=renderHook(({ready})=>useIntraday(items,true,0,'',ready),{initialProps:{ready:false}});expect(fetcher).not.toHaveBeenCalled();rerender({ready:true});await waitFor(()=>expect(result.current.stocks['TW:2330']).toBeTruthy());expect(fetcher.mock.calls[0][0]).toContain('http://127.0.0.1:4178/api/intraday');expect(fetcher.mock.calls[0][1].headers).toEqual({});rerender({ready:false});await waitFor(()=>expect(result.current.stocks).toEqual({}));}finally{meta.remove();}
+});

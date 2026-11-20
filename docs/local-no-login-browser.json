@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-11-20T01:15:13.749Z",
+  "syntheticDataOnly": true,
+  "realFugleKeyTested": false,
+  "noLoginOrExtraPassword": true,
+  "saveThenIntradayAndOpeningLine": true,
+  "keyNotReturnedOrStoredInBrowser": true,
+  "reloadWithoutLogin": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "removeKeyClearsCurve": true,
+  "foreignOriginBlocked": true,
+  "extractedPackageStartsWithoutDependencies": true,
+  "noCloudflareRequests": true,
+  "errors": []
+}

@@ -6,7 +6,7 @@ export function watchTrend(stock,_history,{region='TW',now=new Date()}={}){
  const data=stock?.intraday,today=marketDate(now,region);
  if(!data)return missing();
  if(data.id!==region+':'+stock.code||data.date!==today)return missing('分時標的或交易日不符；舊交易日不標成今日走勢。');
- const viewAllowed=data.publicDisplayAllowed||data.accessScope==='personal-authenticated'&&stock.intradayAuthenticated===true;
+ const viewAllowed=data.publicDisplayAllowed||data.accessScope==='personal-authenticated'&&stock.intradayAuthenticated===true||data.accessScope==='local-only'&&stock.intradayLocal===true;
  if(data.currency!==(stock.currency||stock.quote?.currency||(region==='TW'?'TWD':'USD'))||!viewAllowed||!https(data.source)||data.basis!=='unadjusted'||!data.regularSession)return missing('分時來源、使用範圍、幣別或價格口徑尚未確認。');
  const start=Date.parse(data.sessionStart),end=Date.parse(data.sessionEnd),zone=region==='US'?'America/New_York':'Asia/Taipei';
  const clock=t=>new Intl.DateTimeFormat('en-GB',{timeZone:zone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(t));

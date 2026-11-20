@@ -24,7 +24,8 @@
     "prebuild:pages": "npm run history:assets",
     "update:us": "node scripts/update-us.mjs",
     "update:us:offline": "node scripts/update-us.mjs --offline",
-    "preview:pages": "node scripts/preview-pages.mjs"
+    "preview:pages": "node scripts/preview-pages.mjs",
+    "start:local": "node scripts/start-local.mjs"
   },
   "dependencies": {
     "lightweight-charts": "^5.3.0",

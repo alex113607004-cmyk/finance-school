@@ -30,3 +30,4 @@ it('removes the previous day curve after the market date changes',()=>{
 it('accepts private data only in an authenticated private view without claiming public display rights',()=>{
  const intraday={...feed(),publicDisplayAllowed:false,accessScope:'personal-authenticated'};expect(watchTrend({...stock(),intraday},null,{now}).mode).toBe('missing');expect(watchTrend({...stock(),intraday,intradayAuthenticated:true},null,{now}).mode).toBe('intraday');
 });
+it('keeps loopback data limited to a local view and does not mark it publicly displayable',()=>{const intraday={...feed(),publicDisplayAllowed:false,accessScope:'local-only'};expect(watchTrend({...stock(),intraday},null,{now}).mode).toBe('missing');expect(watchTrend({...stock(),intraday,intradayLocal:true},null,{now}).mode).toBe('intraday');});

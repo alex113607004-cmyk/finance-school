@@ -9,6 +9,7 @@ export function intradayEndpoint(origin,region,symbol){
 export async function loadIntraday(region,symbol,{origin='',accessPassword='',fetcher=(...a)=>fetch(...a)}={}){
  const url=intradayEndpoint(origin,region,symbol);if(!url)return null;
  const response=await fetcher(url,{credentials:'omit',cache:'no-store',headers:accessPassword?{Authorization:'Bearer '+accessPassword}:{},signal:AbortSignal.timeout(15000)});
+ if(!response.ok){let body;try{body=await response.clone().json();}catch{}const messages={LOCAL_KEY_REQUIRED:'請先在本機設定 Fugle API Key。',FUGLE_AUTH:'Fugle 金鑰或方案無法查詢，請檢查本機 API Key。',NO_INTRADAY:'尚無當日有效分時資料，或來源暫時無法連線。',MARKET_UNSUPPORTED:'目前本機分時來源支援台股。'};if(messages[body?.code])throw Error(messages[body.code]);}
  if(response.status===401){const e=Error('私人分時存取密碼不正確，請重新輸入。');e.accessRequired=true;throw e;}
  if(response.status===503)throw Error('私人行情後端尚未完成設定。');
  if(response.status===429)throw Error('行情來源額度暫時用盡，請稍後重新整理。');

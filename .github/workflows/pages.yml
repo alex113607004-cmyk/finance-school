@@ -108,7 +108,8 @@ jobs:
         run: npm run build:pages
         env:
           VITE_MARKET_API_ORIGIN: ${{ vars.VITE_MARKET_API_ORIGIN }}
-          VITE_INTRADAY_API_ORIGIN: ${{ vars.VITE_INTRADAY_API_ORIGIN }}
+      - name: Build Windows local package without credentials
+        run: python3 scripts/package-local.py
       - name: Configure Pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
