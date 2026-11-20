@@ -13,6 +13,7 @@ import WatchlistSearch from './WatchlistSearch';
 import {useForecasts} from '../ForecastContext';
 import {defaultForecast} from '../institutional-forecasts';
 import IntradayAccess from './IntradayAccess';
+import {configuredIntradayOrigin} from '../intraday-config';
 export function MiniTrend({trend}){
  const [cursor,setCursor]=useState(null);
  if(trend.mode!=='intraday')return <div className="mini-trend-empty" aria-label={trend.label} title={trend.note}>分時資料待接入</div>;
@@ -36,7 +37,7 @@ export default function WatchlistSidebar({open=true,onClose=()=>{},market='all',
  return <div className="watchlist-sidebar-content">
   <div className="sidebar-title"><div><Star size={16}/><h2>自選股 <small>{list.items.length} 檔</small></h2></div><button type="button" onClick={onClose} aria-label="收合自選股側邊欄"><PanelLeftClose size={19}/></button></div>
   <WatchlistSearch universe={data.universe} us={data.us} market={market} busy={busy} onSearch={request}/>
-  <IntradayAccess configured={!!import.meta.env.VITE_INTRADAY_API_ORIGIN} active={!!intradayPassword} busy={intraday.busy} onConnect={value=>{setIntradayPassword(value);setIntradayRevision(n=>n+1);}} onDisconnect={()=>setIntradayPassword('')}/>
+  <IntradayAccess configured={!!configuredIntradayOrigin()} active={!!intradayPassword} busy={intraday.busy} onConnect={value=>{setIntradayPassword(value);setIntradayRevision(n=>n+1);}} onDisconnect={()=>setIntradayPassword('')}/>
   <div className="sidebar-filters"><div role="group" aria-label="自選股市場">{[['all','全部'],['TW','台股'],['US','美股']].map(([m,label])=><button type="button" key={m} aria-pressed={m===market} onClick={()=>onMarketChange(m)}>{label}<small>{list.items.filter(s=>m==='all'||s.region===m).length}</small></button>)}</div><button type="button" aria-label="重新整理自選股資料" title="重新整理自選股資料" disabled={busy||intraday.busy} onClick={()=>{refresh();setIntradayRevision(n=>n+1);}}><RefreshCw size={14} className={busy||intraday.busy?'is-spinning':''}/></button></div>
   <label className="sidebar-list-filter"><Search size={13}/><input aria-label="篩選自選股" placeholder="篩選我的自選股" value={query} onChange={e=>setQuery(e.target.value)}/></label>
   <p className="sidebar-data-note">小圖只顯示當日分時；虛線為開盤價。收盤價與分時快照分開標示。</p>

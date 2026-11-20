@@ -13,7 +13,7 @@
 
 ## 目前功能
 
-自選股已改為可收合側邊欄，直接搜尋、加入／移除與切換分析，保留原有收藏與跨分頁同步；手機及平板改為抽屜，支援關閉、Escape、焦點循環及選股後自動收合。小圖只接受當日分時，提供開盤價虛線及時間／價格游標，不以近20日線或高低區間替代。依使用者確認僅本人使用，已加入需私人存取密碼的 Fugle 後端與解鎖介面，Key 只留在後端 Secret。**尚需於使用者 Cloudflare 帳號部署、設定 Secret 及 Worker 網址，真實分時未接通前保留缺口。** 詳見 [個人分時設定步驟](docs/PRIVATE-INTRADAY-SETUP.md)、[圖表功能](docs/WATCHLIST-INTRADAY.md)。舊 `#watchlist/all`／`TW`／`US` 網址會開啟側欄並回到分析；初版紀錄見 [原驗收](docs/SIDEBAR-ETF-FORWARD.md)。
+自選股已改為可收合側邊欄，直接搜尋、加入／移除與切換分析，保留原有收藏與跨分頁同步；手機及平板改為抽屜，支援關閉、Escape、焦點循環及選股後自動收合。小圖只接受當日分時，提供開盤價虛線及時間／價格游標，不以近20日線或高低區間替代。依使用者確認僅本人使用，已加入需私人存取密碼的 Fugle 後端與解鎖介面，Key 只留在後端 Secret，並接至已建立的 `finance-school.alexchen109.workers.dev`。**使用前須在 Cloudflare 保存 Secret 與個人開關，再由本人輸入私人密碼解鎖；實際行情仍需本人帳號驗收。** 詳見 [個人分時設定步驟](docs/PRIVATE-INTRADAY-SETUP.md)、[圖表功能](docs/WATCHLIST-INTRADAY.md)。舊 `#watchlist/all`／`TW`／`US` 網址會開啟側欄並回到分析；初版紀錄見 [原驗收](docs/SIDEBAR-ETF-FORWARD.md)。
 
 一般股票頁的「前瞻本益比」採具名機構年度 EPS 預估：首批為 2330／2317／6488 的 FactSet 調查中位數（鉅亨網公開報導），另有 2330 的摩根士丹利預估（經濟日報轉述）。可切換年度與來源，以實際股價重算，並同步自選側欄；顯示預估期間、報導日及原文連結。原文未區分基本／稀釋 EPS 時明列口徑，不冒稱稀釋 EPS。其餘標的尚缺來源，不外推或套用其他公司預估。使用者假設另收在試算中，不覆寫機構數值。詳見 [來源、引用範圍、更新與驗算](docs/INSTITUTIONAL-FORECASTS.md)。
 
