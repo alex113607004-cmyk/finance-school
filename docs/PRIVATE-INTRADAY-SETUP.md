@@ -1,5 +1,7 @@
 # 個人自用 Fugle 分時行情設定
 
+本文件保留雲端密碼版紀錄。使用者後續選擇「完全免登入、只在自己電腦使用」，已改為 [Windows 本機版](LOCAL-WINDOWS.md)，不必再設定 Cloudflare 或私人存取密碼。
+
 2026-11-20 已確認使用者建立的 Production Worker 為 `https://finance-school.alexchen109.workers.dev`，實際名稱是 `finance-school`。前端以公開網址設定接線，仍須本人保存 Secret 並解鎖；網址本身不含金鑰或密碼。當次未登入查核得到 503「私人行情後端尚未完成設定」，CORS origin 正確，尚不能宣稱真實行情已可讀。
 
 本版本依使用者確認的「僅本人使用」設計。GitHub Pages 保留公開盤後資料；Fugle 分時 API 需要另一組私人存取密碼才能查詢。取得個人 Key 不表示取得公開散布授權，本版本不對未驗證訪客提供 Fugle 行情。

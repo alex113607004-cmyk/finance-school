@@ -1,4 +1,4 @@
-import React,{useMemo,useState} from 'react';
+import React,{useCallback,useMemo,useState} from 'react';
 import {PanelLeftClose,RefreshCw,Search,Star} from 'lucide-react';
 import {useWatchlist,WatchButton} from './WatchlistContext';
 import {useWatchlistData} from '../use-watchlist-data';
@@ -13,7 +13,8 @@ import WatchlistSearch from './WatchlistSearch';
 import {useForecasts} from '../ForecastContext';
 import {defaultForecast} from '../institutional-forecasts';
 import IntradayAccess from './IntradayAccess';
-import {configuredIntradayOrigin} from '../intraday-config';
+import {configuredIntradayOrigin,isLocalRuntime} from '../intraday-config';
+import LocalQuotes from './LocalQuotes';
 export function MiniTrend({trend}){
  const [cursor,setCursor]=useState(null);
  if(trend.mode!=='intraday')return <div className="mini-trend-empty" aria-label={trend.label} title={trend.note}>分時資料待接入</div>;
@@ -23,21 +24,22 @@ export function MiniTrend({trend}){
 }
 export default function WatchlistSidebar({open=true,onClose=()=>{},market='all',onMarketChange=()=>{},currentId,term=t=>t}){
  const list=useWatchlist(),[query,setQuery]=useState(''),{data,busy,warnings,request,refresh}=useWatchlistData(!!list?.items.length,open);
- const [intradayRevision,setIntradayRevision]=useState(0),[intradayPassword,setIntradayPassword]=useState(''),intraday=useIntraday(list?.items||[],open,intradayRevision,intradayPassword);
+ const [intradayRevision,setIntradayRevision]=useState(0),[intradayPassword,setIntradayPassword]=useState(''),[localReady,setLocalReady]=useState(false),local=isLocalRuntime(),intraday=useIntraday(list?.items||[],open,intradayRevision,intradayPassword,localReady);
+ const readyLocal=useCallback(ready=>{setLocalReady(ready);if(ready)setIntradayRevision(n=>n+1);},[]);
  const {publication,choices}=useForecasts();
  const rows=useMemo(()=>list?.items.map(saved=>{
   const raw=saved.region==='TW'?data.universe.stocks?.[saved.symbol]:data.us.stocks?.[saved.id];
   if(!raw)return {...saved,available:false};
   const entry=data.curated.stocks?.[saved.symbol],stock=saved.region==='TW'?latestWatchQuote(raw,entry,data.overview):raw,quote=stock.quote||{},currency=quote.currency||stock.currency||(saved.region==='TW'?/^\d{5}[CK]$/.test(saved.symbol)?'未核實':'TWD':'USD');
   const usable=quoteStatus(quote,{region:saved.region}).usable,nav=saved.region==='TW'?selectNAV(data.etf,'TW',saved.symbol,quote.date):stock.nav;
-  return {...saved,available:true,name:stock.nameZh||stock.name||saved.name,quote,currency,usable,fund:isFund(stock),forward:forwardPE({...stock,currency},{region:saved.region,estimate:stock.forwardEPS||defaultForecast(publication,stock,{region:saved.region,choiceKey:choices?.[saved.id]})}),premium:etfPremium({...quote,currency},nav,{region:saved.region}),trend:watchTrend({...stock,currency,intraday:intraday.stocks[saved.id]||stock.intraday,intradayAuthenticated:!!intradayPassword&&!!intraday.stocks[saved.id]},null,{region:saved.region})};
- })||[],[list?.items,data,publication,choices,intraday.stocks,intraday.clock,intradayPassword]);
+  return {...saved,available:true,name:stock.nameZh||stock.name||saved.name,quote,currency,usable,fund:isFund(stock),forward:forwardPE({...stock,currency},{region:saved.region,estimate:stock.forwardEPS||defaultForecast(publication,stock,{region:saved.region,choiceKey:choices?.[saved.id]})}),premium:etfPremium({...quote,currency},nav,{region:saved.region}),trend:watchTrend({...stock,currency,intraday:intraday.stocks[saved.id]||stock.intraday,intradayAuthenticated:!!intradayPassword&&!!intraday.stocks[saved.id],intradayLocal:local&&localReady&&!!intraday.stocks[saved.id]},null,{region:saved.region})};
+ })||[],[list?.items,data,publication,choices,intraday.stocks,intraday.clock,intradayPassword,local,localReady]);
  const filtered=rows.filter(s=>(market==='all'||s.region===market)&&(!query.trim()||[s.symbol,s.name].some(v=>v.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))));
  if(!list)return null;
  return <div className="watchlist-sidebar-content">
   <div className="sidebar-title"><div><Star size={16}/><h2>自選股 <small>{list.items.length} 檔</small></h2></div><button type="button" onClick={onClose} aria-label="收合自選股側邊欄"><PanelLeftClose size={19}/></button></div>
   <WatchlistSearch universe={data.universe} us={data.us} market={market} busy={busy} onSearch={request}/>
-  <IntradayAccess configured={!!configuredIntradayOrigin()} active={!!intradayPassword} busy={intraday.busy} onConnect={value=>{setIntradayPassword(value);setIntradayRevision(n=>n+1);}} onDisconnect={()=>setIntradayPassword('')}/>
+  {local?<LocalQuotes onReady={readyLocal}/>:<IntradayAccess configured={!!configuredIntradayOrigin()} active={!!intradayPassword} busy={intraday.busy} onConnect={value=>{setIntradayPassword(value);setIntradayRevision(n=>n+1);}} onDisconnect={()=>setIntradayPassword('')}/>}
   <div className="sidebar-filters"><div role="group" aria-label="自選股市場">{[['all','全部'],['TW','台股'],['US','美股']].map(([m,label])=><button type="button" key={m} aria-pressed={m===market} onClick={()=>onMarketChange(m)}>{label}<small>{list.items.filter(s=>m==='all'||s.region===m).length}</small></button>)}</div><button type="button" aria-label="重新整理自選股資料" title="重新整理自選股資料" disabled={busy||intraday.busy} onClick={()=>{refresh();setIntradayRevision(n=>n+1);}}><RefreshCw size={14} className={busy||intraday.busy?'is-spinning':''}/></button></div>
   <label className="sidebar-list-filter"><Search size={13}/><input aria-label="篩選自選股" placeholder="篩選我的自選股" value={query} onChange={e=>setQuery(e.target.value)}/></label>
   <p className="sidebar-data-note">小圖只顯示當日分時；虛線為開盤價。收盤價與分時快照分開標示。</p>

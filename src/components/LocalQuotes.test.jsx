@@ -1,0 +1,8 @@
+import React from 'react';
+import {render,screen,waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {afterEach,it,expect,vi} from 'vitest';
+import LocalQuotes from './LocalQuotes';
+afterEach(()=>vi.unstubAllGlobals());
+it('saves an API key to the local server without requiring login or retaining it in the form',async()=>{const calls=[],ready=vi.fn();vi.stubGlobal('fetch',vi.fn(async(url,options)=>{calls.push([url,options]);return Response.json(url.endsWith('/status')?{mode:'local-only',configured:false}:{configured:true});}));render(<LocalQuotes onReady={ready}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'儲存到本機'})).toBeEnabled());expect(screen.queryByLabelText('私人分時存取密碼')).toBeNull();const user=userEvent.setup(),input=screen.getByLabelText('Fugle API Key');await user.type(input,'synthetic-local-test-key');await user.click(screen.getByRole('button',{name:'儲存到本機'}));await screen.findByText('金鑰已儲存在本機；行情結果顯示於下方。');expect(ready).toHaveBeenLastCalledWith(true);expect(screen.queryByDisplayValue('synthetic-local-test-key')).toBeNull();expect(calls[1][0]).toBe('/api/local/key');expect(calls[1][1].method).toBe('POST');});
+it('removes a saved key and marks local quotes unavailable',async()=>{const ready=vi.fn();vi.stubGlobal('fetch',vi.fn(async(url,options)=>Response.json(options?.method==='DELETE'?{configured:false}:{mode:'local-only',configured:true})));render(<LocalQuotes onReady={ready}/>);const user=userEvent.setup();await user.click(await screen.findByRole('button',{name:'移除本機金鑰'}));await screen.findByText('本機金鑰已移除。');expect(ready).toHaveBeenLastCalledWith(false);expect(screen.getByLabelText('Fugle API Key')).toBeInTheDocument();});
