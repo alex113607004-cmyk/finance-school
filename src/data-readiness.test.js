@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {dataReadiness,validDataDate} from './data-readiness';
+import {dataReadiness,validDataDate,readinessIndicator} from './data-readiness';
 // Explicitly simulated data tests; public pages only use sourced snapshots.
 const now=new Date('2026-11-19T07:00:00Z'),checkedAt='2026-11-19T06:00:00Z';
 const source='https://example.com/simulated-report';
@@ -24,4 +24,12 @@ describe('data readiness and provenance',()=>{
  it('does not show a successful model when its prerequisites or reasons are absent',()=>{const x=fixture();x.valuation={available:false,reasons:[],validSamples:[]};expect(dataReadiness(x).modelReasons.join()).toContain('尚未取得');});
  it('withholds calculated PE when the supplied multiple disagrees with same-date price and EPS',()=>{const x=fixture();x.valuation.pe=88;const r=dataReadiness(x);expect(r.groups[2].state).toBe('missing');expect(r.pe).toBeNull();});
  it('validates calendar dates including leap-year boundaries',()=>{expect(validDataDate('2024-02-29')).toBe(true);for(const d of ['2026-02-29','2026-13-01','2026-11-31',null,'19/11/2026'])expect(validDataDate(d)).toBe(false);});
+});
+
+describe('collapsed data status classification',()=>{
+ const complete=()=>({groups:[{state:'ready'},{state:'ready'},{state:'ready'}],quote:{available:true},financialRows:[{available:true}],mismatches:[],refreshWarnings:[],feedPaused:false});
+ it('requires every applicable group and its source checks to be ready before showing a check',()=>{expect(readinessIndicator(complete()).state).toBe('ready');for(const change of [r=>r.groups[1].state='partial',r=>r.groups[2].state='missing',r=>r.mismatches.push('日期不同'),r=>r.refreshWarnings.push('來源失敗'),r=>r.feedPaused=true,r=>r.groups[0].state='stale']){const r=complete();change(r);expect(readinessIndicator(r).state).toBe('partial');}});
+ it('keeps SEC statements without a quote partial, while a wholly missing ETF is unavailable',()=>{const us=complete();us.groups[0].state='missing';us.quote.available=false;expect(readinessIndicator(us).state).toBe('partial');expect(readinessIndicator({groups:[{state:'missing'},{state:'missing'},{state:'missing'}],quote:{available:false},financialRows:[]}).state).toBe('missing');expect(readinessIndicator().state).toBe('missing');});
+ it('counts a zero or negative EPS as data and excludes inapplicable PE models from the completeness check',()=>{for(const value of [0,-1]){const r=complete();r.financialRows=[{available:true,value}];r.groups[2].state='inapplicable';expect(readinessIndicator(r).state).toBe('ready');}});
+ it('shows checking until refresh completes, instead of displaying a premature success or absence',()=>{const r=complete();r.busy=true;expect(readinessIndicator(r)).toEqual({state:'partial',label:'資料核對中'});r.busy=false;expect(readinessIndicator(r).state).toBe('ready');});
 });
