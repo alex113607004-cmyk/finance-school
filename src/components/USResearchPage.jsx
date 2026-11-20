@@ -1,3 +1,5 @@
+import {useLiveQuote} from '../use-live-quote';
+import LiveQuoteStatus from './LiveQuoteStatus';
 import {WatchButton} from './WatchlistContext';
 import React,{useEffect,useMemo,useState} from 'react';
 import ForwardPE from './ForwardPE';
@@ -37,6 +39,7 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
  const stock=publication.stocks['US:'+code],suggestions=searchUS(publication.stocks,query),value=useMemo(()=>stock?analyzeUSValuation(stock):null,[stock]);
  function choose(s){setCode(s.code);setQuery('');setError('');window.location.hash=analysisHref('US',s.code);}
  function submit(e){e.preventDefault();if(suggestions.length===1){choose(suggestions[0]);return;}const match=suggestions.find(s=>s.code.toUpperCase()===query.trim().toUpperCase());if(match){choose(match);return;}setError(query.trim()?'此代號或公司名稱尚未涵蓋，請選擇 AAPL、MSFT 或 SPY。':'請輸入美股代號或公司名稱。');}
+ const live=useLiveQuote({region:'US',symbol:code,currency:'USD',enabled:!!stock},refresh);
  const q=stock?.quote,status=quoteStatus(q),fund=stock?.securityKind==='etf';
  const readiness=stock?dataReadiness({stock,history:stock.history,valuation:value,snapshot:stock.snapshot,region:'US',policy:publication.policy,busy,refreshWarnings:[warning,...(stock.warnings||[])]}):null;
  return <div className="stock-analysis-page"><div className="page-title compact-title"><h1>美股個股研究</h1><p>Apple・Microsoft・SPY</p></div>
@@ -57,6 +60,7 @@ export default function USStockAnalysis({param='AAPL',term=t=>t}){
      <div className="analysis-price"><strong>{status.usable?format(q.price):'—'}</strong><span>USD／{fund?'受益權單位':'股'}</span>{status.usable&&Number.isFinite(q.changePercent)&&<b className={q.change>0?'gain':q.change<0?'loss':''}>{format(q.change)}（{format(q.changePercent)}%）</b>}</div>
      <div className="quote-meta"><p>{status.usable?`交易日 ${q.date}`:'SEC 財報資料'}</p>{status.usable&&<p>成交量 {format(q.volume,0)} 股<br/>{q.timestamp}</p>}</div>
     </div>
+    <LiveQuoteStatus live={live} fallback={q}/>
     {!status.usable&&<p className="notice">行情資料暫不可用，可先查看已核實財報；價格與估值不以模擬數字補齊。</p>}
     {status.usable&&<p className="quote-market-meta">來源 {q.source} · {q.exchangeCoverage} · {status.label} · 延遲 {q.delayMinutes??'未提供'} 分鐘</p>}
     {!fund&&<QuickFacts term={term} items={[

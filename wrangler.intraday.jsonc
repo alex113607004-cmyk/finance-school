@@ -5,5 +5,7 @@
   "compatibility_date": "2026-11-20",
   "build": {"command": "npm run build:cloud"},
   "workers_dev": true,
-  "keep_vars": true
+  "keep_vars": true,
+  "durable_objects": {"bindings": [{"name": "WATCHLISTS", "class_name": "WatchlistStorage"}]},
+  "migrations": [{"tag": "watchlist-v1", "new_sqlite_classes": ["WatchlistStorage"]}]
 }

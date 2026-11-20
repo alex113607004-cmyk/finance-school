@@ -50,7 +50,7 @@ npx wrangler@4.165.0 deploy --config wrangler.intraday.jsonc
 
 登入有效期依 Access application 的 session 設定。過期時，重新驗證後即可繼續，不需記另一組網站密碼。「登出」使用 `/cdn-cgi/access/logout`，會撤銷 Cloudflare Access 登入工作階段。
 
-收藏保存在各瀏覽器、各網址的 localStorage，**目前不跨裝置同步**。手機可加入主畫面作為捷徑；尚無離線行情或背景更新承諾。
+私人雲端版已新增 [跨裝置自選股同步及個股頁行情](CLOUD-SYNC-LIVE-QUOTES.md)，同一 Email 登入私人網址後，首次合併此網址既有收藏，並同步加入／移除。公開 Pages 與 Windows 本機版仍各自儲存。手機可加入主畫面作為捷徑；尚無離線行情或背景更新承諾。
 
 ## 保護與資料口徑
 
@@ -59,7 +59,7 @@ npx wrangler@4.165.0 deploy --config wrangler.intraday.jsonc
 - **不使用 Static Assets router／binding**：官方說明它不會將 `ctx.access` 傳給使用者 Worker。已建置 HTML 放在 Worker 模組；其他白名單公開資料由 Worker 向原 Pages 讀取。頁面、快照代理和行情回應均 `private, no-store`。
 - 同源快照請求攜帶 Access session cookie；查詢 TWSE 等外部來源不攜帶 cookie，代理向 GitHub 不轉傳 Cookie、Key 或登入身分。
 - 私人行情目前支援 Fugle 台股。分鐘資料來自 Fugle candles，開盤價來自同代號 quote；日期與幣別須通過原有檢查。Key 不回傳瀏覽器，不存 localStorage。
-- 本次未變更行情頻率：開啟側欄、加入標的或按重新整理會查詢；沒有新增逐筆串流或背景定時輪詢。每檔使用 candles、quote 兩次請求，額度取決於本人方案。公開盤後資料仍隨 Pages 每日台灣時間 17:00／21:00 排程更新，原始日期不因進站而改寫。
+- 側欄開啟、加入標的或按重新整理會查詢分時，使用 candles、quote；後續個股頁另新增前景每 30 秒 REST 報價查詢，Ticker 提供幣別及交易單位。沒有逐筆串流或背景輪詢，額度取決於本人方案。公開盤後資料仍隨 Pages 每日台灣時間 17:00／21:00 排程更新，原始日期不因進站而改寫。
 - 資料缺漏、額度不足、過期和來源失敗顯示具體狀態；登入失效清除分時曲線。美股行情缺口及原有估值方法不因登入功能改變。
 
 ## 驗收

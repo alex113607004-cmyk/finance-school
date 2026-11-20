@@ -5,7 +5,7 @@ import {format} from '../domain';
 import LightweightCandles from './LightweightCandles';
 import {latestCandleRange,visibleCandleWindow} from '../chart-viewport';
 const colors={5:'#e6bd7f',20:'#aca6ff',60:'#79c9e4'};
-export default function AnalysisChart({history,asOf,term}){
+export default function AnalysisChart({history,asOf,term,livePrice=null}){
  const [kind,setKind]=useState('day'),[visible,setVisible]=useState([5,20,60]),[viewportRequest,setViewportRequest]=useState({count:60}),[viewport,setViewport]=useState(null),[picked,setPicked]=useState(null),[numbersOpen,setNumbersOpen]=useState(false);
  const pointer=useRef(null),help=useId(),volumeUnit=history?.volumeUnit||'股',adjustmentLabel=history?.adjustment==='split-adjusted'?'已還原分割，未還原股利':history?.adjustment==='dividend-and-split-adjusted'?'已還原股利與分割':'未還原除權息與分割';
  const all=useMemo(()=>aggregateCandles(history?.rows||[],kind,{asOf,coverageStart:history?.coverageStart,partial:history?.partial}),[history?.rows,history?.coverageStart,history?.partial,kind,asOf]);
@@ -22,6 +22,7 @@ export default function AnalysisChart({history,asOf,term}){
  return <div className="analysis-chart" data-visible-count={rows.length} data-total-count={all.length} data-viewport-ready={viewport?.rows===all&&viewport.kind===kind?'true':'false'}>
   <div className="analysis-chart-toolbar"><div className="tab-row" aria-label="K 線週期">{[['day','日 K'],['week','週 K'],['month','月 K']].map(([k,l])=><button key={k} aria-pressed={kind===k} className={kind===k?'selected':''} onClick={()=>{setKind(k);setPicked(null)}}>{l}</button>)}</div><label>顯示根數 <select aria-label="K 棒顯示根數" value={countChoice} onChange={e=>{if(e.target.value==='custom')return;setViewport(null);setViewportRequest({count:e.target.value==='5000'?Infinity:Number(e.target.value)});setPicked(null)}}>{countChoice==='custom'&&<option value="custom">{rows.length} 根</option>}{[30,60,120,5000].map(n=><option key={n} value={n}>{n===5000?`全部（${all.length} 根）`:n+' 根'}</option>)}</select></label></div>
   {kind==='day'?<div className="ma-toggles" aria-label="個股均線開關">{[5,20,60].map(n=><label key={n}><input type="checkbox" checked={visible.includes(n)} onChange={()=>setVisible(v=>v.includes(n)?v.filter(x=>x!==n):[...v,n])}/><span style={{color:colors[n]}}>MA{n}（{n} 日）</span></label>)}{term('均線')}</div>:<p className="subtle">週／月 K 由每日資料彙整，不顯示日均線，避免混淆日數與根數。</p>}
+  {livePrice&&<p className="chart-live-price">現價虛線 {format(livePrice.price)} {livePrice.currency} · {new Date(livePrice.timestamp).toLocaleTimeString('zh-TW',{timeZone:'Asia/Taipei',hour12:false})}；K 線及均線仍採已完成盤後資料。</p>}
   <div className="analysis-chart-readout" aria-live="polite">
    <b data-testid="candle-date">{active.start}{kind!=='day'&&' ～ '+active.date}</b>
    <div className="chart-ohlc"><span>開 {format(active.open)}</span><span>高 {format(active.high)}</span><span>低 {format(active.low)}</span><span>收 <strong>{format(active.close)}</strong></span></div>
@@ -30,7 +31,7 @@ export default function AnalysisChart({history,asOf,term}){
    {active.truncated&&<span>起始週／月未涵蓋完整資料</span>}
    {kind==='day'&&visible.length>0&&<div className="chart-ma-values">{visible.map(n=><span key={n} style={{color:colors[n]}}>MA{n} {format(active['ma'+n])}</span>)}</div>}
   </div>
-  {!/jsdom/i.test(navigator.userAgent)?<LightweightCandles rows={all} kind={kind} visible={visible} active={active} onPick={setPicked} onKeyDown={key} viewportRequest={viewportRequest} onViewportChange={rangeChanged} label={`個股${{day:'日',week:'週',month:'月'}[kind]}K 與均線及成交量`} describedBy={help}/>:<>
+  {!/jsdom/i.test(navigator.userAgent)?<LightweightCandles rows={all} kind={kind} visible={visible} active={active} onPick={setPicked} onKeyDown={key} viewportRequest={viewportRequest} onViewportChange={rangeChanged} label={`個股${{day:'日',week:'週',month:'月'}[kind]}K 與均線及成交量`} describedBy={help} livePrice={livePrice}/>:<>
   <svg className="native-chart interactive-chart analysis-candles" viewBox="0 0 790 300" role="img" tabIndex={0} aria-label={`個股${{day:'日',week:'週',month:'月'}[kind]}K 與均線`} aria-describedby={help} onKeyDown={key} onPointerDown={e=>{if(e.isPrimary===false||e.button!==0)return;pointer.current=e.pointerId;e.currentTarget.setPointerCapture?.(e.pointerId);select(e)}} onPointerMove={e=>{if(pointer.current===e.pointerId)select(e)}} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={end}>
    <title>{history.market==='TPEX'?'櫃買中心':'證交所'}未還原 K 線 · {history.currencyLabel||'新台幣元／股'}</title>{[0,1,2,3].map(i=>{const v=lo+(hi-lo)*i/3;return <g key={i}><line x1="10" x2="700" y1={y(v)} y2={y(v)} stroke="#293044"/><text x="711" y={y(v)+4}>{format(v,0)}</text></g>})}
    {rows.map((r,i)=>{const color=r.close>=r.open?'#ff8c99':'#7ad7a6';return <g key={r.date} data-candle={r.date} opacity={r.unfinished ? .65 : 1}><line x1={x(i)} x2={x(i)} y1={y(r.high)} y2={y(r.low)} stroke={color}/><rect x={x(i)-width/2} y={Math.min(y(r.open),y(r.close))} width={width} height={Math.max(1,Math.abs(y(r.open)-y(r.close)))} fill={color} stroke={r.unfinished?'#e6bd7f':color} strokeDasharray={r.unfinished?'2 2':undefined}/></g>})}

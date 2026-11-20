@@ -10,7 +10,7 @@ const position=(price,low,high)=>price<low?'below':price>high?'above':'within';
 const sourceList=metric=>[...new Set((metric?.sources||[]).map(s=>s.source).filter(Boolean))];
 
 export function assessTechnicals(stock,history,{region='TW',now=new Date()}={}){
- const quote=stock?.quote,price=quote?.price??quote?.close,status=quoteStatus(quote,{region,now}),rows=history?.rows||[],reasons=[];
+ const quote=stock?.quote,price=quote?.price??quote?.close,live=quote?.kind==='live-snapshot',status=quoteStatus(quote,{region,now}),rows=history?.rows||[],reasons=[];
  if(!status.usable)reasons.push(status.reason||'沒有有效行情。');
  if(history?.partial||history?.refreshFailed)reasons.push('日線更新不完整，暫停技術面判讀。');
  if(history?.code&&history.code!==stock?.code||history?.region&&history.region!==region||region==='TW'&&history?.market&&history.market!==stock?.market)reasons.push('歷史資料的市場或股票識別不一致。');
@@ -18,7 +18,7 @@ export function assessTechnicals(stock,history,{region='TW',now=new Date()}={}){
  if(history?.adjustment&&!['unadjusted','split-adjusted','dividend-and-split-adjusted'].includes(history.adjustment))reasons.push('價格調整口徑未確認。');
  if(rows.some(r=>!validCandle(r)||!finite(age(r.date,marketDate(now,region))))||new Set(rows.map(r=>r.date)).size!==rows.length)reasons.push('日線有無效欄位或重複日期。');
  const days=dailyAverages(rows),last=days.at(-1),prior=days.at(-2);
- if(!last||last.date!==quote?.date||last.close!==price)reasons.push('最後一筆日線與目前行情的日期或價格未對齊。');
+ if(!last||(live?(last.date>quote?.date||age(last.date,quote?.date)>10):(last.date!==quote?.date||last.close!==price)))reasons.push('最後一筆日線與目前行情的日期或價格未對齊。');
  if(rows.length<20)reasons.push(`只有 ${rows.length} 筆日線，MA20 至少需要 20 筆。`);
  const base={available:false,title:'技術面資料不足',reasons:[...new Set(reasons)],metrics:[],count:rows.length,volumeRatio:null,trend:'unavailable'};
  if(reasons.length)return base;
@@ -27,8 +27,8 @@ export function assessTechnicals(stock,history,{region='TW',now=new Date()}={}){
  const rising=complete&&price>ma5.value&&ma5.value>ma20.value&&ma20.value>ma60.value&&metrics.every(m=>m.slope>0);
  const falling=complete&&price<ma5.value&&ma5.value<ma20.value&&ma20.value<ma60.value&&metrics.every(m=>m.slope<0);
  const flat=complete&&metrics.every(m=>m.slope===0),trend=rising?'rising':falling?'falling':flat?'flat':complete?'mixed':'partial';
- const volumeDays=days.slice(-21,-1),volumeBase=volumeDays.length===20?volumeDays.reduce((s,r)=>s+r.volume,0)/20:null;
- return {...base,available:true,date:last.date,price,metrics,trend,title:{rising:'短中期均線與價格同向偏強',falling:'短中期均線與價格同向偏弱',flat:'均線走平，暫無方向優勢',mixed:'短中期訊號尚未一致',partial:'部分均線可用，長度仍不足'}[trend],bias20:ma20.bias,volumeRatio:volumeBase>0?last.volume/volumeBase:null,volumeBase,volumeDays,volume:last.volume,reason:complete?null:'完整 MA60 方向比較需至少 61 個有效交易日。'};
+ const volumeDays=days.slice(-21,-1),volumeBase=!live&&volumeDays.length===20?volumeDays.reduce((s,r)=>s+r.volume,0)/20:null;
+ return {...base,available:true,date:last.date,price,metrics,trend,live,averageBasis:'已完成盤後日線',title:{rising:'短中期均線與價格同向偏強',falling:'短中期均線與價格同向偏弱',flat:'均線走平，暫無方向優勢',mixed:'短中期訊號尚未一致',partial:'部分均線可用，長度仍不足'}[trend],bias20:ma20.bias,volumeRatio:volumeBase>0?last.volume/volumeBase:null,volumeBase,volumeDays,volume:last.volume,reason:live?`現價比較 ${last.date} 已完成的日均線；盤中整股量不與歷史全日量混算。`:complete?null:'完整 MA60 方向比較需至少 61 個有效交易日。'};
 }
 
 // Financial observations describe reported facts; they do not award an invented

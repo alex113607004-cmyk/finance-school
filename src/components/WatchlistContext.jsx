@@ -1,12 +1,14 @@
 import React,{createContext,useContext,useMemo,useState,useSyncExternalStore} from 'react';
 import {Star,RefreshCw,X} from 'lucide-react';
 import {createWatchlistStore} from '../watchlist-store';
+import {createCloudWatchlistStore} from '../cloud-watchlist-store';
+import {isCloudRuntime} from '../intraday-config';
 import '../watchlist.css';
 const WatchlistContext=createContext(null);
 export function WatchlistProvider({children,store:provided}){
- const [store]=useState(()=>provided||createWatchlistStore());
+ const [store]=useState(()=>provided||(isCloudRuntime()?createCloudWatchlistStore():createWatchlistStore()));
  const state=useSyncExternalStore(store.subscribe,store.getSnapshot,store.getSnapshot);
- const value=useMemo(()=>({...state,add:store.add,remove:store.remove,retry:store.retry,dismissInputError:store.dismissInputError}),[state,store]);
+ const value=useMemo(()=>({...state,add:store.add,remove:store.remove,retry:store.retry,dismissInputError:store.dismissInputError,sync:store.sync}),[state,store]);
  return <WatchlistContext.Provider value={value}>{children}</WatchlistContext.Provider>;
 }
 export const useWatchlist=()=>useContext(WatchlistContext);
@@ -21,5 +23,5 @@ export function WatchButton({region,code,name,compact=false}){
 }
 export function WatchlistNotice(){const list=useWatchlist();if(!list)return null;return <>
  <span className="sr-only" role="status" aria-live="polite">{list.message}</span>
- {(list.error||list.inputError)&&<aside className="watch-notice" role="alert"><p>{list.inputError||list.error}</p><div>{list.error?<button type="button" onClick={list.retry}><RefreshCw size={13}/>重試儲存</button>:<button type="button" aria-label="關閉自選清單提示" onClick={list.dismissInputError}><X size={14}/>關閉</button>}</div></aside>}
+ {(list.error||list.inputError)&&<aside className="watch-notice" role="alert"><p>{list.inputError||list.error}</p><div>{list.error?<button type="button" onClick={list.retry}><RefreshCw size={13}/>{list.cloud?'重試同步':'重試儲存'}</button>:<button type="button" aria-label="關閉自選清單提示" onClick={list.dismissInputError}><X size={14}/>關閉</button>}</div></aside>}
  </>;}
