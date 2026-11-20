@@ -10,7 +10,7 @@ export function readinessIndicator(report={}){
  if(report.busy)return {state:'partial',label:'資料核對中'};
  const available=report.quote?.available||(report.financialRows||[]).some(r=>r.available)||groups.some(g=>['ready','partial','stale'].includes(g.state));
  if(!available)return {state:'missing',label:'沒有可用資料'};
- const complete=groups.length>0&&groups.every(g=>g.state==='ready')&&!(report.mismatches||[]).length&&!(report.refreshWarnings||[]).length&&!report.feedPaused;
+ const complete=groups.length>0&&groups.every(g=>g.state==='ready')&&!(report.mismatches||[]).length&&!(report.refreshWarnings||[]).length&&!(report.feedPaused&&(report.financialRows||[]).length>0);
  return complete?{state:'ready',label:'資料完整'}:{state:'partial',label:'部分資料缺漏或待核對'};
 }
 export function validDataDate(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&finite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}

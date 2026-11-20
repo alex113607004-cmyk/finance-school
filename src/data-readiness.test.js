@@ -33,3 +33,5 @@ describe('collapsed data status classification',()=>{
  it('counts a zero or negative EPS as data and excludes inapplicable PE models from the completeness check',()=>{for(const value of [0,-1]){const r=complete();r.financialRows=[{available:true,value}];r.groups[2].state='inapplicable';expect(readinessIndicator(r).state).toBe('ready');}});
  it('shows checking until refresh completes, instead of displaying a premature success or absence',()=>{const r=complete();r.busy=true;expect(readinessIndicator(r)).toEqual({state:'partial',label:'資料核對中'});r.busy=false;expect(readinessIndicator(r).state).toBe('ready');});
 });
+
+it('does not flag complete ETF NAV and premium data because an unrelated company-cashflow feed is paused',()=>{expect(readinessIndicator({groups:[{key:'quote',state:'ready'},{key:'financials',label:'基金淨值',state:'ready'},{key:'model',label:'折溢價',state:'ready'}],quote:{available:true},financialRows:[],feedPaused:true,mismatches:[],refreshWarnings:[]}).state).toBe('ready');});

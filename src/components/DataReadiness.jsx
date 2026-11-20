@@ -21,7 +21,7 @@ export function DataReadinessSummary({report,detailsId}){
   <div className="readiness-groups">{report.groups.map(g=><article key={g.key} data-state={g.state} aria-label={`${g.label}資料狀態`}><div><b>{g.label}</b><span>{report.busy?'核對中':READINESS_LABELS[g.state]}</span></div><strong>{g.detail}</strong><small>{g.label==='基金淨值'||g.label==='折溢價'?g.note:g.key==='financials'?g.state==='partial'?'期間、公告日仍需分別核對':g.state==='ready'?'各項期間與公告日可查閱':g.state==='inapplicable'?'基金使用專屬資料':'詳見待補欄位':g.key==='model'&&g.state==='missing'?'依缺漏原因停止計算':g.note}</small></article>)}</div>
   {report.mismatches.map(m=><p key={m} className="readiness-alert readiness-date-alert"><Clock3 size={13}/><span>{m}{report.pe&&<small>同日重算本益比 {format(report.pe.value)} 倍，展開查核表看算式。</small>}</span></p>)}
   {report.refreshWarnings.length>0&&<p className="readiness-alert"><AlertCircle size={13}/>本次部分來源未更新，顯示原日期快照；可展開查核失敗項目。</p>}
-  {report.feedPaused&&<p className="readiness-alert"><Clock3 size={13}/>財報來源暫停更新，保留已查核資料與原日期；開啟查核表可查看恢復時間。</p>}
+  {report.feedPaused&&report.financialRows.length>0&&<p className="readiness-alert"><Clock3 size={13}/>財報來源暫停更新，保留已查核資料與原日期；開啟查核表可查看恢復時間。</p>}
   <p className="readiness-legend">✓ 資料完整　! 部分資料缺漏或待核對　× 沒有可用資料</p>
    </div>
   </details>
