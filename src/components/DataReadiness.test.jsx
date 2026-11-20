@@ -8,6 +8,7 @@ it('opens all disclosure ancestors from the compact status strip and exposes ori
  const r=report();render(<><DataReadinessSummary report={r} detailsId="test-readiness"/><details data-testid="outer"><summary>更多資料</summary><ReadinessDetails report={r} id="test-readiness"/></details></>);
  expect(document.querySelector('.readiness-disclosure').open).toBe(false);expect(document.querySelector('.readiness-overview')).not.toBeVisible();
  await userEvent.click(screen.getByRole('button',{name:/資料狀態：部分資料/}));
+ expect(screen.getByText('財報來源暫停更新，保留已查核資料與原日期；開啟查核表可查看恢復時間。')).toBeVisible();
  expect(screen.getByLabelText('行情資料狀態')).toHaveTextContent('可查閱');expect(screen.getByLabelText('財報資料狀態')).toHaveTextContent('部分待核對');expect(document.querySelector('#test-readiness').open).toBe(false);
  await userEvent.click(screen.getByRole('button',{name:'查看缺口與來源'}));expect(screen.getByTestId('outer').open).toBe(true);expect(document.querySelector('#test-readiness').open).toBe(true);
  const table=screen.getByRole('table');expect(table).toHaveTextContent('來源未提供');expect(within(table).getByRole('row',{name:/近四季稀釋 EPS/})).toHaveTextContent('查核日不當成公告日');expect(within(table).getByRole('row',{name:/近四季稀釋 EPS/})).toHaveTextContent('2026-09-30');expect(within(table).getAllByRole('link',{name:'查原始數字 ↗'})[1]).toHaveAttribute('href','https://example.com/simulated-report');
