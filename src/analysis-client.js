@@ -1,3 +1,4 @@
+import {dataCredentials} from './request-credentials.js';
 import {historyURLs,historyRows,completedHistoryRows,numeric,isoDate} from '../worker/runtime.mjs';
 import {validCandle} from './stock-analysis.js';
 const key='finance-school.analysis.history.v1';
@@ -12,7 +13,7 @@ export function mergeHistory(archive,latest){
 export function createAnalysisClient({fetcher=(...args)=>fetch(...args),baseUrl,now=()=>new Date(),storage=null}){
  const inFlight=new Map(),memory=new Map();
  const url=path=>new URL(path,baseUrl).href;
- async function read(target){const r=await fetcher(target,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(25000)});if(!r.ok)throw Error(`HTTP ${r.status}`);return {body:await r.json(),checkedAt:now().toISOString()};}
+ async function read(target){const r=await fetcher(target,{cache:'no-store',credentials:dataCredentials(target,baseUrl),signal:AbortSignal.timeout(25000)});if(!r.ok)throw Error(`HTTP ${r.status}`);return {body:await r.json(),checkedAt:now().toISOString()};}
  function cache(code){if(memory.has(code))return memory.get(code);try{const saved=JSON.parse(storage?.getItem(key)||'{}')[code];if(saved?.rows)memory.set(code,saved);return saved;}catch{return null;}}
  function save(code,value){memory.set(code,value);try{const all=JSON.parse(storage?.getItem(key)||'{}');all[code]=value;storage?.setItem(key,JSON.stringify(Object.fromEntries(Object.entries(all).sort((a,b)=>String(b[1].fetchedAt).localeCompare(String(a[1].fetchedAt))).slice(0,8))));}catch{}}
  async function publications(){

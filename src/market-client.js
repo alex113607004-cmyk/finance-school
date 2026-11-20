@@ -1,3 +1,4 @@
+import {dataCredentials} from './request-credentials.js';
 import {
   applyDatedValuation, completedDateCandidates, completedHistoryRows,
   enrichHistoryRows, historyRows, historyURLs, peerStatistics, preferHistoryQuote,
@@ -20,7 +21,7 @@ export function createMarketClient({snapshot,fetcher=(...args)=>fetch(...args),n
   const listeners=new Set(),histories=new Map(),inflight=new Map(),visited=new Set();
   const emit=patch=>{state={...state,...patch};for(const listener of listeners)listener();};
   const read=async(url,timeout=20000)=>{
-    const response=await fetcher(url,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(timeout)});
+    const response=await fetcher(url,{cache:'no-store',credentials:dataCredentials(url,baseUrl),signal:AbortSignal.timeout(timeout)});
     if(!response.ok)throw new Error('HTTP '+response.status);
     return {body:await response.json(),checkedAt:now().toISOString()};
   };

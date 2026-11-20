@@ -1,0 +1,5 @@
+import {afterEach,it,expect,vi} from 'vitest';
+import {dataCredentials} from './request-credentials';
+afterEach(()=>{document.querySelector('meta[name="finance-school-mode"]')?.remove();vi.unstubAllGlobals();});
+it('sends a cloud login cookie only to the same private origin, never to exchanges or another host',()=>{const m=document.createElement('meta');m.name='finance-school-mode';m.content='cloud';document.head.append(m);vi.stubGlobal('location',{hostname:'finance-school.alexchen109.workers.dev',origin:'https://finance-school.alexchen109.workers.dev',protocol:'https:'});expect(dataCredentials('https://finance-school.alexchen109.workers.dev/universe-data.json')).toBe('same-origin');expect(dataCredentials('https://www.twse.com.tw/exchangeReport/STOCK_DAY')).toBe('omit');expect(dataCredentials('https://example.com/data.json')).toBe('omit');});
+it('omits cookies on the public site and ordinary development pages',()=>{expect(dataCredentials('https://example.com/data.json')).toBe('omit');});
