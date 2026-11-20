@@ -1,6 +1,6 @@
-import React from 'react';
-import {Database,ArrowRight,Clock3,CheckCircle2,AlertCircle} from 'lucide-react';
-import {READINESS_LABELS} from '../data-readiness';
+import React,{useId} from 'react';
+import {Database,ArrowRight,Clock3,CheckCircle2,AlertCircle,XCircle} from 'lucide-react';
+import {READINESS_LABELS,readinessIndicator} from '../data-readiness';
 import {format} from '../domain';
 import {taipeiTime} from '../freshness';
 import '../data-readiness.css';
@@ -12,11 +12,19 @@ export function openReadiness(id){
  details.scrollIntoView?.({behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});details.querySelector('summary')?.focus({preventScroll:true});
 }
 export function DataReadinessSummary({report,detailsId}){
- return <section className="data-readiness-summary" aria-label="資料狀態摘要" aria-busy={report.busy}>
-  <div className="readiness-title"><span><Database size={14}/>資料狀態</span><button type="button" onClick={()=>openReadiness(detailsId)}>查看缺口與來源<ArrowRight size={13}/></button></div>
+ const status=readinessIndicator(report),panelId=useId(),Icon={ready:CheckCircle2,partial:AlertCircle,missing:XCircle}[status.state];
+ return <section className="data-readiness-summary" aria-label="資料狀態摘要" aria-busy={report.busy} data-state={status.state}>
+  <details key={detailsId} className="readiness-disclosure">
+   <summary className="readiness-toggle" role="button" aria-label={`資料狀態：${status.label}，點擊展開或收起`} aria-controls={panelId} title={`資料狀態：${status.label}，點擊查看詳情`}><Icon size={20} aria-hidden="true"/><span className="sr-only">{status.label}</span></summary>
+   <div id={panelId} className="readiness-overview">
+  <div className="readiness-title"><span><Database size={14}/>資料狀態 · {status.label}</span><button type="button" onClick={()=>openReadiness(detailsId)}>查看缺口與來源<ArrowRight size={13}/></button></div>
   <div className="readiness-groups">{report.groups.map(g=><article key={g.key} data-state={g.state} aria-label={`${g.label}資料狀態`}><div><b>{g.label}</b><span>{report.busy?'核對中':READINESS_LABELS[g.state]}</span></div><strong>{g.detail}</strong><small>{g.label==='基金淨值'||g.label==='折溢價'?g.note:g.key==='financials'?g.state==='partial'?'期間、公告日仍需分別核對':g.state==='ready'?'各項期間與公告日可查閱':g.state==='inapplicable'?'基金使用專屬資料':'詳見待補欄位':g.key==='model'&&g.state==='missing'?'依缺漏原因停止計算':g.note}</small></article>)}</div>
   {report.mismatches.map(m=><p key={m} className="readiness-alert readiness-date-alert"><Clock3 size={13}/><span>{m}{report.pe&&<small>同日重算本益比 {format(report.pe.value)} 倍，展開查核表看算式。</small>}</span></p>)}
   {report.refreshWarnings.length>0&&<p className="readiness-alert"><AlertCircle size={13}/>本次部分來源未更新，顯示原日期快照；可展開查核失敗項目。</p>}
+  {report.feedPaused&&report.financialRows.length>0&&<p className="readiness-alert"><Clock3 size={13}/>財報來源暫停更新，保留已查核資料與原日期；開啟查核表可查看恢復時間。</p>}
+  <p className="readiness-legend">✓ 資料完整　! 部分資料缺漏或待核對　× 沒有可用資料</p>
+   </div>
+  </details>
  </section>;
 }
 export function CoverageProgress({coverage,paused}){

@@ -5,6 +5,14 @@ import {format} from './domain.js';
 import {etfPremium} from './etf-nav.js';
 const DAY=86400000,finite=Number.isFinite;
 export const READINESS_LABELS={ready:'可查閱',partial:'部分待核對',missing:'尚缺資料',stale:'需重新查核',inapplicable:'不適用'};
+export function readinessIndicator(report={}){
+ const groups=(report.groups||[]).filter(g=>g.state!=='inapplicable');
+ if(report.busy)return {state:'partial',label:'資料核對中'};
+ const available=report.quote?.available||(report.financialRows||[]).some(r=>r.available)||groups.some(g=>['ready','partial','stale'].includes(g.state));
+ if(!available)return {state:'missing',label:'沒有可用資料'};
+ const complete=groups.length>0&&groups.every(g=>g.state==='ready')&&!(report.mismatches||[]).length&&!(report.refreshWarnings||[]).length&&!(report.feedPaused&&(report.financialRows||[]).length>0);
+ return complete?{state:'ready',label:'資料完整'}:{state:'partial',label:'部分資料缺漏或待核對'};
+}
 export function validDataDate(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&finite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
 const safeSource=value=>{try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:null;}catch{return null;}};
 function row(key,label,{value=null,unit='',period=null,announcedOn=null,checkedAt=null,source=null,reason='',state,asOf,checkedBefore=Date.now()+300000,available=true}={}){

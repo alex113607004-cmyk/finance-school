@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-11-20T14:33:04.840Z",
+  "syntheticHistoryForGreenETF": true,
+  "realUserDataUsed": false,
+  "delta2308StartsCollapsedWithWarning": true,
+  "warningColorPreservedWhenExpanded": true,
+  "keyboardEnterAndSpace": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "collapsed": true,
+      "touchTarget44px": true,
+      "detailsAccessible": true,
+      "noOverflow": true
+    },
+    {
+      "width": 820,
+      "collapsed": true,
+      "touchTarget44px": true,
+      "detailsAccessible": true,
+      "noOverflow": true
+    },
+    {
+      "width": 390,
+      "collapsed": true,
+      "touchTarget44px": true,
+      "detailsAccessible": true,
+      "noOverflow": true
+    },
+    {
+      "width": 320,
+      "collapsed": true,
+      "touchTarget44px": true,
+      "detailsAccessible": true,
+      "noOverflow": true
+    }
+  ],
+  "sourceDisclosureAncestorsStillOpen": true,
+  "alignedETFUsesGreenCheck": true,
+  "navigationCollapsesStatus": true,
+  "usFinancialsWithoutQuotesRemainPartial": true,
+  "noETFQuoteOrNavUsesRedCross": true,
+  "errors": []
+}
