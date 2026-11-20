@@ -3,12 +3,12 @@ import {createChart,CandlestickSeries,HistogramSeries,LineSeries,CrosshairMode,L
 import {latestCandleRange,preserveCandleRange,visibleCandleWindow} from '../chart-viewport';
 const asDate=time=>typeof time==='string'?time:time?`${time.year}-${String(time.month).padStart(2,'0')}-${String(time.day).padStart(2,'0')}`:null;
 const colors={5:'#e6bd7f',20:'#aca6ff',60:'#79c9e4'};
-export default function LightweightCandles({rows,kind,visible,active,onPick,onKeyDown,label,describedBy,viewportRequest,onViewportChange}){
- const host=useRef(),api=useRef(),callback=useRef(onPick),viewport=useRef(null),rangeCallback=useRef(onViewportChange);
- callback.current=onPick;rangeCallback.current=onViewportChange;
+export default function LightweightCandles({rows,kind,visible,active,onPick,onKeyDown,label,describedBy,viewportRequest,onViewportChange,livePrice}){
+ const host=useRef(),api=useRef(),callback=useRef(onPick),viewport=useRef(null),rangeCallback=useRef(onViewportChange),live=useRef(livePrice);
+ callback.current=onPick;rangeCallback.current=onViewportChange;live.current=livePrice;
  useEffect(()=>{
   const chart=createChart(host.current,{autoSize:true,localization:{locale:'zh-TW'},layout:{background:{color:'#0d1722'},textColor:'#a8bacc',attributionLogo:true},grid:{vertLines:{color:'#202e3b'},horzLines:{color:'#283743'}},crosshair:{mode:CrosshairMode.Normal,vertLine:{style:LineStyle.Dashed,color:'#c1d7e4'},horzLine:{style:LineStyle.Dashed,color:'#c1d7e4'}},timeScale:{borderColor:'#334155',fixLeftEdge:true,fixRightEdge:true,minBarSpacing:.05,lockVisibleTimeRangeOnResize:true,rightBarStaysOnScroll:true},rightPriceScale:{borderColor:'#334155'},handleScroll:{mouseWheel:false,pressedMouseMove:false,horzTouchDrag:false,vertTouchDrag:false},handleScale:{axisPressedMouseMove:true,mouseWheel:true,pinch:true},trackingMode:{exitMode:0}});
-  const candles=chart.addSeries(CandlestickSeries,{upColor:'#ff8c99',downColor:'#7ad7a6',wickUpColor:'#ff8c99',wickDownColor:'#7ad7a6',borderVisible:false});
+  const candles=chart.addSeries(CandlestickSeries,{upColor:'#ff8c99',downColor:'#7ad7a6',wickUpColor:'#ff8c99',wickDownColor:'#7ad7a6',borderVisible:false,autoscaleInfoProvider:original=>{const range=original(),price=live.current?.price;return range&&Number.isFinite(price)?{...range,priceRange:{minValue:Math.min(range.priceRange.minValue,price),maxValue:Math.max(range.priceRange.maxValue,price)}}:range;}});
   candles.priceScale().applyOptions({scaleMargins:{top:.07,bottom:.28}});
   candles.setData(rows.map(r=>({time:r.date,open:r.open,high:r.high,low:r.low,close:r.close,...r.unfinished?{color:'#b99369',wickColor:'#e6bd7f',borderColor:'#e6bd7f'}:{}})));
   const volume=chart.addSeries(HistogramSeries,{priceFormat:{type:'volume'},priceScaleId:'volume',lastValueVisible:false,priceLineVisible:false});
@@ -33,6 +33,7 @@ export default function LightweightCandles({rows,kind,visible,active,onPick,onKe
   return()=>{api.current=null;element.removeEventListener('pointerdown',move);element.removeEventListener('pointermove',move);timeScale.unsubscribeVisibleLogicalRangeChange(rangeChanged);chart.unsubscribeCrosshairMove(pick);chart.remove();};
  },[rows,kind,visible]);
  useEffect(()=>{if(api.current&&viewportRequest){const range=latestCandleRange(rows.length,viewportRequest.count);if(range)api.current.chart.timeScale().setVisibleLogicalRange(range);}},[viewportRequest]);
+ useEffect(()=>{if(!api.current||!livePrice)return;const series=api.current.candles,line=series.createPriceLine({price:livePrice.price,color:'#9ee3c5',lineWidth:1,lineStyle:LineStyle.Dashed,axisLabelVisible:true,title:'最新成交'});return()=>{try{series.removePriceLine(line);}catch{}};},[livePrice,rows,kind,visible]);
  useEffect(()=>{if(active&&api.current)api.current.chart.setCrosshairPosition(active.close,active.date,api.current.candles);},[active,rows,kind,visible]);
  return <div ref={host} className="lightweight-chart" role="img" tabIndex={0} aria-label={label} aria-describedby={describedBy} onKeyDown={onKeyDown}/>;
 }

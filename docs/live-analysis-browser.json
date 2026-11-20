@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-11-20T03:51:07.079Z",
+  "syntheticIdentityAndQuotes": true,
+  "realKeyTested": false,
+  "unstarred2330UsesPrivatePrice": true,
+  "actualTradeNotTrialPrice": true,
+  "currentPERecalculation": {
+    "price": 2250,
+    "eps": 98.26,
+    "displayedPE": 22.9,
+    "calculatedPE": 22.89843272949318
+  },
+  "forwardPERecalculation": {
+    "price": 2250,
+    "forecastEPS": 148.64,
+    "displayedPE": 15.14,
+    "calculatedPE": 15.137244348762112
+  },
+  "kSwitchAndWheelZoomPreserved": true,
+  "pollingUpdatesPriceAndValuation": true,
+  "hiddenTabPausesPolling": true,
+  "otc6488UsesPrivatePrice": true,
+  "etfUsesNavAndNoCompanyPE": true,
+  "usGapExplicitNoFakeQuotes": true,
+  "sizes": [
+    {
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 820,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "quotaFailureClearsPrivatePriceAndStopsPolling": true,
+  "expiredSessionClearsPrivatePrice": true,
+  "errors": []
+}

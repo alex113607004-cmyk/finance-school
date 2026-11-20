@@ -1,0 +1,7 @@
+{
+  "runtime": "Wrangler workerd SQLite Durable Objects",
+  "syntheticDataOnly": true,
+  "concurrentAdds": true,
+  "idempotentRetryAfterRemoval": true,
+  "revision": 3
+}

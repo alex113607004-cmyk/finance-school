@@ -1,3 +1,5 @@
+import {useLiveQuote} from '../use-live-quote';
+import LiveQuoteStatus from './LiveQuoteStatus';
 import {WatchButton} from './WatchlistContext';
 import React,{useEffect,useMemo,useState} from 'react';
 import ForwardPE from './ForwardPE';
@@ -90,17 +92,21 @@ export default function TaiwanStockAnalysis({term,param}){
  function submit(e){e.preventDefault();if(focused&&query&&activeOption>0&&suggestions[activeOption]){choose(suggestions[activeOption]);return;}const found=resolveStock(universe.stocks,query);if(found){choose(found);return;}if(!query.trim()){setSearchError('請輸入股票代號或名稱。');return;}if(suggestions.length){setFocused(true);setSearchError('找到多個相關標的，請從搜尋結果選擇。');return;}setCode(query.trim());setLoaded(null);setFocused(false);setSearchError('');window.location.hash=analysisHref('TW',query.trim());}
  const currentLoad=loaded?.code===code?loaded:null,entry=Object.hasOwn(curated.stocks,code)?curated.stocks[code]:null,history=useMemo(()=>mergeHistory(entry?.history,currentLoad?.history)||emptyHistory(code,selected?.market),[entry,currentLoad,code,selected?.market]);
  const baseStock=selected||null,stock=baseStock?quoteFromHistory(baseStock,history):null;
+ const nativeCurrency=/^\d{5}[CK]$/.test(code)?'未核實':'TWD';
+ const live=useLiveQuote({region:'TW',symbol:code,market:selected?.market,currency:nativeCurrency,enabled:!!selected},refresh);
  const knownQuote=entry?.quote;
- const quote=stock&&knownQuote&&(knownQuote.date>stock.quote?.date||knownQuote.date===stock.quote?.date&&knownQuote.checkedAt>(stock.sourceChecks?.quotes||''))?knownQuote:stock?.quote;
- const effectiveStock=knownQuote&&quote===knownQuote?{...stock,quote,sources:{...stock?.sources,quotes:knownQuote.source},sourceChecks:{...stock?.sourceChecks,quotes:knownQuote.checkedAt}}:stock;
+ const fallbackQuote=stock&&knownQuote&&(knownQuote.date>stock.quote?.date||knownQuote.date===stock.quote?.date&&knownQuote.checkedAt>(stock.sourceChecks?.quotes||''))?knownQuote:stock?.quote;
+ const privateQuote=live.quote&&(!fallbackQuote?.date||live.quote.date>=fallbackQuote.date)?live.quote:null,quote=privateQuote||fallbackQuote;
+ const archivedStock=knownQuote&&fallbackQuote===knownQuote?{...stock,quote:fallbackQuote,sources:{...stock?.sources,quotes:knownQuote.source},sourceChecks:{...stock?.sourceChecks,quotes:knownQuote.checkedAt}}:stock;
+ const effectiveStock=privateQuote?{...archivedStock,quote,currency:quote.currency,sources:{...archivedStock?.sources,quotes:quote.source},sourceChecks:{...archivedStock?.sourceChecks,quotes:quote.checkedAt}}:archivedStock;
  const filings=entry?.filings||{reports:[],warnings:[],basisConfirmed:false,checkedAt:null},value=historicalValuation({quote,history,filings,expectedPeriod:stock?.fundamentals?.earnings?.period});
  const researchSnapshot=code==='2330'?researchSnapshotTW(extra2330,value.ttm):undefined;
  const fund=['etf','etn','reit'].includes(selected?.securityKind),busy=checking||publication.busy;
- const currency=/^\d{5}[CK]$/.test(code)?'未核實':'TWD';
+ const currency=privateQuote?.currency||nativeCurrency;
  const {nav,warning:navWarning}=useETFNav('TW',code,quote,selected?.securityKind==='etf',refresh);
  const warnings=[...publication.warnings,...(selected?.warnings||[]),...(entry?.warnings||[]),...(filings.warnings||[]),currentLoad?.error,history.reason].filter(Boolean);
  const readiness=selected?dataReadiness({stock:fund?{...effectiveStock,nav,currency}:effectiveStock,history,valuation:value,filings,snapshot:researchSnapshot,coverage:universe.financialCoverage,busy,refreshWarnings:warnings}):null;
- const priceUnit=/^\d{5}[CK]$/.test(code)?'原交易幣別／受益權單位（幣別待核實）':'新台幣元／'+(fund?'受益權單位':'股');
+ const priceUnit=privateQuote?`${currency}／${fund?'受益權單位':'股'}`:/^\d{5}[CK]$/.test(code)?'原交易幣別／受益權單位（幣別待核實）':'新台幣元／'+(fund?'受益權單位':'股');
  return <div className="stock-analysis-page">
   <div className="page-title compact-title"><h1>台股個股研究</h1><p>上市・上櫃・興櫃，共 {Object.values(counts).reduce((a,b)=>a+b,0).toLocaleString()} 檔標的</p></div>
   <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="analysis-search">搜尋個股代號或名稱</label><input id="analysis-search" role="combobox" aria-autocomplete="list" aria-expanded={focused&&!!query&&!!suggestions.length} aria-controls="stock-search-results" aria-activedescendant={focused&&suggestions[activeOption]?'stock-option-'+suggestions[activeOption].code:undefined} autoComplete="off" onBlur={e=>{if(!e.currentTarget.parentElement.parentElement.contains(e.relatedTarget))setFocused(false);}} value={query} onFocus={()=>setFocused(true)} onChange={e=>{setQuery(e.target.value);setActiveOption(0);setFocused(true);}} onKeyDown={e=>{if(e.key==='Escape')setFocused(false);if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();setFocused(true);setActiveOption(i=>Math.max(0,Math.min(suggestions.length-1,i+(e.key==='ArrowDown'?1:-1))));}}} placeholder="搜尋代號或名稱，例如 2330"/><button className="primary">分析個股</button></form>
@@ -112,30 +118,31 @@ export default function TaiwanStockAnalysis({term,param}){
   <SectionNav fund={fund}/>
   <DataReadinessSummary report={readiness} detailsId={readinessId('TW',code)}/>
   <div className="stock-overview">
-  <section className="panel analysis-quote" aria-label="個股盤後行情">
+  <section className="panel analysis-quote" aria-label={privateQuote?'個股私人行情':'個股盤後行情'}>
    <div className="quote-layout">
     <div className="quote-heading">
      <h2>{selected.name} <span className="quote-symbol">{selected.code}</span></h2>
      <p className="quote-company">{selected.company?.fullName}</p>
-     <p className="quote-market">{selected.market} · {MARKET_NAMES[selected.market]} · {KIND_NAMES[selected.securityKind]||'股票'} · {selected.market==='ESB'?'成交快照':'盤後'}</p>
+     <p className="quote-market">{selected.market} · {MARKET_NAMES[selected.market]} · {KIND_NAMES[selected.securityKind]||'股票'} · {privateQuote?quote.status==='aftermarket'?'盤後成交快照':'盤中成交快照':selected.market==='ESB'?'成交快照':'盤後'}</p>
     </div>
     <div className="quote-actions"><button className="secondary refresh-quote" disabled={busy} onClick={()=>setRefresh(r=>r+1)}><RefreshCw size={14} className={busy?'is-spinning':''}/>{busy?progress?`載入日線 ${progress.finished}/${progress.total}`:'查詢中…':'重新查詢'}</button><WatchButton region="TW" code={selected.code} name={selected.name}/></div>
-    <div className="analysis-price"><strong>{format(quote?.close)}</strong><span>{priceUnit}</span>{Number.isFinite(quote?.change)&&<b className={quote.change>0?'gain':quote.change<0?'loss':''}>{quote.change>0?'+':''}{format(quote.change)}（{quote.changePercent>0?'+':''}{format(quote.changePercent)}%）</b>}</div>
+    <div className="analysis-price"><strong data-testid="current-stock-price">{format(quote?.close)}</strong><span>{priceUnit}</span>{Number.isFinite(quote?.change)&&<b className={quote.change>0?'gain':quote.change<0?'loss':''}>{quote.change>0?'+':''}{format(quote.change)}（{quote.changePercent>0?'+':''}{format(quote.changePercent)}%）</b>}</div>
     <div className="quote-meta">
      <p>{selected.market==='ESB'?'成交日期':'交易日'} <b>{quote?.date||'尚未取得'}</b><br/>{quote?.time&&quote.time.replace(/(\d{2})(\d{2})(\d{2})/,'$1:$2:$3')} {freshness(quote?.date).label}</p>
-     <p>成交量 <b>{format(quote?.volume,0)}</b> {fund?'受益權單位':'股'}<br/><Link href={effectiveStock?.sources?.quotes}>{selected.market==='TWSE'?'臺灣證券交易所':'證券櫃檯買賣中心'}</Link></p>
+     <p>成交量 <b>{format(quote?.volume,0)}</b> {fund?'受益權單位':'股'}<br/><Link href={effectiveStock?.sources?.quotes}>{privateQuote?'Fugle':selected.market==='TWSE'?'臺灣證券交易所':'證券櫃檯買賣中心'}</Link></p>
     </div>
    </div>
+   <LiveQuoteStatus live={{...live,quote:privateQuote,error:live.quote&&!privateQuote?'私人來源日期較舊，保留較新的原盤後資料。':live.error}} fallback={fallbackQuote}/>
    {!Number.isFinite(quote?.close)&&<p role="status" className="notice">尚無有效成交價，可能暫停交易、今日無成交或來源尚未更新。</p>}
    {!fund&&<QuickFacts term={term} items={[
     {label:'EPS',value:format(value.ttm?.available?value.ttm.eps:effectiveStock.fundamentals?.earnings?.epsYtd),unit:'元／股',note:value.ttm?.available?'近四季稀釋 EPS':`${effectiveStock.fundamentals?.earnings?.period?.label||'期間待確認'} · 累計基本 EPS`},
-    {label:'本益比',value:format(readiness.pe?.value??effectiveStock.valuation?.pe),unit:'倍',note:readiness.pe?`本頁重算 · ${readiness.pe.date}`:`官方倍數${readiness.mismatches.length?'（不同日）':''} · ${effectiveStock.valuation?.date||'尚未提供'}`},
+    {label:'本益比',value:format(value.available?value.pe:readiness.pe?.value??effectiveStock.valuation?.pe),unit:'倍',note:value.available?`最新成交 ÷ 近四季 EPS · ${quote?.date}`:readiness.pe?`本頁重算 · ${readiness.pe.date}`:`官方倍數${readiness.mismatches.length?'（不同日）':''} · ${effectiveStock.valuation?.date||'尚未提供'}`},
     {label:'營業利益率',value:format(effectiveStock.fundamentals?.kind==='financial'?null:effectiveStock.profit?.operating),unit:'%',note:effectiveStock.fundamentals?.kind==='financial'?'金融業不套一般業比率':effectiveStock.profit?.period||'期間待確認'},
     {label:'YoY',value:format(effectiveStock.fundamentals?.revenue?.yoy),unit:'%',note:`單月營收年增 · ${effectiveStock.fundamentals?.revenue?.month||'月份待確認'}`},
    ]}/>}
    {warnings.length>0&&<details className="quote-update-note"><summary>有 {new Set(warnings).size} 項資料待確認，查看詳情</summary><p className="notice" role="status">{[...new Set(warnings)].join('；')}{filings.warnings?.some(w=>w.startsWith('公司公告更新失敗'))&&value.available?'；沿用已核實首次公告快照及原查核時間，下一季結束仍未核實時停止估值。':''}</p></details>}
   </section>
-  <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><h2>價格走勢</h2><span className="chart-basis-tag">盤後 · 未還原價格</span></div>{history.rows.length?<AnalysisChart key={code} history={{...history,currencyLabel:priceUnit,volumeUnit:fund?'受益權單位':'股'}} asOf={taipeiDay()} term={term}/>:<div className="chart-empty" role="status"><Info size={28}/><h3>{checking?'正在載入官方日線':'日線資料暫不可用'}</h3><p>{history.reason||currentLoad?.error||'此標的尚無可核實的日線資料。'}</p></div>}</section>
+  <section id="stock-chart" tabIndex={-1} className="panel analysis-section chart-panel"><div className="section-title"><h2>價格走勢</h2><span className="chart-basis-tag">{privateQuote?'盤後 K 線 · 現價虛線':'盤後 · 未還原價格'}</span></div>{history.rows.length?<AnalysisChart key={code} history={{...history,currencyLabel:priceUnit,volumeUnit:fund?'受益權單位':'股'}} asOf={taipeiDay()} term={term} livePrice={privateQuote}/>:<div className="chart-empty" role="status"><Info size={28}/><h3>{checking?'正在載入官方日線':'日線資料暫不可用'}</h3><p>{history.reason||currentLoad?.error||'此標的尚無可核實的日線資料。'}</p></div>}</section>
   </div>
   <div id="stock-assessment" tabIndex={-1}><PriceResearchSummary stock={{...effectiveStock,quote,currency,nav}} history={history} valuation={value} snapshot={researchSnapshot} region="TW" busy={busy} term={term}/></div>
   {!fund&&<ForwardPE key={'TW:'+code} stock={{...effectiveStock,quote,currency}} region="TW" term={term}/>}
