@@ -48,7 +48,7 @@ npx wrangler@4.165.0 deploy --config wrangler.intraday.jsonc
 
 用 Safari 或 Chrome 開啟私人網址，輸入允許的 Email，從信箱取得一次性驗證碼並填入 Cloudflare 登入頁。登入後在自選股側欄加入台股，查看分鐘走勢與開盤價虛線。Email PIN 每次只能用一次，官方期限為 10 分鐘；未被政策允許的信箱不會收到 PIN，畫面可能仍顯示一般提示。
 
-登入有效期依 Access application 的 session 設定。過期時，重新驗證後即可繼續，不需記另一組網站密碼。「登出」使用 `/cdn-cgi/access/logout`，會撤銷 Cloudflare Access 登入工作階段。
+同一瀏覽器可保留登入，建議期限 7 天，詳見 [快速登入設定與評估](DEVICE-LOGIN.md)。登入有效期依 Access application／policy 的 session 設定。過期時，重新驗證後即可繼續，不需記另一組網站密碼。「登出」使用 `/cdn-cgi/access/logout`，會撤銷 Cloudflare Access 登入工作階段。
 
 私人雲端版已新增 [跨裝置自選股同步及個股頁行情](CLOUD-SYNC-LIVE-QUOTES.md)，同一 Email 登入私人網址後，首次合併此網址既有收藏，並同步加入／移除。公開 Pages 與 Windows 本機版仍各自儲存。手機可加入主畫面作為捷徑；尚無離線行情或背景更新承諾。
 

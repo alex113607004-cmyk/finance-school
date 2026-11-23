@@ -1,0 +1,58 @@
+{
+  "testedAt": "2026-11-23T03:16:40.236Z",
+  "mode": "local production build under /finance-school/; external providers blocked to verify saved official data",
+  "screens": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "overviewRows": 30,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 820,
+      "height": 1180,
+      "overviewRows": 30,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "overviewRows": 30,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "overviewRows": 30,
+      "overflow": false,
+      "errors": []
+    }
+  ],
+  "checks": [
+    "Sidebar: browse industry without query, load 8→16, add to saved list",
+    "TW industry rankings + same-day statistics; finder lists 12→24; exact-symbol scope enforced; SEC SIC route AAPL→MSFT; no page errors or horizontal overflow at desktop, iPad, mobile and narrow mobile widths"
+  ],
+  "touchSidebar": [
+    {
+      "width": 820,
+      "industryBrowse": true,
+      "stockNavigation": true,
+      "drawerClosed": true
+    },
+    {
+      "width": 390,
+      "industryBrowse": true,
+      "stockNavigation": true,
+      "drawerClosed": true
+    },
+    {
+      "width": 320,
+      "industryBrowse": true,
+      "stockNavigation": true,
+      "drawerClosed": true
+    }
+  ]
+}

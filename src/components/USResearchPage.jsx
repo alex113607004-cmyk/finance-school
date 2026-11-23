@@ -1,3 +1,5 @@
+import IndustrySelect from './IndustrySelect';
+import {industryInfo,matchesIndustry} from '../industries';
 import {useLiveQuote} from '../use-live-quote';
 import LiveQuoteStatus from './LiveQuoteStatus';
 import {WatchButton} from './WatchlistContext';
@@ -33,18 +35,19 @@ export function USValuation({stock,value}){
  </section>;
 }
 export default function USStockAnalysis({param='AAPL',term=t=>t}){
- const [publication,setPublication]=useState(fallback),[query,setQuery]=useState(''),[code,setCode]=useState(param.toUpperCase()),[error,setError]=useState(''),[warning,setWarning]=useState(''),[busy,setBusy]=useState(true),[refresh,setRefresh]=useState(0);
+ const [publication,setPublication]=useState(fallback),[query,setQuery]=useState(''),[industry,setIndustry]=useState('all'),[code,setCode]=useState(param.toUpperCase()),[error,setError]=useState(''),[warning,setWarning]=useState(''),[busy,setBusy]=useState(true),[refresh,setRefresh]=useState(0);
  useEffect(()=>{setCode(param.toUpperCase());setQuery('');setError('');},[param]);
  useEffect(()=>{let active=true;setBusy(true);loadUSPublication().then(p=>{if(active){setPublication(p);setWarning('');}}).catch(e=>{if(active)setWarning(e.message+'；保留最後已核實快照與原始查核日期。');}).finally(()=>{if(active)setBusy(false);});return()=>{active=false;};},[refresh]);
- const stock=publication.stocks['US:'+code],suggestions=searchUS(publication.stocks,query),value=useMemo(()=>stock?analyzeUSValuation(stock):null,[stock]);
+ const industryEntries=useMemo(()=>Object.values(publication.stocks).map(stock=>({stock,region:'US'})),[publication.stocks]);
+ const stock=publication.stocks['US:'+code],suggestions=searchUS(publication.stocks,query,{industry}),value=useMemo(()=>stock?analyzeUSValuation(stock):null,[stock]);
  function choose(s){setCode(s.code);setQuery('');setError('');window.location.hash=analysisHref('US',s.code);}
  function submit(e){e.preventDefault();if(suggestions.length===1){choose(suggestions[0]);return;}const match=suggestions.find(s=>s.code.toUpperCase()===query.trim().toUpperCase());if(match){choose(match);return;}setError(query.trim()?'此代號或公司名稱尚未涵蓋，請選擇 AAPL、MSFT 或 SPY。':'請輸入美股代號或公司名稱。');}
  const live=useLiveQuote({region:'US',symbol:code,currency:'USD',enabled:!!stock},refresh);
  const q=stock?.quote,status=quoteStatus(q),fund=stock?.securityKind==='etf';
  const readiness=stock?dataReadiness({stock,history:stock.history,valuation:value,snapshot:stock.snapshot,region:'US',policy:publication.policy,busy,refreshWarnings:[warning,...(stock.warnings||[])]}):null;
  return <div className="stock-analysis-page"><div className="page-title compact-title"><h1>美股個股研究</h1><p>Apple・Microsoft・SPY</p></div>
-  <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="us-analysis-search">搜尋美股代號或公司名稱</label><input id="us-analysis-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="AAPL、Apple、蘋果、MSFT、微軟" autoComplete="off"/><button className="primary">分析美股</button></form>{query&&suggestions.length>0&&<ul className="analysis-suggestions" aria-label="美股搜尋結果">{suggestions.map(s=><li key={s.id}><button onClick={()=>choose(s)}><b>{s.code}</b><span>{s.nameZh}<small>{s.name}</small></span><em>{s.market}</em></button></li>)}</ul>}</div>
-  <div className="analysis-recent">{Object.values(publication.stocks).map(s=><button key={s.id} className={'secondary '+(s.code===code?'selected':'')} onClick={()=>choose(s)}>{s.nameZh} <small>{s.code}</small></button>)}</div>{error&&<p role="alert" className="error-message">{error}</p>}{warning&&<p className="notice" role="status">{warning}</p>}
+  <div className="analysis-stock-finder"><form className="market-search" onSubmit={submit}><Search size={18}/><label className="sr-only" htmlFor="us-analysis-search">搜尋美股代號或公司名稱</label><input id="us-analysis-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="AAPL、Apple、蘋果、MSFT、微軟" autoComplete="off"/><button className="primary">分析美股</button></form>{query&&suggestions.length>0&&<ul className="analysis-suggestions" aria-label="美股搜尋結果">{suggestions.map(s=><li key={s.id}><button onClick={()=>choose(s)}><b>{s.code}</b><span>{s.nameZh}<small>{s.name}</small></span><em>{industryInfo(s,'US').label}</em></button></li>)}</ul>}</div>
+  <div className="analysis-search-controls"><IndustrySelect label="美股產業篩選" entries={industryEntries} value={industry} onChange={setIndustry}/><div className="analysis-recent">{Object.values(publication.stocks).filter(s=>matchesIndustry(s,industry,'US')).map(s=><button key={s.id} className={'secondary '+(s.code===code?'selected':'')} onClick={()=>choose(s)}>{s.nameZh} <small>{s.code}</small></button>)}</div></div>{industry!=='all'&&<p className="industry-note">依 SEC SIC 分類；{suggestions.length} 檔符合目前範圍。</p>}{error&&<p role="alert" className="error-message">{error}</p>}{warning&&<p className="notice" role="status">{warning}</p>}
   {!stock?<section className="panel empty-state"><h2>美股資料尚未涵蓋</h2><p>{code} 尚無經核實的財報與行情，請選擇搜尋結果。</p></section>:<>
    <SectionNav fund={fund}/>
    <DataReadinessSummary report={readiness} detailsId={readinessId('US',stock.code)}/>

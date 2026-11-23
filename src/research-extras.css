@@ -26,3 +26,19 @@
 .local-quotes form{margin-top:10px}.local-quotes button+button{background:#203f34;color:#b4d9c4;border:1px solid #426256}
 .cloud-session-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}.cloud-session-links a{font-size:10px;color:#a8dbc0;text-decoration:underline}.cloud-session-links button{width:auto;font-size:10px;margin:0;padding:6px 8px}
 .live-quote-status{margin:16px 0;padding:12px 14px;border:1px solid #365a50;border-radius:10px;background:#132a25;font-size:.76rem;color:#abc8bf;overflow-wrap:anywhere}.live-quote-status>div{display:flex;align-items:center;justify-content:space-between;gap:10px}.live-quote-status b{color:#b7ecd4}.live-quote-status p{margin:7px 0;line-height:1.65}.live-quote-status a{color:#a1e4c6}.live-quote-status button{white-space:nowrap;font-size:.72rem}.chart-live-price{font-size:.78rem;color:#a1e4c6;line-height:1.6;margin:8px 0}.cloud-sync-button{margin:0 0 16px;font-size:.72rem}
+
+/* Official industry discovery, shared across desktop and touch layouts. */
+.industry-select{display:flex;align-items:center;gap:8px;min-width:0;color:#9eb8c7;font-size:12px}
+.industry-select select{min-width:0;max-width:100%;border:1px solid #354e5e;border-radius:6px;background:#101e2a;color:#c8ded6;padding:9px 10px;font:inherit;min-height:40px}
+.analysis-search-controls{flex-wrap:wrap}.analysis-search-controls>.industry-select select{max-width:300px}
+.ov-control-right{flex-wrap:wrap}.ov-control-right .industry-select select{max-width:260px}
+.analysis-industry-browse{margin:0 0 22px;border:1px solid #304c48;border-radius:10px;padding:16px;background:#12222c}
+.analysis-app .analysis-industry-browse>p,.industry-note{font-size:12px;color:#9cbdb0;margin-bottom:12px}
+.analysis-industry-results{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;padding:0}
+.analysis-industry-results a{display:flex;flex-wrap:wrap;gap:7px;padding:12px;background:#162d33;border:1px solid #304c48;border-radius:6px;font-size:13px}
+.analysis-industry-results a:hover{background:#234638}.analysis-industry-results a b{color:#a3d7bd}.analysis-industry-results a small{flex-basis:100%;font-size:11px;color:#90acb8}
+.industry-more{font-size:12px;margin-top:12px;padding:9px 12px;min-height:40px}
+.wl-discovery>.industry-select{margin-top:12px;flex-wrap:wrap}.wl-discovery>.industry-select select{flex:1;max-width:100%;width:100%}
+.watchlist-sidebar .industry-select{display:block;font-size:11px}.watchlist-sidebar .industry-select span{display:block;margin-bottom:6px}.watchlist-sidebar .industry-select select{width:100%;font-size:11px}
+@media(max-width:760px){.ov-control-right{gap:12px}.ov-control-right .industry-select{flex:1 1 100%;flex-wrap:wrap;order:2}.ov-control-right .industry-select select{flex:1;max-width:100%}.analysis-search-controls>.industry-select{flex:1 1 100%}.analysis-search-controls>.industry-select select{flex:1;max-width:100%;width:150px}.analysis-industry-results{grid-template-columns:1fr}.industry-select select{min-height:44px}.industry-more{min-height:44px}}
+.cloud-login-help{margin:10px 0;font-size:11px;color:#a9c8ba}.cloud-login-help summary{cursor:pointer}.cloud-login-help a{display:inline-block;margin-top:6px;color:#9ed4b7;text-decoration:underline}

@@ -1,4 +1,5 @@
 import {numeric,isoDate,reportPeriod,stockData} from '../worker/runtime.mjs';
+import {matchesIndustry} from './industries.js';
 export const MARKET_NAMES={TWSE:'上市',TPEX:'上櫃',ESB:'興櫃'};
 export const KIND_NAMES={stock:'普通股',preferred:'特別股',etf:'ETF',etn:'ETN',reit:'不動產受益證券',tdr:'存託憑證'};
 export const TPEX_API='https://www.tpex.org.tw/openapi/v1/';
@@ -64,9 +65,9 @@ export function addPeerContext(stocks){
  return stocks;
 }
 const text=v=>String(v||'').normalize('NFKC').replace(/臺/g,'台').replace(/\s+/g,'').toLocaleLowerCase();
-export function searchStocks(stocks,query,{market='all',limit=15}={}){
+export function searchStocks(stocks,query,{market='all',industry='all',limit=15}={}){
  const q=text(query).replace(/^(twse|tpex|esb):/,'');
- return Object.values(stocks).filter(s=>(market==='all'||s.market===market)&&(!q||[s.code,s.name,s.company?.fullName,s.company?.english].some(v=>text(v).includes(q)))).sort((a,b)=>{
+ return Object.values(stocks).filter(s=>(market==='all'||s.market===market)&&matchesIndustry(s,industry,'TW')&&(!q||[s.code,s.name,s.company?.fullName,s.company?.english].some(v=>text(v).includes(q)))).sort((a,b)=>{
   const score=s=>text(s.code)===q?0:text(s.name)===q?1:text(s.code).startsWith(q)?2:text(s.name).startsWith(q)?3:4;
   return score(a)-score(b)||a.code.localeCompare(b.code);
  }).slice(0,limit);

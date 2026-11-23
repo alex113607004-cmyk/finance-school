@@ -1,4 +1,5 @@
 import {numeric,isoDate} from '../worker/runtime.mjs';
+import {industryInfo,matchesIndustry} from './industries.js';
 export const OVERVIEW_MARKETS={TWSE:'上市',TPEX:'上櫃'};
 export const OVERVIEW_CATEGORIES=[['hot','成交熱門'],['gainers','漲幅排行'],['losers','跌幅排行'],['limitUp','漲停板'],['limitDown','跌停板']];
 const text=v=>String(v??'').replace(/<[^>]*>/g,'').replace(/\s/g,'');
@@ -18,7 +19,7 @@ export function parseOverviewQuotes(body,market,universe,{source,checkedAt}){
    const previous=change!==null?price-change:null;
    const nameColumn=at(['證券名稱','名稱']);
    const open=numeric(r[at(['開盤價','開盤'])]),high=numeric(r[at(['最高價','最高'])]),low=numeric(r[at(['最低價','最低'])]),validRange=[open,high,low].every(n=>n>0)&&high>=Math.max(open,price)&&low<=Math.min(open,price);
-   out.push({id:`TW:${market}:${code}`,code,name:nameColumn>=0?String(r[nameColumn]).trim():registered.name,market,type:registered.securityKind,date,close:price,open:validRange?open:null,high:validRange?high:null,low:validRange?low:null,change,changePercent:previous>0?change/previous*100:null,volume:v*(f[volume]==='成交股數'?1:1000),turnover,source,checkedAt,limit:{status:'unavailable',reason:'尚無同日官方停板價。'}});
+   out.push({id:`TW:${market}:${code}`,code,name:nameColumn>=0?String(r[nameColumn]).trim():registered.name,market,type:registered.securityKind,industry:industryInfo(registered,'TW'),date,close:price,open:validRange?open:null,high:validRange?high:null,low:validRange?low:null,change,changePercent:previous>0?change/previous*100:null,volume:v*(f[volume]==='成交股數'?1:1000),turnover,source,checkedAt,limit:{status:'unavailable',reason:'尚無同日官方停板價。'}});
   }
  }
  if(!out.length)throw Error('官方行情表格無可辨認且有效的股票／ETF成交資料');
@@ -51,10 +52,16 @@ export function attachOverviewLimits(stocks,limits){
   return {...s,limit:{...b,status:equal(b.upper)?'up':equal(b.lower)?'down':'none'}};
  });
 }
-export function overviewScope(snapshot,{market='all',type='stock'}={}){
+export function withOverviewIndustries(snapshot,catalog){
+ return {...snapshot,stocks:(snapshot.stocks||[]).map(s=>{
+  const registered=catalog?.[s.code];
+  return {...s,industry:s.industry||(registered?.market===s.market?industryInfo(registered,'TW'):undefined)};
+ })};
+}
+export function overviewScope(snapshot,{market='all',type='stock',industry='all'}={}){
  const available=(snapshot?.stocks||[]).filter(s=>OVERVIEW_MARKETS[s.market]&&(market==='all'||s.market===market)&&(type==='all'||s.type===type)&&s.close>0&&Number.isFinite(s.volume)&&s.volume>0);
  const date=available.map(s=>s.date).sort().at(-1)||null;
- const stocks=available.filter(s=>s.date===date),known=stocks.filter(s=>Number.isFinite(s.changePercent)),count=status=>stocks.filter(s=>s.limit?.status===status).length;
+ const dated=available.filter(s=>s.date===date),stocks=dated.filter(s=>matchesIndustry(s,industry,'TW')),known=stocks.filter(s=>Number.isFinite(s.changePercent)),count=status=>stocks.filter(s=>s.limit?.status===status).length;
  const missingMarkets=Object.keys(OVERVIEW_MARKETS).filter(m=>(market==='all'||m===market)&&snapshot?.markets?.[m]?.date!==date);
  return {date,stocks,missingMarkets,stats:{total:stocks.length,up:known.filter(s=>s.changePercent>0).length,down:known.filter(s=>s.changePercent<0).length,flat:known.filter(s=>s.changePercent===0).length,unknownChange:stocks.length-known.length,limitUp:count('up'),limitDown:count('down'),limitUnknown:count('unavailable'),unrestricted:count('unrestricted'),turnover:stocks.reduce((sum,s)=>sum+s.turnover,0)}};
 }
