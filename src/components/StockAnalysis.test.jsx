@@ -6,7 +6,7 @@ import StockAnalysis from './StockAnalysis';
 import analysis from '../generated/analysis.json';
 import {format} from '../domain';
 const term=t=><button>{t}</button>;
-afterEach(()=>vi.unstubAllGlobals());
+afterEach(()=>{vi.unstubAllGlobals();vi.useRealTimers();});
 const setup=()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json(analysis)));return render(<StockAnalysis term={term}/>)};
 describe('stock analysis workflow',()=>{
  it('loads a real stock, labels sources and accounting basis, and keeps metric definitions without retired course links',async()=>{
@@ -24,6 +24,8 @@ describe('stock analysis workflow',()=>{
   expect(screen.getByRole('link',{name:/現金流表/})).toHaveAttribute('href',analysis.stocks[2330].filings.cashflow.source);
  });
  it('switches daily/weekly/monthly K, keeps volume, and toggles daily MAs',async()=>{
+  // Keep the fixture observation week open regardless of the wall-clock date.
+  vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-11-20T04:00:00Z'));
   const user=userEvent.setup();setup();await screen.findByRole('button',{name:'重新查詢'});
   const chart=screen.getByRole('img',{name:'個股日K 與均線'});expect(chart.querySelector('[data-ma="20"]')).toBeTruthy();
   await user.click(screen.getByRole('checkbox',{name:'MA20（20 日）'}));expect(chart.querySelector('[data-ma="20"]')).toBeNull();

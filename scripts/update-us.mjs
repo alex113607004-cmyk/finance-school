@@ -1,3 +1,4 @@
+import {secIndustry} from '../src/industries.js';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import {extractFacts,fiscalPeriods,financialSnapshot,plainFinancialSummary} from '../src/sec-financials.js';
@@ -47,7 +48,7 @@ for(const company of companies){
   extraEPS.push(e);
  }
  const facts=extractFacts(cf,sub),periods=fiscalPeriods(facts,sub,extraEPS),financials={facts,periods,extraEPS},snapshot=financialSnapshot(financials,asOf);
- stocks['US:'+name]={id:'US:'+name,region:'US',code:name,ticker:name,cik,name:company.name,nameZh:company.nameZh,market:company.exchange,securityKind:'stock',currency:'USD',fiscalYearEnd:sub.fiscalYearEnd,latestFiscalEnd:periods.filter(p=>p.fiscalQuarter===4).at(-1)?.end,financials,snapshot,summary:plainFinancialSummary(snapshot),sourceChecks:checks,sources:{facts:factsURL,submissions:submissionsURL},dataStatus:warnings.length?'last-verified':'verified',warnings,quote:{status:'unavailable',currency:'USD',price:null,source:null,reason:'公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。'},history:{code:name,market:company.exchange,region:'US',rows:[],sources:[],partial:false,completeMonths:[],corporateActionsVerified:false,reason:'沒有已授權的美股歷史行情，K 線、均線與價格估值暫不可用。'}};
+ stocks['US:'+name]={id:'US:'+name,region:'US',code:name,ticker:name,cik,name:company.name,nameZh:company.nameZh,market:company.exchange,securityKind:'stock',currency:'USD',industry:secIndustry(sub,{source:submissionsURL,checkedAt:checks.submissions?.checkedAt}),fiscalYearEnd:sub.fiscalYearEnd,latestFiscalEnd:periods.filter(p=>p.fiscalQuarter===4).at(-1)?.end,financials,snapshot,summary:plainFinancialSummary(snapshot),sourceChecks:checks,sources:{facts:factsURL,submissions:submissionsURL},dataStatus:warnings.length?'last-verified':'verified',warnings,quote:{status:'unavailable',currency:'USD',price:null,source:null,reason:'公開版尚無已確認展示權的美股行情來源；不轉載 yfinance／Yahoo 試用資料。'},history:{code:name,market:company.exchange,region:'US',rows:[],sources:[],partial:false,completeMonths:[],corporateActionsVerified:false,reason:'沒有已授權的美股歷史行情，K 線、均線與價格估值暫不可用。'}};
  console.log(JSON.stringify({ticker:name,period:snapshot.latest?.end,ttmEPS:snapshot.ttm?.eps,status:stocks['US:'+name].dataStatus,warnings}));
 }
 // ETF fields are explicit gaps; ETF issuer corporate earnings are never substituted.

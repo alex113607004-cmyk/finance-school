@@ -1,3 +1,4 @@
+import {industryInfo} from '../src/industries.js';
 // Shared all-market snapshots + bounded TPEx daily archives. No per-visitor CORS proxy.
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -115,5 +116,5 @@ for(const code of otcCodes){
 const snapshot={schemaVersion:1,generatedAt:now.toISOString(),stocks,counts:universeCounts(stocks),warnings,history:{TPEX:{coverageStart,coverageEnd:days[0],days:reports.filter(r=>r&&!r.closed).length,failedDates:failed}}};
 fs.writeFileSync(file,JSON.stringify(snapshot)+'\n');
 // A lightweight bundled catalog lets search + market identity work while refreshing.
-fs.writeFileSync('src/generated/universe-catalog.json',JSON.stringify({generatedAt:snapshot.generatedAt,counts:snapshot.counts,stocks:Object.fromEntries(Object.values(stocks).map(s=>[s.code,{code:s.code,name:s.name,market:s.market,securityKind:s.securityKind,company:s.company,quote:s.quote,sources:{quotes:s.sources.quotes,companies:s.sources.companies},sourceChecks:{quotes:s.sourceChecks.quotes}}]))})+'\n');
+fs.writeFileSync('src/generated/universe-catalog.json',JSON.stringify({generatedAt:snapshot.generatedAt,counts:snapshot.counts,stocks:Object.fromEntries(Object.values(stocks).map(s=>[s.code,{code:s.code,name:s.name,market:s.market,securityKind:s.securityKind,company:s.company,industry:industryInfo(s,'TW'),quote:s.quote,sources:{quotes:s.sources.quotes,companies:s.sources.companies},sourceChecks:{quotes:s.sourceChecks.quotes}}]))})+'\n');
 console.log(JSON.stringify({counts:snapshot.counts,otcHistory:snapshot.history.TPEX,warnings}));

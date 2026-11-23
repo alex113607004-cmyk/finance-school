@@ -34,3 +34,16 @@ it('keeps the original snapshot date visible when refreshing fails and exposes s
 it('restores filters, sort and page after leaving and remounting, including after fresh snapshot arrival',async()=>{
  vi.stubGlobal('fetch',vi.fn(async()=>Response.json(fixture())));const user=userEvent.setup(),first=render(<MarketOverview/>);await waitFor(()=>expect(screen.getByRole('button',{name:'重新整理'})).toBeEnabled());await user.selectOptions(screen.getByRole('combobox',{name:'熱門排序依據'}),'turnover');await user.click(screen.getByRole('button',{name:'下一頁排行'}));expect(screen.getByText('第 31～35 檔，共 35 檔')).toBeInTheDocument();first.unmount();render(<MarketOverview/>);await waitFor(()=>expect(screen.getByRole('button',{name:'重新整理'})).toBeEnabled());expect(screen.getByRole('combobox',{name:'熱門排序依據'})).toHaveValue('turnover');expect(screen.getByText('第 31～35 檔，共 35 檔')).toBeInTheDocument();
 });
+
+it('filters ranking totals and rows by industry, resets pagination and restores the choice on return',async()=>{
+ const data=fixture();data.stocks.forEach((s,i)=>s.industry={code:i%2?'24':'28',label:i%2?'半導體業':'電子零組件業'});
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json(data)));const user=userEvent.setup(),first=render(<MarketOverview/>);
+ await waitFor(()=>expect(screen.getByRole('button',{name:'重新整理'})).toBeEnabled());await user.click(screen.getByRole('button',{name:'下一頁排行'}));
+ await user.selectOptions(screen.getByRole('combobox',{name:'排行產業篩選'}),'TW:24');
+ expect(screen.getByText('第 1～20 檔，共 20 檔')).toBeInTheDocument();expect(screen.getByRole('button',{name:'下一頁排行'})).toBeDisabled();
+ expect(screen.queryByRole('link',{name:'查看 6002 模擬標的2 個股分析'})).not.toBeInTheDocument();
+ expect(screen.getByRole('link',{name:'查看 6001 模擬標的1 個股分析'})).toBeInTheDocument();
+ first.unmount();render(<MarketOverview/>);await waitFor(()=>expect(screen.getByRole('button',{name:'重新整理'})).toBeEnabled());
+ expect(screen.getByRole('combobox',{name:'排行產業篩選'})).toHaveValue('TW:24');
+ await user.selectOptions(screen.getByRole('combobox',{name:'排行標的類型'}),'etf');expect(screen.getByRole('combobox',{name:'排行產業篩選'})).toHaveValue('all');
+});
